@@ -1,0 +1,25 @@
+{
+ "colors": ["", "a", "app", "app:server", "app:db", "worker:*", "x:y:z", "socket.io:client", "express:router", "postiz", "nest:core", "日本", "😀emoji", "a much longer namespace name that goes on and on"],
+ "patterns": ["", "*", "app", "app:*", "app*,-app:db", "-app:db,app:*", "*,-*:db", "a*b*c", "app:server   worker", " , app ,", "*:*", "x:*:z", "-*"],
+ "names": ["app", "app:server", "app:db", "worker", "abc", "aXbYc", "ab", "x:y:z", "x:z", "other"],
+ "logs": [
+  {"ns": "app", "args": ["hello"]},
+  {"ns": "app", "args": ["hello %s, you are %d", "bob", 42]},
+  {"ns": "app", "args": ["obj %o", {"$": "obj", "props": [["a", 1], ["b", {"$": "arr", "items": [1, 2, 3]}]]}]},
+  {"ns": "app", "args": ["obj %O", {"$": "obj", "props": [["a", 1], ["nested", {"$": "obj", "props": [["deep", {"$": "obj", "props": [["deeper", {"$": "obj", "props": [["x", 1]]}]]}]]}]]}]},
+  {"ns": "app", "args": ["json %j", {"$": "obj", "props": [["k", "v"]]}]},
+  {"ns": "app", "args": ["100%% done"]},
+  {"ns": "app", "args": ["%x unknown %s", "kept"]},
+  {"ns": "app", "args": [{"$": "obj", "props": [["first", "is object"]]}]},
+  {"ns": "app", "args": [42]},
+  {"ns": "app", "args": [null]},
+  {"ns": "app", "args": [{"$": "err", "msg": "boom"}]},
+  {"ns": "app", "args": ["multi\nline\nmessage"]},
+  {"ns": "app", "args": ["extra args", 1, "two", {"$": "obj", "props": [["three", 3]]}]},
+  {"ns": "app", "args": ["%o then %s", "str", "next"]},
+  {"ns": "app", "args": ["missing %s"]},
+  {"ns": "app", "args": []},
+  {"ns": "worker:queue", "args": ["started %d jobs", 7]},
+  {"ns": "postiz:posts", "args": ["published %o", {"$": "arr", "items": ["x", "y"]}]}
+ ]
+}

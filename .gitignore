@@ -1,0 +1,13 @@
+# npm tarballs and extracted originals are never committed
+*.tgz
+node_modules/
+
+# Go
+*.test
+*.out
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
