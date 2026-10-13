@@ -61,7 +61,7 @@ Classification outcomes:
 
 ---
 
-## Phase 2: A new, separate native-Go library
+## Phase 2: Recast, a new, separate native-Go library
 
 Phase 2 is **not** an edit of the Phase 1 translations. It is a new library, invented fresh, in its own
 folder and Go module, separate from this one:
@@ -69,7 +69,7 @@ folder and Go module, separate from this one:
 ```text
 NPM Project/
 ├── golang invention/      Phase 1: faithful translations (this module, `npmgo`)
-└── <new library folder>/  Phase 2: new native-Go library (its own go.mod, repo and versioning)
+└── recast/                Phase 2: Recast, the new native-Go library (own go.mod, repo: gav4you/recast)
 ```
 
 - **Phase 1 stays frozen as the reference.** The Phase 1 ports and their parity suites become the
