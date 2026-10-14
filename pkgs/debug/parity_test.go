@@ -9,13 +9,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gav4you/npmgo/internal/nodeutil"
 	"github.com/gav4you/npmgo/internal/parityspec"
 )
 
 type logCase struct {
-	NS   string            `json:"ns"`
-	Args []json.RawMessage `json:"args"`
+	NS         string            `json:"ns"`
+	Args       []json.RawMessage `json:"args"`
+	UseColors  *bool             `json:"useColors"`
+	GlobalOpts map[string]any    `json:"globalOpts"`
 }
 
 type cases struct {
@@ -46,6 +47,17 @@ func load(t *testing.T, path string, v any) {
 	}
 }
 
+// capture collects what the default sink (Log, debug's process.stderr.write)
+// receives while fn runs, like the oracle's capture().
+func capture(fn func()) []string {
+	lines := []string{}
+	saved := Log
+	Log = func(line string) { lines = append(lines, line) }
+	defer func() { Log = saved }()
+	fn()
+	return lines
+}
+
 // run reproduces parity/oracle_debug.cjs's run(env) against the Go port.
 func run(c cases, env []string) mode {
 	InspectOpts = LoadInspectOpts(env)
@@ -67,17 +79,31 @@ func run(c cases, env []string) mode {
 	}
 	Enable("*")
 	for _, k := range c.Logs {
-		lines := []string{}
-		Now = func() time.Time { return time.UnixMilli(1700000000000) }
-		d := New(k.NS)
-		d.Log = func(line string) { lines = append(lines, line) }
-		args := make([]any, len(k.Args))
-		for i, a := range k.Args {
-			args[i] = parityspec.Build(a)
-		}
-		d.Print(args...)
-		Now = time.Now
-		out.Logs = append(out.Logs, lines)
+		out.Logs = append(out.Logs, capture(func() {
+			Now = func() time.Time { return time.UnixMilli(1700000000000) }
+			defer func() { Now = time.Now }()
+			d := New(k.NS)
+			if k.UseColors != nil {
+				d.UseColors = *k.UseColors
+			}
+			saved := InspectOpts
+			if k.GlobalOpts != nil {
+				merged := map[string]any{}
+				for key, v := range saved {
+					merged[key] = v
+				}
+				for key, v := range k.GlobalOpts {
+					merged[key] = v
+				}
+				InspectOpts = merged
+			}
+			defer func() { InspectOpts = saved }()
+			args := make([]any, len(k.Args))
+			for i, a := range k.Args {
+				args[i] = parityspec.Build(a)
+			}
+			d.Print(args...)
+		}))
 	}
 	parent := New("parent")
 	slash, empty := "/", ""
@@ -89,14 +115,9 @@ func run(c cases, env []string) mode {
 	Formatters['h'] = func(d *Debugger, v any) string {
 		return hex.EncodeToString([]byte(fmt.Sprint(v)))
 	}
-	out.Custom = []string{}
 	d := New("custom")
 	d.UseColors = false
-	d.Log = func(line string) { out.Custom = append(out.Custom, line) }
-	saved := InspectOpts
-	InspectOpts = map[string]any{"hideDate": true}
-	d.Print("hex %h and %s", "AB", "tail")
-	InspectOpts = saved
+	out.Custom = capture(func() { d.Print("hex %h and %s", "AB", "tail") })
 	delete(Formatters, 'h')
 	d2 := New("override")
 	Enable("")
@@ -109,40 +130,51 @@ func run(c cases, env []string) mode {
 }
 
 // TestParity diffs the Go port against outputs recorded from the original
-// npm debug@4.4.3 by parity/oracle_debug.cjs.
+// npm debug@4.4.3 by parity/oracle_debug.cjs, in its three env modes.
 func TestParity(t *testing.T) {
 	var c cases
-	var want struct{ Plain, Colored mode }
+	var want struct{ Plain, Colored, Env mode }
 	load(t, "../../parity/debug/cases.json", &c)
 	load(t, "../../parity/debug/expected.json", &want)
 
-	for name, m := range map[string]struct {
+	for _, m := range []struct {
+		name string
 		env  []string
 		want mode
 	}{
-		"plain":   {[]string{"DEBUG_COLORS=no", "DEBUG_HIDE_DATE=yes"}, want.Plain},
-		"colored": {[]string{"DEBUG_COLORS=true"}, want.Colored},
+		{"plain", []string{"DEBUG_COLORS=no", "DEBUG_HIDE_DATE=yes"}, want.Plain},
+		{"colored", []string{"DEBUG_COLORS=true", "DEBUG_HIDE_DATE=yes"}, want.Colored},
+		{"env", []string{"DEBUG_COLORS=off", "DEBUG_HIDE_DATE=on", "DEBUG_DEPTH=yes", "DEBUG_SHOW_HIDDEN=1",
+			"DEBUG_COMPACT=null", "DEBUG_BREAK_LENGTH=abc", "DEBUG_MAX_ARRAY_LENGTH=2", "DEBUG_SORTED=enabled",
+			"DEBUG_GETTERS=1", "DEBUG_NUMERIC_SEPARATOR=TRUE", "DEBUG_SHOW_PROXY=true", "DEBUG_MAX_STRING_LENGTH=3"}, want.Env},
 	} {
 		got := run(c, m.env)
 		gv, wv := reflect.ValueOf(got), reflect.ValueOf(m.want)
 		for i := 0; i < gv.NumField(); i++ {
 			f := gv.Type().Field(i).Name
-			if !reflect.DeepEqual(gv.Field(i).Interface(), wv.Field(i).Interface()) {
-				if f == "Logs" {
-					for j := range m.want.Logs {
-						if j >= len(got.Logs) || !reflect.DeepEqual(got.Logs[j], m.want.Logs[j]) {
-							var g []string
-							if j < len(got.Logs) {
-								g = got.Logs[j]
-							}
-							t.Errorf("%s log #%d %q\n--- js  %q\n+++ go  %q", name, j, c.Logs[j].NS, m.want.Logs[j], g)
+			if reflect.DeepEqual(gv.Field(i).Interface(), wv.Field(i).Interface()) {
+				continue
+			}
+			switch f {
+			case "Logs":
+				for j := range m.want.Logs {
+					if j >= len(got.Logs) || !reflect.DeepEqual(got.Logs[j], m.want.Logs[j]) {
+						var g []string
+						if j < len(got.Logs) {
+							g = got.Logs[j]
 						}
+						t.Errorf("%s log #%d %q\n--- js  %q\n+++ go  %q", m.name, j, c.Logs[j].NS, m.want.Logs[j], g)
 					}
-					continue
 				}
-				t.Errorf("%s %s\n--- js  %v\n+++ go  %v", name, f, wv.Field(i).Interface(), gv.Field(i).Interface())
+			case "Enabled", "Disable":
+				for j := range c.Patterns {
+					if !reflect.DeepEqual(gv.Field(i).Index(j).Interface(), wv.Field(i).Index(j).Interface()) {
+						t.Errorf("%s %s pattern %q\n--- js  %v\n+++ go  %v", m.name, f, c.Patterns[j], wv.Field(i).Index(j).Interface(), gv.Field(i).Index(j).Interface())
+					}
+				}
+			default:
+				t.Errorf("%s %s\n--- js  %v\n+++ go  %v", m.name, f, wv.Field(i).Interface(), gv.Field(i).Interface())
 			}
 		}
 	}
-	_ = nodeutil.Undefined{}
 }

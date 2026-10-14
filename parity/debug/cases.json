@@ -1,7 +1,7 @@
 {
  "colors": ["", "a", "app", "app:server", "app:db", "worker:*", "x:y:z", "socket.io:client", "express:router", "postiz", "nest:core", "日本", "😀emoji", "a much longer namespace name that goes on and on"],
- "patterns": ["", "*", "app", "app:*", "app*,-app:db", "-app:db,app:*", "*,-*:db", "a*b*c", "app:server   worker", " , app ,", "*:*", "x:*:z", "-*"],
- "names": ["app", "app:server", "app:db", "worker", "abc", "aXbYc", "ab", "x:y:z", "x:z", "other"],
+ "patterns": ["", "*", "app", "app:*", "app*,-app:db", "-app:db,app:*", "*,-*:db", "a*b*c", "app:server   worker", " , app ,", "*:*", "x:*:z", "-*", "a\u0085b,c d", "﻿app　worker ", "**", "*app*", "app**:db"],
+ "names": ["app", "app:server", "app:db", "worker", "abc", "aXbYc", "ab", "x:y:z", "x:z", "other", "a\u0085b", "a", "b", "c", "d", "c d"],
  "logs": [
   {"ns": "app", "args": ["hello"]},
   {"ns": "app", "args": ["hello %s, you are %d", "bob", 42]},
@@ -20,6 +20,24 @@
   {"ns": "app", "args": ["missing %s"]},
   {"ns": "app", "args": []},
   {"ns": "worker:queue", "args": ["started %d jobs", 7]},
-  {"ns": "postiz:posts", "args": ["published %o", {"$": "arr", "items": ["x", "y"]}]}
+  {"ns": "postiz:posts", "args": ["published %o", {"$": "arr", "items": ["x", "y"]}]},
+  {"ns": "app", "args": ["100%%s %s", "x"]},
+  {"ns": "app", "args": [{"$": "err", "msg": "boom", "stack": {"$": "obj", "props": [["a", 1]]}}]},
+  {"ns": "app", "args": [{"$": "err", "msg": "boom", "stack": "Error: boom\n    at a (f.js:1:1)"}]},
+  {"ns": "app", "args": ["%o", {"$": "obj", "props": [["alpha", "aaaaaaaaaaaaaaaaaaaa"], ["beta", "bbbbbbbbbbbbbbbbbbbbbbbb"], ["gamma", "cccccccccccccccccccccccc"], ["delta", {"$": "arr", "items": [1, 2, 3, 4, 5]}]]}]},
+  {"ns": "app", "args": ["%O", {"$": "obj", "props": [["alpha", "aaaaaaaaaaaaaaaaaaaa"], ["beta", "bbbbbbbbbbbbbbbbbbbbbbbb"], ["gamma", "cccccccccccccccccccccccc"], ["delta", {"$": "arr", "items": [1, 2, 3, 4, 5]}]]}]},
+  {"ns": "app", "args": ["arr %O", {"$": "arr", "items": [1, 2, 3]}]},
+  {"ns": "app", "args": ["get %O", {"$": "obj", "props": [["g", 1, {"getter": true}], ["z", 2], ["a", 3]]}]},
+  {"ns": "app", "args": ["proxy %O", {"$": "proxy", "target": {"$": "obj", "props": [["a", 1]]}, "handler": {"$": "obj", "props": []}}]},
+  {"ns": "app", "args": ["long %O %s", "abcdef", "abcdef"]},
+  {"ns": "app", "args": ["nums %O %d", 1234567.5, 1234567]},
+  {"ns": "app", "args": ["map %O", {"$": "map", "entries": [["k", {"$": "obj", "props": [["deep", {"$": "obj", "props": [["x", 1]]}]]}]]}]},
+  {"ns": "app", "args": ["trail", {"$": "obj", "props": [["nested", {"$": "obj", "props": [["x", 1]]}]]}, {"$": "arr", "items": [1, 2, 3]}]},
+  {"ns": "snap", "globalOpts": {"depth": 0}, "args": ["%O then", {"$": "obj", "props": [["a", {"$": "obj", "props": [["b", 1]]}]]}, {"$": "obj", "props": [["a", {"$": "obj", "props": [["b", 1]]}]]}]},
+  {"ns": "snap", "globalOpts": {"colors": true}, "args": ["%O then", {"$": "obj", "props": [["a", 1]]}, {"$": "obj", "props": [["b", 2]]}]},
+  {"ns": "mix", "useColors": true, "args": ["%O and", {"$": "obj", "props": [["a", 1]]}, {"$": "obj", "props": [["b", 2]]}]},
+  {"ns": "mix", "useColors": true, "args": ["%o and %s", {"$": "obj", "props": [["a", 1]]}, {"$": "arr", "items": ["x"]}]},
+  {"ns": "nocolor", "useColors": false, "args": ["%O and", {"$": "obj", "props": [["a", 1]]}, {"$": "obj", "props": [["b", 2]]}]},
+  {"ns": "nocolor", "useColors": false, "args": ["multi\nline"]}
  ]
 }

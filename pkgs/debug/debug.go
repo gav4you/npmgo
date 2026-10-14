@@ -2,9 +2,15 @@
 // build, https://github.com/debug-js/debug). The original copyright notice
 // and MIT license are preserved in LICENSE.
 //
-// Not ported: deep util.inspect of arbitrary objects (see internal/nodeutil),
-// the supports-color 256-color palette (an optional dependency Postiz does
-// not install), and the deprecated destroy() stub.
+// Not ported: the supports-color 256-color palette (an optional dependency
+// Postiz does not install) and the deprecated destroy() stub.
+//
+// Like the JavaScript module, the package keeps process-wide state: the
+// enabled namespaces (Enable, Disable, the DEBUG environment variable), the
+// DEBUG_* options (InspectOpts), the Formatters table and the Log and Now
+// hooks. Enable, Disable, Enabled and the methods of a Debugger are safe for
+// concurrent use; set Formatters, InspectOpts, Log and Now before logging from
+// several goroutines, as there is no lock around them.
 package debug
 
 import (
@@ -15,11 +21,11 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"unicode"
 	"unicode/utf16"
 
 	"golang.org/x/term"
 
+	"github.com/gav4you/npmgo/internal/jsnum"
 	"github.com/gav4you/npmgo/internal/nodeutil"
 	"github.com/gav4you/npmgo/pkgs/ms"
 )
@@ -27,7 +33,9 @@ import (
 // Colors is the ANSI palette used by SelectColor (Node build, basic palette).
 var Colors = []int{6, 2, 3, 4, 5, 1}
 
-// Formatter handles a custom %X placeholder.
+// Formatter handles a custom %X placeholder, like createDebug.formatters[X]
+// called with the Debugger as `this`. A Formatter runs while the Debugger is
+// locked, so it must not log through the same Debugger.
 type Formatter func(d *Debugger, v any) string
 
 var (
@@ -36,19 +44,28 @@ var (
 	skips      []string
 	generation int
 
-	// Formatters maps a placeholder letter to its handler (%o and %O preset).
+	// Formatters maps a placeholder letter to its handler. %o and %O are
+	// preset: they set the instance's InspectOpts["colors"] to its UseColors
+	// and inspect with the instance's options, as the originals do.
 	Formatters = map[byte]Formatter{
 		'o': func(d *Debugger, v any) string {
-			lines := strings.Split(nodeutil.Inspect(v, d.inspectOptions(true)), "\n")
+			d.InspectOpts["colors"] = d.UseColors
+			lines := strings.Split(nodeutil.Inspect(v, InspectOptions(d.InspectOpts)), "\n")
 			for i, l := range lines {
-				lines[i] = strings.TrimSpace(l)
+				lines[i] = jsnum.TrimSpace(l)
 			}
 			return strings.Join(lines, " ")
 		},
-		'O': func(d *Debugger, v any) string { return nodeutil.Inspect(v, d.inspectOptions(true)) },
+		'O': func(d *Debugger, v any) string {
+			d.InspectOpts["colors"] = d.UseColors
+			return nodeutil.Inspect(v, InspectOptions(d.InspectOpts))
+		},
 	}
 
-	// InspectOpts mirrors exports.inspectOpts, built from DEBUG_* env vars.
+	// InspectOpts mirrors exports.inspectOpts: the DEBUG_* environment
+	// variables, parsed by LoadInspectOpts. It is the options object of the
+	// final util.formatWithOptions call and the source of hideDate; every New
+	// Debugger takes a copy of it for its own %o / %O formatting.
 	InspectOpts = LoadInspectOpts(os.Environ())
 
 	// Log is the default sink (stderr), like exports.log.
@@ -71,11 +88,16 @@ type Debugger struct {
 	Namespace string
 	UseColors bool
 	Color     int
-	Log       func(line string)
-	Diff      float64
-	Prev      float64
-	Curr      float64
+	// Log, when set, replaces the Log sink for this instance (debug.log = fn).
+	Log func(line string)
+	// InspectOpts is this instance's copy of InspectOpts, taken when it was
+	// created (createDebug.init); %o and %O format with it.
+	InspectOpts map[string]any
+	// Diff, Prev and Curr are the timing of the last Print, in milliseconds
+	// since the epoch (debug.diff, .prev, .curr); Print writes them.
+	Diff, Prev, Curr float64
 
+	mu          sync.Mutex
 	prevTime    float64
 	override    *bool
 	cacheGen    int
@@ -87,7 +109,9 @@ func init() {
 	Enable(v)
 }
 
-// LoadInspectOpts ports the DEBUG_* environment parsing into inspectOpts.
+// LoadInspectOpts ports the DEBUG_* environment parsing into inspectOpts:
+// yes/on/true/enabled and no/off/false/disabled become booleans, null nil,
+// anything else Number(value).
 func LoadInspectOpts(env []string) map[string]any {
 	opts := map[string]any{}
 	for _, kv := range env {
@@ -106,22 +130,98 @@ func LoadInspectOpts(env []string) map[string]any {
 		case val == "null":
 			opts[prop] = nil
 		default:
-			opts[prop] = nodeutil.ToNumber(val)
+			opts[prop] = jsnum.Number(val)
 		}
 	}
 	return opts
 }
 
+// truthy ports ToBoolean for the values an options map can hold.
 func truthy(v any) bool {
 	switch x := v.(type) {
-	case nil:
+	case nil, nodeutil.Undefined:
 		return false
 	case bool:
 		return x
 	case float64:
 		return x != 0 && !math.IsNaN(x)
+	case int:
+		return x != 0
+	case string:
+		return x != ""
 	}
 	return true
+}
+
+// InspectOptions converts an inspectOpts map (see LoadInspectOpts) into the
+// util.inspect options Node derives from it: numbers are used as they are,
+// booleans count as 0 / 1 where a number is compared, null means Infinity for
+// depth, maxArrayLength and maxStringLength but 0 for breakLength, null or NaN
+// compact disables the compact layout, and getters are only read for `true`.
+func InspectOptions(m map[string]any) nodeutil.Options {
+	o := nodeutil.DefaultOptions()
+	num := func(v any, null float64) (float64, bool) {
+		switch x := v.(type) {
+		case float64:
+			return x, true
+		case bool:
+			if x {
+				return 1, true
+			}
+			return 0, true
+		case nil:
+			return null, true
+		}
+		return 0, false
+	}
+	for k, v := range m {
+		switch k {
+		case "colors":
+			o.Colors = truthy(v)
+		case "showHidden":
+			o.ShowHidden = truthy(v)
+		case "depth":
+			if n, ok := num(v, math.Inf(1)); ok {
+				o.Depth = n
+			}
+		case "breakLength":
+			if n, ok := num(v, 0); ok {
+				o.BreakLength = n
+			}
+		case "maxArrayLength":
+			if n, ok := num(v, math.Inf(1)); ok {
+				o.MaxArrayLength = n
+			}
+		case "maxStringLength":
+			if n, ok := num(v, math.Inf(1)); ok {
+				o.MaxStringLength = n
+			}
+		case "compact":
+			switch x := v.(type) {
+			case bool:
+				o.CompactTrue, o.CompactFalse = x, !x
+			case float64:
+				if math.IsNaN(x) {
+					o.CompactTrue, o.CompactFalse = false, true
+				} else {
+					o.Compact = int(x)
+				}
+			case nil:
+				o.CompactTrue, o.CompactFalse = false, true
+			}
+		case "sorted":
+			o.Sorted = truthy(v)
+		case "getters":
+			o.Getters = v == true
+		case "numericSeparator":
+			o.NumericSeparator = truthy(v)
+		case "showProxy":
+			o.ShowProxy = truthy(v)
+		case "customInspect":
+			o.CustomInspect = truthy(v)
+		}
+	}
+	return o
 }
 
 // UseColors ports useColors(): DEBUG_COLORS wins, else whether stderr is a TTY.
@@ -142,13 +242,19 @@ func SelectColor(namespace string) int {
 	return Colors[int(math.Mod(h, float64(len(Colors))))]
 }
 
-// New creates a Debugger, the equivalent of require('debug')(namespace).
+// New creates a Debugger, the equivalent of require('debug')(namespace). It
+// reads UseColors and copies InspectOpts at this moment.
 func New(namespace string) *Debugger {
+	opts := make(map[string]any, len(InspectOpts))
+	for k, v := range InspectOpts {
+		opts[k] = v
+	}
 	return &Debugger{
-		Namespace: namespace,
-		UseColors: UseColors(),
-		Color:     SelectColor(namespace),
-		cacheGen:  -1,
+		Namespace:   namespace,
+		UseColors:   UseColors(),
+		Color:       SelectColor(namespace),
+		InspectOpts: opts,
+		cacheGen:    -1,
 	}
 }
 
@@ -165,6 +271,8 @@ func (d *Debugger) Extend(namespace string, delimiter *string) *Debugger {
 
 // Enabled ports the `enabled` getter.
 func (d *Debugger) Enabled() bool {
+	d.mu.Lock()
+	defer d.mu.Unlock()
 	if d.override != nil {
 		return *d.override
 	}
@@ -178,13 +286,18 @@ func (d *Debugger) Enabled() bool {
 }
 
 // SetEnabled ports the `enabled` setter.
-func (d *Debugger) SetEnabled(v bool) { d.override = &v }
+func (d *Debugger) SetEnabled(v bool) {
+	d.mu.Lock()
+	d.override = &v
+	d.mu.Unlock()
+}
 
-// Coerce ports createDebug.coerce: errors become their message.
+// Coerce ports createDebug.coerce: an error becomes `stack || message`, so a
+// non-string truthy stack is returned as it is (and then logged with %O).
 func Coerce(v any) any {
 	if e, ok := v.(*nodeutil.Error); ok {
-		if s, ok := e.Stack.(string); ok && s != "" {
-			return s
+		if truthy(e.Stack) {
+			return e.Stack
 		}
 		return e.Message
 	}
@@ -199,6 +312,10 @@ func (d *Debugger) Print(args ...any) {
 	if !d.Enabled() {
 		return
 	}
+	d.mu.Lock()
+	if d.InspectOpts == nil { // a zero-value Debugger rather than one from New
+		d.InspectOpts = map[string]any{}
+	}
 	curr := float64(Now().UnixMilli())
 	prev := d.prevTime
 	if prev == 0 {
@@ -209,6 +326,7 @@ func (d *Debugger) Print(args ...any) {
 	d.Curr = curr
 	d.prevTime = curr
 
+	args = append([]any(nil), args...)
 	if len(args) == 0 {
 		args = []any{nodeutil.Undefined{}}
 	}
@@ -237,11 +355,13 @@ func (d *Debugger) Print(args ...any) {
 	})
 	args[0] = f
 	args = d.formatArgs(args)
+	line := nodeutil.FormatWithOptions(InspectOptions(InspectOpts), args...)
 	logFn := d.Log
+	d.mu.Unlock()
 	if logFn == nil {
 		logFn = Log
 	}
-	logFn(nodeutil.FormatWithOptions(d.inspectOptions(false), args...))
+	logFn(line)
 }
 
 func (d *Debugger) formatArgs(args []any) []any {
@@ -267,7 +387,9 @@ func getDate() string {
 	return Now().UTC().Format("2006-01-02T15:04:05.000Z") + " "
 }
 
-// Enable ports createDebug.enable(namespaces).
+// Enable ports createDebug.enable(namespaces): it also stores the string in
+// the DEBUG environment variable (createDebug.save), or removes the variable
+// for "". Names are separated by commas or JavaScript whitespace.
 func Enable(ns string) {
 	mu.Lock()
 	defer mu.Unlock()
@@ -278,7 +400,7 @@ func Enable(ns string) {
 	}
 	generation++
 	names, skips = nil, nil
-	fields := strings.FieldsFunc(ns, func(r rune) bool { return r == ',' || isJSSpace(r) })
+	fields := strings.FieldsFunc(ns, func(r rune) bool { return r == ',' || jsnum.IsWhiteSpace(r) })
 	for _, f := range fields {
 		if f[0] == '-' {
 			skips = append(skips, f[1:])
@@ -321,6 +443,8 @@ func enabledLocked(name string) bool {
 	return false
 }
 
+// matchesTemplate ports matchesTemplate over UTF-16 code units, as the
+// original indexes the strings.
 func matchesTemplate(searchS, templateS string) bool {
 	search := utf16.Encode([]rune(searchS))
 	template := utf16.Encode([]rune(templateS))
@@ -346,62 +470,4 @@ func matchesTemplate(searchS, templateS string) bool {
 		ti++
 	}
 	return ti == len(template)
-}
-
-func isJSSpace(r rune) bool { return unicode.IsSpace(r) || r == 0xFEFF }
-
-// inspectOptions converts InspectOpts (DEBUG_* env) into util.inspect options.
-// withUseColors mirrors the %o/%O formatters, which set colors = useColors.
-func (d *Debugger) inspectOptions(withUseColors bool) nodeutil.Options {
-	o := nodeutil.DefaultOptions()
-	num := func(v any) (float64, bool) {
-		switch x := v.(type) {
-		case float64:
-			return x, true
-		case nil:
-			return math.Inf(1), true
-		}
-		return 0, false
-	}
-	for k, v := range InspectOpts {
-		switch k {
-		case "colors":
-			o.Colors = truthy(v)
-		case "showHidden":
-			o.ShowHidden = truthy(v)
-		case "depth":
-			if n, ok := num(v); ok {
-				o.Depth = n
-			}
-		case "breakLength":
-			if n, ok := num(v); ok {
-				o.BreakLength = n
-			}
-		case "maxArrayLength":
-			if n, ok := num(v); ok {
-				o.MaxArrayLength = n
-			}
-		case "maxStringLength":
-			if n, ok := num(v); ok {
-				o.MaxStringLength = n
-			}
-		case "compact":
-			switch x := v.(type) {
-			case bool:
-				o.CompactTrue, o.CompactFalse = x, !x
-			case float64:
-				o.Compact = int(x)
-			}
-		case "sorted":
-			o.Sorted = truthy(v)
-		case "getters":
-			o.Getters = truthy(v)
-		case "numericSeparator":
-			o.NumericSeparator = truthy(v)
-		}
-	}
-	if withUseColors {
-		o.Colors = d.UseColors
-	}
-	return o
 }

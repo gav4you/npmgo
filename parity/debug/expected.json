@@ -27,9 +27,21 @@
     false,
     false,
     false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
     false
    ],
    [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
     true,
     true,
     true,
@@ -51,24 +63,6 @@
     false,
     false,
     false,
-    false
-   ],
-   [
-    false,
-    true,
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false
-   ],
-   [
-    true,
-    true,
-    false,
     false,
     false,
     false,
@@ -80,6 +74,12 @@
    [
     false,
     true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
     false,
     false,
     false,
@@ -93,6 +93,48 @@
     true,
     true,
     false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
     true,
     true,
     true,
@@ -111,24 +153,6 @@
     false,
     false,
     false,
-    false
-   ],
-   [
-    false,
-    true,
-    false,
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false
-   ],
-   [
-    true,
-    false,
-    false,
     false,
     false,
     false,
@@ -140,6 +164,42 @@
    [
     false,
     true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    true,
     true,
     false,
     false,
@@ -147,6 +207,12 @@
     false,
     true,
     true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
     false
    ],
    [
@@ -159,9 +225,111 @@
     false,
     true,
     false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
     false
    ],
    [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   [
+    true,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   [
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
     false,
     false,
     false,
@@ -187,7 +355,12 @@
    "app",
    "*:*",
    "x:*:z",
-   "-*"
+   "-*",
+   "ab,c,d",
+   "app,worker",
+   "**",
+   "*app*",
+   "app**:db"
   ],
   "logs": [
    [
@@ -243,6 +416,60 @@
    ],
    [
     "postiz:posts published [ 'x', 'y' ]"
+   ],
+   [
+    "app 100x %s"
+   ],
+   [
+    "app { a: 1 }"
+   ],
+   [
+    "app Error: boom\n    at a (f.js:1:1)"
+   ],
+   [
+    "app { alpha: 'aaaaaaaaaaaaaaaaaaaa', beta: 'bbbbbbbbbbbbbbbbbbbbbbbb', gamma: 'cccccccccccccccccccccccc', delta: [ 1, 2, 3, 4, 5 ] }"
+   ],
+   [
+    "app {\n  alpha: 'aaaaaaaaaaaaaaaaaaaa',\n  beta: 'bbbbbbbbbbbbbbbbbbbbbbbb',\n  gamma: 'cccccccccccccccccccccccc',\n  delta: [ 1, 2, 3, 4, 5 ]\n}"
+   ],
+   [
+    "app arr [ 1, 2, 3 ]"
+   ],
+   [
+    "app get { g: [Getter], z: 2, a: 3 }"
+   ],
+   [
+    "app proxy { a: 1 }"
+   ],
+   [
+    "app long 'abcdef' abcdef"
+   ],
+   [
+    "app nums 1234567.5 1234567"
+   ],
+   [
+    "app map Map(1) { 'k' => { deep: { x: 1 } } }"
+   ],
+   [
+    "app trail { nested: { x: 1 } } [ 1, 2, 3 ]"
+   ],
+   [
+    "snap { a: { b: 1 } } then { a: [Object] }"
+   ],
+   [
+    "snap { a: 1 } then { b: \u001b[33m2\u001b[39m }"
+   ],
+   [
+    "  \u001b[35;1mmix \u001b[0m{ a: \u001b[33m1\u001b[39m } and { b: 2 } \u001b[35m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[35;1mmix \u001b[0m{ a: \u001b[33m1\u001b[39m } and [ 'x' ] \u001b[35m+0ms\u001b[0m"
+   ],
+   [
+    "nocolor { a: 1 } and { b: 2 }"
+   ],
+   [
+    "nocolor multi\nline"
    ]
   ],
   "extend": [
@@ -284,9 +511,21 @@
     false,
     false,
     false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
     false
    ],
    [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
     true,
     true,
     true,
@@ -308,24 +547,6 @@
     false,
     false,
     false,
-    false
-   ],
-   [
-    false,
-    true,
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false
-   ],
-   [
-    true,
-    true,
-    false,
     false,
     false,
     false,
@@ -337,6 +558,12 @@
    [
     false,
     true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
     false,
     false,
     false,
@@ -350,6 +577,48 @@
     true,
     true,
     false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
     true,
     true,
     true,
@@ -368,24 +637,6 @@
     false,
     false,
     false,
-    false
-   ],
-   [
-    false,
-    true,
-    false,
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false
-   ],
-   [
-    true,
-    false,
-    false,
     false,
     false,
     false,
@@ -397,6 +648,42 @@
    [
     false,
     true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    true,
     true,
     false,
     false,
@@ -404,6 +691,12 @@
     false,
     true,
     true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
     false
    ],
    [
@@ -416,9 +709,111 @@
     false,
     true,
     false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
     false
    ],
    [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   [
+    true,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   [
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
     false,
     false,
     false,
@@ -444,7 +839,12 @@
    "app",
    "*:*",
    "x:*:z",
-   "-*"
+   "-*",
+   "ab,c,d",
+   "app,worker",
+   "**",
+   "*app*",
+   "app**:db"
   ],
   "logs": [
    [
@@ -500,6 +900,544 @@
    ],
    [
     "  \u001b[33;1mpostiz:posts \u001b[0mpublished [ \u001b[32m'x'\u001b[39m, \u001b[32m'y'\u001b[39m ] \u001b[33m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[34;1mapp \u001b[0m100x \u001b[34m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[34;1mapp \u001b[0m{ a: \u001b[33m1\u001b[39m } \u001b[34m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[34;1mapp \u001b[0mError: boom\n  \u001b[34;1mapp \u001b[0m    at a (f.js:1:1) \u001b[34m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[34;1mapp \u001b[0m{ alpha: \u001b[32m'aaaaaaaaaaaaaaaaaaaa'\u001b[39m, beta: \u001b[32m'bbbbbbbbbbbbbbbbbbbbbbbb'\u001b[39m, gamma: \u001b[32m'cccccccccccccccccccccccc'\u001b[39m, delta: [ \u001b[33m1\u001b[39m, \u001b[33m2\u001b[39m, \u001b[33m3\u001b[39m, \u001b[33m4\u001b[39m, \u001b[33m5\u001b[39m ] } \u001b[34m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[34;1mapp \u001b[0m{\n  \u001b[34;1mapp \u001b[0m  alpha: \u001b[32m'aaaaaaaaaaaaaaaaaaaa'\u001b[39m,\n  \u001b[34;1mapp \u001b[0m  beta: \u001b[32m'bbbbbbbbbbbbbbbbbbbbbbbb'\u001b[39m,\n  \u001b[34;1mapp \u001b[0m  gamma: \u001b[32m'cccccccccccccccccccccccc'\u001b[39m,\n  \u001b[34;1mapp \u001b[0m  delta: [ \u001b[33m1\u001b[39m, \u001b[33m2\u001b[39m, \u001b[33m3\u001b[39m, \u001b[33m4\u001b[39m, \u001b[33m5\u001b[39m ]\n  \u001b[34;1mapp \u001b[0m} \u001b[34m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[34;1mapp \u001b[0marr [ \u001b[33m1\u001b[39m, \u001b[33m2\u001b[39m, \u001b[33m3\u001b[39m ] \u001b[34m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[34;1mapp \u001b[0mget { g: \u001b[36m[Getter]\u001b[39m, z: \u001b[33m2\u001b[39m, a: \u001b[33m3\u001b[39m } \u001b[34m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[34;1mapp \u001b[0mproxy { a: \u001b[33m1\u001b[39m } \u001b[34m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[34;1mapp \u001b[0mlong \u001b[32m'abcdef'\u001b[39m abcdef \u001b[34m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[34;1mapp \u001b[0mnums \u001b[33m1234567.5\u001b[39m 1234567 \u001b[34m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[34;1mapp \u001b[0mmap Map(1) { \u001b[32m'k'\u001b[39m => { deep: { x: \u001b[33m1\u001b[39m } } } \u001b[34m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[34;1mapp \u001b[0mtrail { nested: { x: \u001b[33m1\u001b[39m } } [ \u001b[33m1\u001b[39m, \u001b[33m2\u001b[39m, \u001b[33m3\u001b[39m ] \u001b[34m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[33;1msnap \u001b[0m{ a: { b: \u001b[33m1\u001b[39m } } then { a: \u001b[36m[Object]\u001b[39m } \u001b[33m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[33;1msnap \u001b[0m{ a: \u001b[33m1\u001b[39m } then { b: \u001b[33m2\u001b[39m } \u001b[33m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[35;1mmix \u001b[0m{ a: \u001b[33m1\u001b[39m } and { b: \u001b[33m2\u001b[39m } \u001b[35m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[35;1mmix \u001b[0m{ a: \u001b[33m1\u001b[39m } and [ 'x' ] \u001b[35m+0ms\u001b[0m"
+   ],
+   [
+    "nocolor { a: 1 } and { b: \u001b[33m2\u001b[39m }"
+   ],
+   [
+    "nocolor multi\nline"
+   ]
+  ],
+  "extend": [
+   "parent:child",
+   "parent/child",
+   "parentchild"
+  ],
+  "custom": [
+   "custom hex 4142 and tail"
+  ],
+  "override": true,
+  "override2": false
+ },
+ "env": {
+  "colors": [
+   6,
+   2,
+   4,
+   5,
+   4,
+   5,
+   1,
+   3,
+   1,
+   2,
+   2,
+   4,
+   1,
+   4
+  ],
+  "enabled": [
+   [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   [
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   [
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   [
+    true,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   [
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   [
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ]
+  ],
+  "disable": [
+   "",
+   "*",
+   "app",
+   "app:*",
+   "app*,-app:db",
+   "app:*,-app:db",
+   "*,-*:db",
+   "a*b*c",
+   "app:server,worker",
+   "app",
+   "*:*",
+   "x:*:z",
+   "-*",
+   "ab,c,d",
+   "app,worker",
+   "**",
+   "*app*",
+   "app**:db"
+  ],
+  "logs": [
+   [
+    "app hello"
+   ],
+   [
+    "app hello bob, you are 42"
+   ],
+   [
+    "app obj { a: 1, b: [ 1, 2, ... 1 more item, [length]: 3 ] }"
+   ],
+   [
+    "app obj {\n  a: 1,\n  nested: {\n    deep: [Object]\n  }\n}"
+   ],
+   [
+    "app json {\"k\":\"v\"}"
+   ],
+   [
+    "app 100% done"
+   ],
+   [
+    "app %x unknown kept"
+   ],
+   [
+    "app {\n  first: 'is '... 6 more characters\n}"
+   ],
+   [
+    "app 42"
+   ],
+   [
+    "app null"
+   ],
+   [
+    "app boom"
+   ],
+   [
+    "app multi\nline\nmessage"
+   ],
+   [
+    "app extra args 1 two {\n  three: 3\n}"
+   ],
+   [
+    "app 'str' then next"
+   ],
+   [
+    "app missing %s"
+   ],
+   [
+    "app undefined"
+   ],
+   [
+    "worker:queue started 7 jobs"
+   ],
+   [
+    "postiz:posts published [ 'x', 'y', [length]: 2 ]"
+   ],
+   [
+    "app 100x %s"
+   ],
+   [
+    "app {\n  a: 1\n}"
+   ],
+   [
+    "app Error: boom\n    at a (f.js:1:1)"
+   ],
+   [
+    "app { alpha: 'aaa'... 17 more characters, beta: 'bbb'... 21 more characters, delta: [ 1, 2, ... 3 more items, [length]: 5 ], gamma: 'ccc'... 21 more characters }"
+   ],
+   [
+    "app {\n  alpha: 'aaa'... 17 more characters,\n  beta: 'bbb'... 21 more characters,\n  delta: [\n    1,\n    2,\n    ... 3 more items,\n    [length]: 5\n  ],\n  gamma: 'ccc'... 21 more characters\n}"
+   ],
+   [
+    "app arr [\n  1,\n  2,\n  ... 1 more item,\n  [length]: 3\n]"
+   ],
+   [
+    "app get {\n  a: 3,\n  g: [Getter],\n  z: 2\n}"
+   ],
+   [
+    "app proxy Proxy [\n  {\n    a: 1\n  },\n  {}\n]"
+   ],
+   [
+    "app long 'abc'... 3 more characters abcdef"
+   ],
+   [
+    "app nums 1_234_567.5 1_234_567"
+   ],
+   [
+    "app map Map(1) {\n  'k' => {\n    deep: [Object]\n  }\n}"
+   ],
+   [
+    "app trail {\n  nested: {\n    x: 1\n  }\n} [\n  1,\n  2,\n  ... 1 more item,\n  [length]: 3\n]"
+   ],
+   [
+    "snap {\n  a: {\n    b: 1\n  }\n} then {\n  a: [Object]\n}"
+   ],
+   [
+    "snap {\n  a: 1\n} then {\n  b: \u001b[33m2\u001b[39m\n}"
+   ],
+   [
+    "  \u001b[35;1mmix \u001b[0m{\n  \u001b[35;1mmix \u001b[0m  a: \u001b[33m1\u001b[39m\n  \u001b[35;1mmix \u001b[0m} and {\n  b: 2\n} \u001b[35m+0ms\u001b[0m"
+   ],
+   [
+    "  \u001b[35;1mmix \u001b[0m{ a: \u001b[33m1\u001b[39m } and [ 'x', [length]: 1 ] \u001b[35m+0ms\u001b[0m"
+   ],
+   [
+    "nocolor {\n  a: 1\n} and {\n  b: 2\n}"
+   ],
+   [
+    "nocolor multi\nline"
    ]
   ],
   "extend": [
