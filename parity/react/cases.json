@@ -6880,60 +6880,55 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "f"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "f"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "ctx",
-        "n": "Theme"
-       },
-       "p": {
-        "$": "obj",
-        "p": [
-         [
-          "value",
-          "x"
-         ]
-        ]
-       },
-       "c": [
-        {
-         "$": "el",
-         "t": {
-          "$": "comp",
-          "n": "Id"
-         },
-         "p": null,
-         "c": []
-        },
-        {
-         "$": "el",
-         "t": {
-          "$": "comp",
-          "n": "Id"
-         },
-         "p": null,
-         "c": []
-        }
-       ]
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "ctx",
+       "n": "Theme"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "value",
+         "x"
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "Id"
+        },
+        "p": null,
+        "c": []
+       },
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "Id"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     }
+    ]
    },
    "comps": {
     "Id": {
@@ -8648,33 +8643,28 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "F"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "Use_p"
-       },
-       "p": null,
-       "c": []
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Use_p"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
    },
    "comps": {
     "Use_p": {
@@ -8782,33 +8772,28 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "F"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "Use_p"
-       },
-       "p": null,
-       "c": []
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Use_p"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
    },
    "twice": true,
    "modes": [
@@ -8853,33 +8838,28 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "F"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "Use_p"
-       },
-       "p": null,
-       "c": []
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Use_p"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
    },
    "twice": true,
    "modes": [
@@ -8925,33 +8905,28 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "F"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "Use_p"
-       },
-       "p": null,
-       "c": []
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Use_p"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
    },
    "comps": {
     "Use_p": {
@@ -8991,33 +8966,28 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "F"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "Use_p"
-       },
-       "p": null,
-       "c": []
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Use_p"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
    },
    "comps": {
     "Use_p": {
@@ -9114,33 +9084,28 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "F"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "Use_p"
-       },
-       "p": null,
-       "c": []
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Use_p"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
    },
    "comps": {
     "Use_p": {
@@ -9331,28 +9296,23 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "wait"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "wait"
       ]
-     },
-     "c": [
-      {
-       "$": "promise",
-       "n": "p"
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "promise",
+      "n": "p"
+     }
+    ]
    },
    "promises": [
     {
@@ -9368,33 +9328,28 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "F"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "Two"
-       },
-       "p": null,
-       "c": []
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Two"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
    },
    "comps": {
     "Two": {
@@ -9463,33 +9418,28 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "F"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "Catch"
-       },
-       "p": null,
-       "c": []
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Catch"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
    },
    "comps": {
     "Catch": {
@@ -9604,57 +9554,52 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "outer"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "outer"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": "div",
-       "p": null,
-       "c": [
-        {
-         "$": "el",
-         "t": {
-          "$": "suspense"
-         },
-         "p": {
-          "$": "obj",
-          "p": [
-           [
-            "fallback",
-            "inner"
-           ]
-          ]
-         },
-         "c": [
-          {
-           "$": "el",
-           "t": {
-            "$": "comp",
-            "n": "Use_p"
-           },
-           "p": null,
-           "c": []
-          }
-         ]
-        }
-       ]
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": "div",
+      "p": null,
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "suspense"
+        },
+        "p": {
+         "$": "obj",
+         "p": [
+          [
+           "fallback",
+           "inner"
+          ]
+         ]
+        },
+        "c": [
+         {
+          "$": "el",
+          "t": {
+           "$": "comp",
+           "n": "Use_p"
+          },
+          "p": null,
+          "c": []
+         }
+        ]
+       }
+      ]
+     }
+    ]
    },
    "comps": {
     "Use_p": {
@@ -10006,41 +9951,36 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        {
-         "$": "el",
-         "t": {
-          "$": "comp",
-          "n": "Boom"
-         },
-         "p": null,
-         "c": []
-        }
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "Boom"
+        },
+        "p": null,
+        "c": []
+       }
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "Use_p"
-       },
-       "p": null,
-       "c": []
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Use_p"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
    },
    "comps": {
     "Use_p": {
@@ -10968,59 +10908,54 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "outer"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "outer"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "A"
-       },
-       "p": null,
-       "c": []
-      },
-      {
-       "$": "el",
-       "t": {
-        "$": "suspense"
-       },
-       "p": {
-        "$": "obj",
-        "p": [
-         [
-          "fallback",
-          "inner"
-         ]
-        ]
-       },
-       "c": [
-        {
-         "$": "el",
-         "t": {
-          "$": "comp",
-          "n": "B"
-         },
-         "p": null,
-         "c": []
-        }
-       ]
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "A"
+      },
+      "p": null,
+      "c": []
+     },
+     {
+      "$": "el",
+      "t": {
+       "$": "suspense"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "fallback",
+         "inner"
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "B"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     }
+    ]
    },
    "comps": {
     "A": {
@@ -11177,49 +11112,44 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "outer"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "outer"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": "div",
-       "p": null,
-       "c": [
-        {
-         "$": "el",
-         "t": {
-          "$": "comp",
-          "n": "A"
-         },
-         "p": null,
-         "c": []
-        },
-        {
-         "$": "el",
-         "t": {
-          "$": "comp",
-          "n": "B"
-         },
-         "p": null,
-         "c": []
-        }
-       ]
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": "div",
+      "p": null,
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "A"
+        },
+        "p": null,
+        "c": []
+       },
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "B"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     }
+    ]
    },
    "comps": {
     "A": {
@@ -11539,41 +11469,36 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "F"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "L"
-       },
-       "p": {
-        "$": "obj",
-        "p": [
-         [
-          "who",
-          "async"
-         ]
-        ]
-       },
-       "c": []
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "L"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "who",
+         "async"
+        ]
+       ]
+      },
+      "c": []
+     }
+    ]
    },
    "comps": {
     "Hello": {
@@ -11623,41 +11548,36 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "F"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "L"
-       },
-       "p": {
-        "$": "obj",
-        "p": [
-         [
-          "who",
-          "resolved"
-         ]
-        ]
-       },
-       "c": []
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "L"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "who",
+         "resolved"
+        ]
+       ]
+      },
+      "c": []
+     }
+    ]
    },
    "comps": {
     "Hello": {
@@ -11760,33 +11680,28 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "F"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": {
-        "$": "comp",
-        "n": "L"
-       },
-       "p": null,
-       "c": []
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "L"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
    },
    "comps": {
     "L": {
@@ -16760,39 +16675,34 @@
    "tree": {
     "$": "el",
     "t": {
-     "$": "el",
-     "t": {
-      "$": "suspense"
-     },
-     "p": {
-      "$": "obj",
-      "p": [
-       [
-        "fallback",
-        "F"
-       ]
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
       ]
-     },
-     "c": [
-      {
-       "$": "el",
-       "t": "html",
-       "p": null,
-       "c": [
-        {
-         "$": "el",
-         "t": "body",
-         "p": null,
-         "c": [
-          "x"
-         ]
-        }
-       ]
-      }
      ]
     },
-    "p": null,
-    "c": []
+    "c": [
+     {
+      "$": "el",
+      "t": "html",
+      "p": null,
+      "c": [
+       {
+        "$": "el",
+        "t": "body",
+        "p": null,
+        "c": [
+         "x"
+        ]
+       }
+      ]
+     }
+    ]
    }
   },
   {
@@ -19798,6 +19708,1826 @@
      }
     }
    }
+  },
+  {
+   "name": "attr: attribute value escaping and bigint",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "title",
+       "a\"b'c<d>e&f"
+      ],
+      [
+       "data-n",
+       {
+        "$": "big",
+        "v": "123456789012345678901234567890"
+       }
+      ],
+      [
+       "id",
+       0
+      ],
+      [
+       "lang",
+       {
+        "$": "num",
+        "v": "-0"
+       }
+      ]
+     ]
+    },
+    "c": [
+     "x"
+    ]
+   }
+  },
+  {
+   "name": "attr: symbol style value is a TypeError",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "style",
+       {
+        "$": "obj",
+        "p": [
+         [
+          "color",
+          {
+           "$": "sym",
+           "d": "s"
+          }
+         ]
+        ]
+       }
+      ]
+     ]
+    },
+    "c": []
+   }
+  },
+  {
+   "name": "attr: bigint cols is a TypeError",
+   "tree": {
+    "$": "el",
+    "t": "textarea",
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "cols",
+       {
+        "$": "big",
+        "v": "5"
+       }
+      ]
+     ]
+    },
+    "c": []
+   }
+  },
+  {
+   "name": "ctx: values restored when suspended tasks resume",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "ctx",
+       "n": "A"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "value",
+         "a1"
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "ctx",
+         "n": "B"
+        },
+        "p": {
+         "$": "obj",
+         "p": [
+          [
+           "value",
+           "b1"
+          ]
+         ]
+        },
+        "c": [
+         {
+          "$": "el",
+          "t": {
+           "$": "suspense"
+          },
+          "p": {
+           "$": "obj",
+           "p": [
+            [
+             "fallback",
+             "f1"
+            ]
+           ]
+          },
+          "c": [
+           {
+            "$": "el",
+            "t": {
+             "$": "comp",
+             "n": "UseP"
+            },
+            "p": null,
+            "c": []
+           }
+          ]
+         },
+         {
+          "$": "el",
+          "t": {
+           "$": "comp",
+           "n": "Both"
+          },
+          "p": null,
+          "c": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "$": "el",
+      "t": {
+       "$": "ctx",
+       "n": "A"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "value",
+         "a2"
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "suspense"
+        },
+        "p": {
+         "$": "obj",
+         "p": [
+          [
+           "fallback",
+           "f2"
+          ]
+         ]
+        },
+        "c": [
+         {
+          "$": "el",
+          "t": {
+           "$": "comp",
+           "n": "UseQ"
+          },
+          "p": null,
+          "c": []
+         }
+        ]
+       },
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "Both"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     },
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Both"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
+   },
+   "ctxs": {
+    "A": {
+     "default": "a0"
+    },
+    "B": {
+     "default": "b0"
+    }
+   },
+   "comps": {
+    "Both": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": "a",
+       "v": {
+        "$": "hook",
+        "h": "useContext",
+        "a": [
+         {
+          "$": "ctxv",
+          "n": "A"
+         }
+        ]
+       }
+      },
+      {
+       "let": "b",
+       "v": {
+        "$": "hook",
+        "h": "useContext",
+        "a": [
+         {
+          "$": "ctxv",
+          "n": "B"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "el",
+      "t": "i",
+      "p": null,
+      "c": [
+       {
+        "$": "cat",
+        "a": [
+         {
+          "$": "var",
+          "n": "a"
+         },
+         "/",
+         {
+          "$": "var",
+          "n": "b"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "UseP": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "p"
+         }
+        ]
+       }
+      },
+      {
+       "let": "a",
+       "v": {
+        "$": "hook",
+        "h": "useContext",
+        "a": [
+         {
+          "$": "ctxv",
+          "n": "A"
+         }
+        ]
+       }
+      },
+      {
+       "let": "b",
+       "v": {
+        "$": "hook",
+        "h": "useContext",
+        "a": [
+         {
+          "$": "ctxv",
+          "n": "B"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "el",
+      "t": "i",
+      "p": null,
+      "c": [
+       {
+        "$": "cat",
+        "a": [
+         {
+          "$": "var",
+          "n": "x"
+         },
+         ":",
+         {
+          "$": "var",
+          "n": "a"
+         },
+         "/",
+         {
+          "$": "var",
+          "n": "b"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "UseQ": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "q"
+         }
+        ]
+       }
+      },
+      {
+       "let": "a",
+       "v": {
+        "$": "hook",
+        "h": "useContext",
+        "a": [
+         {
+          "$": "ctxv",
+          "n": "A"
+         }
+        ]
+       }
+      },
+      {
+       "let": "b",
+       "v": {
+        "$": "hook",
+        "h": "useContext",
+        "a": [
+         {
+          "$": "ctxv",
+          "n": "B"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "el",
+      "t": "i",
+      "p": null,
+      "c": [
+       {
+        "$": "cat",
+        "a": [
+         {
+          "$": "var",
+          "n": "x"
+         },
+         ":",
+         {
+          "$": "var",
+          "n": "a"
+         },
+         "/",
+         {
+          "$": "var",
+          "n": "b"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   },
+   "promises": [
+    {
+     "n": "p",
+     "kind": "pending",
+     "value": "P",
+     "step": 2
+    },
+    {
+     "n": "q",
+     "kind": "pending",
+     "value": "Q",
+     "step": 1
+    }
+   ]
+  },
+  {
+   "name": "useId: stable across suspension",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Id"
+      },
+      "p": null,
+      "c": []
+     },
+     {
+      "$": "el",
+      "t": {
+       "$": "suspense"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "fallback",
+         {
+          "$": "el",
+          "t": {
+           "$": "comp",
+           "n": "Id"
+          },
+          "p": null,
+          "c": []
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "IdUse"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     },
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Id"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
+   },
+   "comps": {
+    "Id": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": "id",
+       "v": {
+        "$": "hook",
+        "h": "useId",
+        "a": []
+       }
+      }
+     ],
+     "ret": {
+      "$": "el",
+      "t": "span",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "id",
+         {
+          "$": "var",
+          "n": "id"
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "var",
+        "n": "id"
+       }
+      ]
+     }
+    },
+    "IdUse": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": "id",
+       "v": {
+        "$": "hook",
+        "h": "useId",
+        "a": []
+       }
+      },
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "p"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "el",
+      "t": "span",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "id",
+         {
+          "$": "var",
+          "n": "id"
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "var",
+        "n": "x"
+       }
+      ]
+     }
+    }
+   },
+   "promises": [
+    {
+     "n": "p",
+     "kind": "pending",
+     "value": "resumed",
+     "step": 1
+    }
+   ]
+  },
+  {
+   "name": "doc: suspense inside head",
+   "tree": {
+    "$": "el",
+    "t": "html",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": "head",
+      "p": null,
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "suspense"
+        },
+        "p": {
+         "$": "obj",
+         "p": [
+          [
+           "fallback",
+           null
+          ]
+         ]
+        },
+        "c": [
+         {
+          "$": "el",
+          "t": {
+           "$": "comp",
+           "n": "HeadStyle"
+          },
+          "p": null,
+          "c": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "$": "el",
+      "t": "body",
+      "p": null,
+      "c": [
+       "b"
+      ]
+     }
+    ]
+   },
+   "comps": {
+    "HeadStyle": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "p"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "el",
+      "t": "style",
+      "p": null,
+      "c": [
+       {
+        "$": "var",
+        "n": "x"
+       }
+      ]
+     }
+    }
+   },
+   "promises": [
+    {
+     "n": "p",
+     "kind": "pending",
+     "value": ".late{}",
+     "step": 1
+    }
+   ]
+  },
+  {
+   "name": "suspense: fallback that suspends",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "suspense"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "fallback",
+         {
+          "$": "el",
+          "t": {
+           "$": "comp",
+           "n": "Use_q"
+          },
+          "p": null,
+          "c": []
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "Use_p"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     }
+    ]
+   },
+   "comps": {
+    "Use_p": {
+     "kind": "fn",
+     "name": "Use_p",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "p"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "var",
+      "n": "x"
+     }
+    },
+    "Use_q": {
+     "kind": "fn",
+     "name": "Use_q",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "q"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "var",
+      "n": "x"
+     }
+    }
+   },
+   "promises": [
+    {
+     "n": "q",
+     "kind": "pending",
+     "value": "fallback-ready",
+     "step": 1
+    },
+    {
+     "n": "p",
+     "kind": "pending",
+     "value": "content-ready",
+     "step": 2
+    }
+   ]
+  },
+  {
+   "name": "suspense: abort with a suspended fallback",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "suspense"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "fallback",
+         {
+          "$": "el",
+          "t": {
+           "$": "comp",
+           "n": "Use_q"
+          },
+          "p": null,
+          "c": []
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "Use_p"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     }
+    ]
+   },
+   "modes": [
+    "stream"
+   ],
+   "comps": {
+    "Use_p": {
+     "kind": "fn",
+     "name": "Use_p",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "p"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "var",
+      "n": "x"
+     }
+    },
+    "Use_q": {
+     "kind": "fn",
+     "name": "Use_q",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "q"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "var",
+      "n": "x"
+     }
+    }
+   },
+   "promises": [
+    {
+     "n": "q",
+     "kind": "pending",
+     "value": "never"
+    },
+    {
+     "n": "p",
+     "kind": "pending",
+     "value": "never"
+    }
+   ],
+   "stream": {
+    "abort": {
+     "step": 1,
+     "reason": {
+      "$": "error",
+      "m": "gone"
+     }
+    }
+   }
+  },
+  {
+   "name": "suspense: error in both content and fallback",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "suspense"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "fallback",
+         {
+          "$": "el",
+          "t": {
+           "$": "comp",
+           "n": "Boom2"
+          },
+          "p": null,
+          "c": []
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "Boom"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     }
+    ]
+   },
+   "comps": {
+    "Boom": {
+     "kind": "fn",
+     "body": [
+      {
+       "throw": {
+        "$": "error",
+        "m": "content broke"
+       }
+      }
+     ],
+     "ret": "x"
+    },
+    "Boom2": {
+     "kind": "fn",
+     "body": [
+      {
+       "throw": {
+        "$": "error",
+        "m": "fallback broke"
+       }
+      }
+     ],
+     "ret": "y"
+    }
+   }
+  },
+  {
+   "name": "suspense: sibling rejection and resolution in one flush",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "suspense"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "fallback",
+         "f1"
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "Use_p"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     },
+     {
+      "$": "el",
+      "t": {
+       "$": "suspense"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "fallback",
+         "f2"
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "Use_q"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     }
+    ]
+   },
+   "comps": {
+    "Use_p": {
+     "kind": "fn",
+     "name": "Use_p",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "p"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "var",
+      "n": "x"
+     }
+    },
+    "Use_q": {
+     "kind": "fn",
+     "name": "Use_q",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "q"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "var",
+      "n": "x"
+     }
+    }
+   },
+   "promises": [
+    {
+     "n": "p",
+     "kind": "pending",
+     "value": "P",
+     "step": 1
+    },
+    {
+     "n": "q",
+     "kind": "pending",
+     "value": {
+      "$": "error",
+      "m": "Q failed"
+     },
+     "reject": true,
+     "step": 1
+    }
+   ],
+   "stream": {
+    "digest": "msg"
+   }
+  },
+  {
+   "name": "suspense: abort then pipe in onAllReady",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "suspense"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "fallback",
+         "F"
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "Use_p"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     }
+    ]
+   },
+   "modes": [
+    "stream"
+   ],
+   "comps": {
+    "Use_p": {
+     "kind": "fn",
+     "name": "Use_p",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "p"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "var",
+      "n": "x"
+     }
+    }
+   },
+   "promises": [
+    {
+     "n": "p",
+     "kind": "pending",
+     "value": "never"
+    }
+   ],
+   "stream": {
+    "pipe": "all",
+    "digest": "msg",
+    "abort": {
+     "step": 1,
+     "reason": {
+      "$": "error",
+      "m": "late abort"
+     }
+    }
+   }
+  },
+  {
+   "name": "keys: Children.count with lazy child",
+   "tree": {
+    "$": "el",
+    "t": "p",
+    "p": null,
+    "c": [
+     {
+      "$": "api",
+      "f": "Children.count",
+      "a": [
+       [
+        {
+         "$": "compv",
+         "n": "L"
+        },
+        "x"
+       ]
+      ]
+     }
+    ]
+   },
+   "comps": {
+    "L": {
+     "kind": "lazy",
+     "p": "mod"
+    }
+   },
+   "promises": [
+    {
+     "n": "mod",
+     "kind": "sync",
+     "value": {
+      "$": "obj",
+      "p": [
+       [
+        "default",
+        "lazy text"
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "lazy: module that is the component itself",
+   "tree": {
+    "$": "el",
+    "t": {
+     "$": "suspense"
+    },
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "fallback",
+       "F"
+      ]
+     ]
+    },
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "L"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "who",
+         "direct"
+        ]
+       ]
+      },
+      "c": []
+     }
+    ]
+   },
+   "comps": {
+    "Hello": {
+     "kind": "fn",
+     "body": [],
+     "ret": {
+      "$": "el",
+      "t": "b",
+      "p": null,
+      "c": [
+       "lazy:",
+       {
+        "$": "prop",
+        "n": "who"
+       }
+      ]
+     },
+     "name": "Hello"
+    },
+    "L": {
+     "kind": "lazy",
+     "p": "mod"
+    }
+   },
+   "promises": [
+    {
+     "n": "mod",
+     "kind": "sync",
+     "value": {
+      "$": "compv",
+      "n": "Hello"
+     }
+    }
+   ]
+  },
+  {
+   "name": "form: useActionState postback key with special key characters",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "key",
+       "q\"\\ é"
+      ]
+     ]
+    },
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "ActForm"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
+   },
+   "comps": {
+    "ActForm": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": [
+        "s",
+        "a"
+       ],
+       "v": {
+        "$": "hook",
+        "h": "useActionState",
+        "a": [
+         {
+          "$": "action",
+          "fn": {
+           "$": "fn",
+           "ps": [
+            "p"
+           ],
+           "ret": 1
+          },
+          "bindable": true,
+          "formAction": {
+           "$": "fn",
+           "ps": [
+            "p"
+           ],
+           "ret": {
+            "$": "obj",
+            "p": [
+             [
+              "name",
+              {
+               "$": "cat",
+               "a": [
+                "n_",
+                {
+                 "$": "var",
+                 "n": "p"
+                }
+               ]
+              }
+             ],
+             [
+              "data",
+              [
+               [
+                "field",
+                "v"
+               ]
+              ]
+             ]
+            ]
+           }
+          }
+         },
+         "init"
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "el",
+      "t": "form",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "action",
+         {
+          "$": "var",
+          "n": "a"
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "var",
+        "n": "s"
+       }
+      ]
+     },
+     "name": "ActForm"
+    }
+   }
+  },
+  {
+   "name": "stream: formState shorter than four entries",
+   "tree": {
+    "$": "el",
+    "t": {
+     "$": "comp",
+     "n": "Act"
+    },
+    "p": null,
+    "c": []
+   },
+   "modes": [
+    "stream"
+   ],
+   "comps": {
+    "Act": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": [
+        "s",
+        "a"
+       ],
+       "v": {
+        "$": "hook",
+        "h": "useActionState",
+        "a": [
+         {
+          "$": "action",
+          "fn": {
+           "$": "fn",
+           "ps": [
+            "p"
+           ],
+           "ret": 1
+          },
+          "formAction": {
+           "$": "fn",
+           "ps": [
+            "p"
+           ],
+           "ret": {
+            "$": "obj",
+            "p": [
+             [
+              "name",
+              "n"
+             ],
+             [
+              "data",
+              []
+             ]
+            ]
+           }
+          },
+          "sigEqual": {
+           "$": "fn",
+           "ps": [
+            "x",
+            "y"
+           ],
+           "ret": true
+          }
+         },
+         "initial",
+         "/perma"
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "el",
+      "t": "form",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "action",
+         {
+          "$": "var",
+          "n": "a"
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "var",
+        "n": "s"
+       }
+      ]
+     }
+    }
+   },
+   "stream": {
+    "opts": {
+     "formState": [
+      "restored",
+      "p/perma"
+     ]
+    }
+   }
+  },
+  {
+   "name": "use: rejected thenable child",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "suspense"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "fallback",
+         "F"
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "promise",
+        "n": "p"
+       }
+      ]
+     },
+     "after"
+    ]
+   },
+   "promises": [
+    {
+     "n": "p",
+     "kind": "rejectedTagged",
+     "value": {
+      "$": "error",
+      "m": "child rejected"
+     }
+    }
+   ]
+  },
+  {
+   "name": "resources: async script image and preload from a late boundary",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "suspense"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "fallback",
+         "F"
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "Late"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     }
+    ]
+   },
+   "comps": {
+    "Late": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "p"
+         }
+        ]
+       }
+      },
+      {
+       "do": {
+        "$": "api",
+        "f": "preload",
+        "a": [
+         "late-font.woff2",
+         {
+          "$": "obj",
+          "p": [
+           [
+            "as",
+            "font"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "ret": [
+      {
+       "$": "el",
+       "t": "script",
+       "p": {
+        "$": "obj",
+        "p": [
+         [
+          "async",
+          true
+         ],
+         [
+          "src",
+          "late.js"
+         ],
+         [
+          "key",
+          "s"
+         ]
+        ]
+       },
+       "c": []
+      },
+      {
+       "$": "el",
+       "t": "img",
+       "p": {
+        "$": "obj",
+        "p": [
+         [
+          "src",
+          "late.png"
+         ],
+         [
+          "key",
+          "i"
+         ]
+        ]
+       },
+       "c": []
+      },
+      {
+       "$": "var",
+       "n": "x"
+      }
+     ]
+    }
+   },
+   "promises": [
+    {
+     "n": "p",
+     "kind": "pending",
+     "value": "late content",
+     "step": 1
+    }
+   ]
+  },
+  {
+   "name": "form: select value survives suspension",
+   "tree": {
+    "$": "el",
+    "t": "select",
+    "p": {
+     "$": "obj",
+     "p": [
+      [
+       "value",
+       "b"
+      ]
+     ]
+    },
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "suspense"
+      },
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "fallback",
+         {
+          "$": "el",
+          "t": "option",
+          "p": {
+           "$": "obj",
+           "p": [
+            [
+             "value",
+             "x"
+            ]
+           ]
+          },
+          "c": [
+           "wait"
+          ]
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "Opt"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     },
+     {
+      "$": "el",
+      "t": "option",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "value",
+         "c"
+        ]
+       ]
+      },
+      "c": [
+       "C"
+      ]
+     }
+    ]
+   },
+   "comps": {
+    "Opt": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "p"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "el",
+      "t": "option",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "value",
+         {
+          "$": "var",
+          "n": "x"
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "var",
+        "n": "x"
+       }
+      ]
+     }
+    }
+   },
+   "promises": [
+    {
+     "n": "p",
+     "kind": "pending",
+     "value": "b",
+     "step": 1
+    }
+   ]
   }
  ]
 }

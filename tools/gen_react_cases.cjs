@@ -11,7 +11,12 @@ const sym = d => ({ $: 'sym', d });
 const symfor = k => ({ $: 'symfor', k });
 const o = obj => ({ $: 'obj', p: Object.entries(obj) });
 const isExpr = x => x !== null && typeof x === 'object' && !Array.isArray(x) && '$' in x;
-const el = (t, p, ...c) => ({ $: 'el', t, p: p === null || p === undefined ? null : isExpr(p) ? p : o(p), c });
+const el = (t, p, ...c) => {
+  // An element expression used as a type renders as "Element type is invalid ... got: object"
+  // on both sides, which would silently void the case (as 18 cases once did).
+  if (isExpr(t) && t.$ === 'el') throw new Error('el(): the type is an element expression; drop the outer el()');
+  return { $: 'el', t, p: p === null || p === undefined ? null : isExpr(p) ? p : o(p), c };
+};
 const v = n => ({ $: 'var', n });
 const prop = n => ({ $: 'prop', n });
 const hook = (h, ...a) => ({ $: 'hook', h, a });
@@ -244,7 +249,7 @@ add_('useId: several in one component', el('div', null, el(C('Id2'))), { comps: 
 add_('useId: nested components', el(C('Outer')), { comps: { Id, Outer: Show([letv('id', hook('useId'))], el('div', { id: v('id') }, el(C('Id')), el(C('Id')))) } });
 add_('useId: identifierPrefix', el('div', null, el(C('Id')), el(C('Id'))), { comps: { Id }, opts: { identifierPrefix: 'app-' }, stream: { opts: { identifierPrefix: 'app-' } } });
 add_('useId: in arrays and fragments', el('div', null, [el(C('Id'), { key: 'a' }), el(T.frag, { key: 'b' }, el(C('Id')), el(C('Id')))], el(C('Id'))), { comps: { Id } });
-add_('useId: inside suspense and context', el(Sus('f', el(ctx('Theme'), { value: 'x' }, el(C('Id'), null), el(C('Id'))))), { comps: { Id }, ctxs: { Theme } });
+add_('useId: inside suspense and context', Sus('f', el(ctx('Theme'), { value: 'x' }, el(C('Id'), null), el(C('Id')))), { comps: { Id }, ctxs: { Theme } });
 const deep = (n) => { let t = el(C('Id')); for (let i = 0; i < n; i++) t = el('div', null, 'x', t, 'y'); return t; };
 add_('useId: deep tree overflow', deep(20), { comps: { Id } });
 add_('useId: wide tree', el('div', null, ...Array.from({ length: 40 }, (_, i) => el(C('Id'), { key: String(i) }))), { comps: { Id } });
@@ -252,33 +257,33 @@ add_('useId: deep and wide overflow mix', (() => { let t = el(C('Id2')); for (le
 add_('useId: component without useId does not advance tree id', el('div', null, el(C('Plain')), el(C('Id'))), { comps: { Id, Plain: Show([], el(C('Id'))) } });
 
 // ---- use() and thenables -------------------------------------------------------------
-add_('use: tagged fulfilled promise reads synchronously', el(Sus('F', el(C('Use_p')))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'fulfilled', value: 'tagged' }] });
+add_('use: tagged fulfilled promise reads synchronously', Sus('F', el(C('Use_p'))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'fulfilled', value: 'tagged' }] });
 add_('use: untracked resolved promise suspends once', el('div', null, Sus('F', el(C('Use_p')))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'resolved', value: 'resolved' }] });
-add_('use: resolved promise is cached for the next render', el(Sus('F', el(C('Use_p')))), { twice: true, modes: ['string', 'static'], comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'resolved', value: 'cached' }] });
-add_('use: pending promise resolved before second render', el(Sus('F', el(C('Use_p')))), { twice: true, modes: ['string', 'static'], comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'later', step: 1 }] });
-add_('use: synchronous thenable', el(Sus('F', el(C('Use_p')))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'sync', value: 'sync-value' }] });
-add_('use: synchronous rejecting thenable', el(Sus('F', el(C('Use_p')))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'syncReject', value: err('sync boom') }] });
+add_('use: resolved promise is cached for the next render', Sus('F', el(C('Use_p'))), { twice: true, modes: ['string', 'static'], comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'resolved', value: 'cached' }] });
+add_('use: pending promise resolved before second render', Sus('F', el(C('Use_p'))), { twice: true, modes: ['string', 'static'], comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'later', step: 1 }] });
+add_('use: synchronous thenable', Sus('F', el(C('Use_p'))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'sync', value: 'sync-value' }] });
+add_('use: synchronous rejecting thenable', Sus('F', el(C('Use_p'))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'syncReject', value: err('sync boom') }] });
 add_('use: tagged rejected promise throws', el('div', null, el(C('Use_p'))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'rejectedTagged', value: err('tagged boom') }] });
-add_('use: tagged rejected inside suspense', el(Sus('F', el(C('Use_p')))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'rejectedTagged', value: err('in boundary') }] });
+add_('use: tagged rejected inside suspense', Sus('F', el(C('Use_p'))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'rejectedTagged', value: err('in boundary') }] });
 add_('use: suspending outside a boundary', el('div', null, el(C('Use_p'))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'v', step: 1 }] });
 add_('use: unsupported argument', el(C('Bad')), { comps: { Bad: Show([letv('x', hook('use', 5))], 'x') } });
 add_('use: unsupported object argument', el(C('Bad')), { comps: { Bad: Show([letv('x', hook('use', o({ a: 1 })))], 'x') } });
 add_('use: thenable child', el('div', null, promise('p')), { promises: [{ n: 'p', kind: 'fulfilled', value: el('b', null, 'from promise') }] });
-add_('use: pending thenable child in suspense', el(Sus('wait', promise('p'))), { promises: [{ n: 'p', kind: 'pending', value: 'resolved child', step: 1 }] });
-add_('use: two uses in one component', el(Sus('F', el(C('Two')))), { comps: { Two: Show([letv('a', hook('use', promise('a'))), letv('b', hook('use', promise('b')))], cat(v('a'), '+', v('b'))) },
+add_('use: pending thenable child in suspense', Sus('wait', promise('p')), { promises: [{ n: 'p', kind: 'pending', value: 'resolved child', step: 1 }] });
+add_('use: two uses in one component', Sus('F', el(C('Two'))), { comps: { Two: Show([letv('a', hook('use', promise('a'))), letv('b', hook('use', promise('b')))], cat(v('a'), '+', v('b'))) },
   promises: [{ n: 'a', kind: 'pending', value: 'A', step: 1 }, { n: 'b', kind: 'pending', value: 'B', step: 2 }] });
-add_('use: try/catch around use rethrows', el(Sus('F', el(C('Catch')))), { comps: { Catch: Show([{ try: [letv('x', hook('use', promise('p')))], catch: 'e', handle: [{ throw: v('e') }] }], 'unreached') }, promises: [{ n: 'p', kind: 'pending', value: 'v', step: 1 }] });
+add_('use: try/catch around use rethrows', Sus('F', el(C('Catch'))), { comps: { Catch: Show([{ try: [letv('x', hook('use', promise('p')))], catch: 'e', handle: [{ throw: v('e') }] }], 'unreached') }, promises: [{ n: 'p', kind: 'pending', value: 'v', step: 1 }] });
 
 // ---- Suspense ------------------------------------------------------------------------
 add_('suspense: no suspension', el('div', null, Sus('F', el('p', null, 'content'))));
 add_('suspense: text inside boundary', el('div', null, 'before', Sus('F', 'inside'), 'after'));
-add_('suspense: nested boundaries', el(Sus('outer', el('div', null, Sus('inner', el(C('Use_p')))))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'deep', step: 1 }] });
+add_('suspense: nested boundaries', Sus('outer', el('div', null, Sus('inner', el(C('Use_p'))))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'deep', step: 1 }] });
 add_('suspense: fallback element', el('div', null, Sus(el('span', { className: 'spinner' }, 'Loading…'), el(C('Use_p')))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'loaded', step: 1 }] });
 add_('suspense: two boundaries resolve in order', el('div', null, Sus('f1', el(C('A'))), Sus('f2', el(C('B')))), { comps: { A: UseP('a'), B: UseP('b') },
   promises: [{ n: 'a', kind: 'pending', value: 'first', step: 2 }, { n: 'b', kind: 'pending', value: 'second', step: 1 }] });
 add_('suspense: error inside boundary', el('div', null, Sus('fallback', el(C('Boom')))), { comps: { Boom: Show([{ throw: err('kaboom') }], 'x') } });
 add_('suspense: error with digest', el('div', null, Sus('fallback', el(C('Boom')))), { comps: { Boom: Show([{ throw: err('digest me') }], 'x') }, stream: { digest: 'msg' } });
-add_('suspense: error in fallback', el(Sus(el(C('Boom')), el(C('Use_p')))), { comps: { Use_p: UseP('p'), Boom: Show([{ throw: err('fallback broke') }], 'x') }, promises: [{ n: 'p', kind: 'pending', value: 'v', step: 1 }] });
+add_('suspense: error in fallback', Sus(el(C('Boom')), el(C('Use_p'))), { comps: { Use_p: UseP('p'), Boom: Show([{ throw: err('fallback broke') }], 'x') }, promises: [{ n: 'p', kind: 'pending', value: 'v', step: 1 }] });
 add_('suspense: rejection after shell', el('div', null, Sus('F', el(C('Use_p')))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: err('late failure'), reject: true, step: 1 }] });
 add_('suspense: rejection after shell with digest', el('div', null, Sus('F', el(C('Use_p')))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: err('late'), reject: true, step: 1 }], stream: { digest: 'msg' } });
 add_('suspense: undefined fallback', el('div', null, el(T.suspense, null, el(C('Use_p')))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'x', step: 1 }] });
@@ -291,11 +296,11 @@ add_('suspense: abort the shell', el('div', null, el(C('Use_p'))), { modes: ['st
 add_('suspense: pipe in onShellReady', el('div', null, Sus('F', el(C('Use_p')))), { modes: ['stream'], comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'shell-piped', step: 1 }], stream: { pipe: 'shell' } });
 add_('suspense: pipe in onAllReady inlines content', el('div', null, Sus('F', el(C('Use_p')))), { modes: ['stream'], comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'all-piped', step: 1 }], stream: { pipe: 'all' } });
 add_('suspense: resolved promise piped in onAllReady', el('div', null, Sus('F', el(C('Use_p')))), { modes: ['stream'], comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'resolved', value: 'quick' }], stream: { pipe: 'all' } });
-add_('suspense: nested boundary completes before outer', el(Sus('outer', el(C('A')), Sus('inner', el(C('B'))))), { comps: { A: UseP('a'), B: UseP('b') },
+add_('suspense: nested boundary completes before outer', Sus('outer', el(C('A')), Sus('inner', el(C('B')))), { comps: { A: UseP('a'), B: UseP('b') },
   promises: [{ n: 'a', kind: 'pending', value: 'A', step: 2 }, { n: 'b', kind: 'pending', value: 'B', step: 1 }] });
 add_('suspense: large boundary is outlined', el('div', null, Sus('F', el('p', null, 'x'.repeat(600)))), { modes: ['stream'], stream: { opts: { progressiveChunkSize: 100 } } });
 add_('suspense: large boundary inlined when piped late', el('div', null, Sus('F', el('p', null, 'y'.repeat(600)))), { modes: ['stream'], stream: { pipe: 'all', opts: { progressiveChunkSize: 100 } } });
-add_('suspense: segment inside resolved boundary (partial)', el(Sus('outer', el('div', null, el(C('A')), el(C('B'))))), { comps: { A: UseP('a'), B: UseP('b') },
+add_('suspense: segment inside resolved boundary (partial)', Sus('outer', el('div', null, el(C('A')), el(C('B')))), { comps: { A: UseP('a'), B: UseP('b') },
   promises: [{ n: 'a', kind: 'pending', value: 'A', step: 1 }, { n: 'b', kind: 'pending', value: 'B', step: 2 }] });
 add_('suspense: table insertion mode segments', el('table', null, el('tbody', null, Sus(el('tr', null, el('td', null, 'loading')), el(C('Row'))))), { comps: { Row: Show([letv('x', hook('use', promise('p')))], el('tr', null, el('td', null, v('x')))) },
   promises: [{ n: 'p', kind: 'pending', value: 'row', step: 1 }] });
@@ -305,11 +310,11 @@ add_('suspense: svg insertion mode segments', el('svg', null, Sus(el('circle'), 
 // ---- lazy --------------------------------------------------------------------------------
 const Hello = Show([], el('b', null, 'lazy:', prop('who')), { name: 'Hello' });
 add_('lazy: synchronous thenable module', el(C('L'), { who: 'sync' }), { comps: { Hello, L: { kind: 'lazy', p: 'mod' } }, promises: [{ n: 'mod', kind: 'sync', value: o({ default: compv('Hello') }) }] });
-add_('lazy: pending module in suspense', el(Sus('F', el(C('L'), { who: 'async' }))), { comps: { Hello, L: { kind: 'lazy', p: 'mod' } }, promises: [{ n: 'mod', kind: 'pending', value: o({ default: compv('Hello') }), step: 1 }] });
-add_('lazy: resolved promise module suspends once', el(Sus('F', el(C('L'), { who: 'resolved' }))), { comps: { Hello, L: { kind: 'lazy', p: 'mod' } }, promises: [{ n: 'mod', kind: 'resolved', value: o({ default: compv('Hello') }) }] });
+add_('lazy: pending module in suspense', Sus('F', el(C('L'), { who: 'async' })), { comps: { Hello, L: { kind: 'lazy', p: 'mod' } }, promises: [{ n: 'mod', kind: 'pending', value: o({ default: compv('Hello') }), step: 1 }] });
+add_('lazy: resolved promise module suspends once', Sus('F', el(C('L'), { who: 'resolved' })), { comps: { Hello, L: { kind: 'lazy', p: 'mod' } }, promises: [{ n: 'mod', kind: 'resolved', value: o({ default: compv('Hello') }) }] });
 add_('lazy: module without default', el(C('L')), { comps: { L: { kind: 'lazy', p: 'mod' } }, promises: [{ n: 'mod', kind: 'sync', value: o({ other: 1 }) }] });
 add_('lazy: loader throws', el(C('L')), { comps: { L: { kind: 'lazy', throws: err('loader failed') } } });
-add_('lazy: rejected module', el(Sus('F', el(C('L')))), { comps: { L: { kind: 'lazy', p: 'mod' } }, promises: [{ n: 'mod', kind: 'syncReject', value: err('module failed') }] });
+add_('lazy: rejected module', Sus('F', el(C('L'))), { comps: { L: { kind: 'lazy', p: 'mod' } }, promises: [{ n: 'mod', kind: 'syncReject', value: err('module failed') }] });
 add_('lazy: as a child node', el('div', null, compv('L')), { comps: { L: { kind: 'lazy', p: 'mod' } }, promises: [{ n: 'mod', kind: 'sync', value: o({ default: 'lazy text' }) }] });
 
 // ---- forwardRef and memo ------------------------------------------------------------------
@@ -427,7 +432,7 @@ add_('doc: head and body twice is an error', el('html', null, el('head'), el('he
 add_('doc: body without html', el('body', null, 'only body'));
 add_('doc: head without html', el('div', null, el('head', null, el('title', null, 't'))));
 add_('doc: html with suspense in body', el('html', null, el('head'), el('body', null, Sus('F', el(C('Use_p'))))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'body content', step: 1 }] });
-add_('doc: suspense around html', el(Sus('F', el('html', null, el('body', null, 'x')))));
+add_('doc: suspense around html', Sus('F', el('html', null, el('body', null, 'x'))));
 add_('doc: stylesheet with document', el('html', null, el('head'), el('body', null, el('link', { rel: 'stylesheet', href: 'main.css', precedence: 'default' }), 'x')));
 add_('doc: hoistables inside suspense boundary', el('div', null, Sus('F', el('title', null, 'In boundary'), el('meta', { name: 'b' }), el(C('Use_p')))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'later', step: 1 }] });
 add_('doc: stylesheet inside late boundary', el('div', null, Sus('F', el(C('Use_p')), el('link', { rel: 'stylesheet', href: 'late.css', precedence: 'default' }))), { comps: { Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'styled', step: 1 }] });
@@ -498,5 +503,48 @@ add_('api: renderToString nested inside a component', el('div', null, el(C('Nest
 add_('api: version', el('p', null, api('version')));
 add_('api: cache passes calls through', el('p', null, call(api('cache', fn(['x'], cat('c:', v('x')))), 1)));
 add_('api: startTransition runs the scope', el(C('ST')), { comps: { ST: Show([doo(api('startTransition', fn([], gset('ran', 'yes'))))], str(gget('ran'))) } });
+
+// ---- review additions: gaps found while comparing the port with the original -------------
+add_('attr: attribute value escaping and bigint', el('div', { title: 'a"b\'c<d>e&f', 'data-n': big('123456789012345678901234567890'), id: 0, lang: num('-0') }, 'x'));
+add_('attr: symbol style value is a TypeError', el('div', { style: o({ color: sym('s') }) }));
+add_('attr: bigint cols is a TypeError', el('textarea', { cols: big('5') }));
+// Context values must be restored when a suspended task resumes under a different snapshot
+// (switchContext across tasks: q resolves under A=a2 first, then p under A=a1,B=b1).
+const Both = fc([letv('a', hook('useContext', ctxv('A'))), letv('b', hook('useContext', ctxv('B')))], el('i', null, cat(v('a'), '/', v('b'))));
+const UseThenBoth = n => fc([letv('x', hook('use', promise(n))), letv('a', hook('useContext', ctxv('A'))), letv('b', hook('useContext', ctxv('B')))], el('i', null, cat(v('x'), ':', v('a'), '/', v('b'))));
+add_('ctx: values restored when suspended tasks resume', el('div', null,
+  el(ctx('A'), { value: 'a1' }, el(ctx('B'), { value: 'b1' }, Sus('f1', el(C('UseP'))), el(C('Both')))),
+  el(ctx('A'), { value: 'a2' }, Sus('f2', el(C('UseQ'))), el(C('Both'))),
+  el(C('Both'))), {
+  ctxs: { A: { default: 'a0' }, B: { default: 'b0' } }, comps: { Both, UseP: UseThenBoth('p'), UseQ: UseThenBoth('q') },
+  promises: [{ n: 'p', kind: 'pending', value: 'P', step: 2 }, { n: 'q', kind: 'pending', value: 'Q', step: 1 }] });
+add_('useId: stable across suspension', el('div', null, el(C('Id')), Sus(el(C('Id')), el(C('IdUse'))), el(C('Id'))), {
+  comps: { Id, IdUse: Show([letv('id', hook('useId')), letv('x', hook('use', promise('p')))], el('span', { id: v('id') }, v('x'))) },
+  promises: [{ n: 'p', kind: 'pending', value: 'resumed', step: 1 }] });
+add_('doc: suspense inside head', el('html', null, el('head', null, Sus(null, el(C('HeadStyle')))), el('body', null, 'b')), {
+  comps: { HeadStyle: Show([letv('x', hook('use', promise('p')))], el('style', null, v('x'))) },
+  promises: [{ n: 'p', kind: 'pending', value: '.late{}', step: 1 }] });
+add_('suspense: fallback that suspends', el('div', null, Sus(el(C('Use_q')), el(C('Use_p')))), { comps: { Use_p: UseP('p'), Use_q: UseP('q') },
+  promises: [{ n: 'q', kind: 'pending', value: 'fallback-ready', step: 1 }, { n: 'p', kind: 'pending', value: 'content-ready', step: 2 }] });
+add_('suspense: abort with a suspended fallback', el('div', null, Sus(el(C('Use_q')), el(C('Use_p')))), { modes: ['stream'], comps: { Use_p: UseP('p'), Use_q: UseP('q') },
+  promises: [{ n: 'q', kind: 'pending', value: 'never' }, { n: 'p', kind: 'pending', value: 'never' }], stream: { abort: { step: 1, reason: err('gone') } } });
+add_('suspense: error in both content and fallback', el('div', null, Sus(el(C('Boom2')), el(C('Boom')))), {
+  comps: { Boom: Show([{ throw: err('content broke') }], 'x'), Boom2: Show([{ throw: err('fallback broke') }], 'y') } });
+add_('suspense: sibling rejection and resolution in one flush', el('div', null, Sus('f1', el(C('Use_p'))), Sus('f2', el(C('Use_q')))), { comps: { Use_p: UseP('p'), Use_q: UseP('q') },
+  promises: [{ n: 'p', kind: 'pending', value: 'P', step: 1 }, { n: 'q', kind: 'pending', value: err('Q failed'), reject: true, step: 1 }], stream: { digest: 'msg' } });
+add_('suspense: abort then pipe in onAllReady', el('div', null, Sus('F', el(C('Use_p')))), { modes: ['stream'], comps: { Use_p: UseP('p') },
+  promises: [{ n: 'p', kind: 'pending', value: 'never' }], stream: { pipe: 'all', digest: 'msg', abort: { step: 1, reason: err('late abort') } } });
+add_('keys: Children.count with lazy child', el('p', null, api('Children.count', [compv('L'), 'x'])), { comps: { L: { kind: 'lazy', p: 'mod' } }, promises: [{ n: 'mod', kind: 'sync', value: o({ default: 'lazy text' }) }] });
+add_('lazy: module that is the component itself', Sus('F', el(C('L'), { who: 'direct' })), { comps: { Hello, L: { kind: 'lazy', p: 'mod' } }, promises: [{ n: 'mod', kind: 'sync', value: compv('Hello') }] });
+add_('form: useActionState postback key with special key characters', el('div', { key: 'q"\\ é' }, el(C('ActForm'))), { comps: { ActForm } });
+add_('stream: formState shorter than four entries', el(C('Act')), { modes: ['stream'], comps: { Act: Show([letv(['s', 'a'], hook('useActionState', { $: 'action', fn: fn(['p'], 1), formAction: fn(['p'], o({ name: 'n', data: [] })), sigEqual: fn(['x', 'y'], true) }, 'initial', '/perma'))], el('form', { action: v('a') }, v('s'))) },
+  stream: { opts: { formState: ['restored', 'p/perma'] } } });
+add_('use: rejected thenable child', el('div', null, Sus('F', promise('p')), 'after'), { promises: [{ n: 'p', kind: 'rejectedTagged', value: err('child rejected') }] });
+add_('resources: async script image and preload from a late boundary', el('div', null, Sus('F', el(C('Late')))), {
+  comps: { Late: Show([letv('x', hook('use', promise('p'))), doo(api('preload', 'late-font.woff2', o({ as: 'font' })))], [el('script', { async: true, src: 'late.js', key: 's' }), el('img', { src: 'late.png', key: 'i' }), v('x')]) },
+  promises: [{ n: 'p', kind: 'pending', value: 'late content', step: 1 }] });
+add_('form: select value survives suspension', el('select', { value: 'b' }, Sus(el('option', { value: 'x' }, 'wait'), el(C('Opt'))), el('option', { value: 'c' }, 'C')), {
+  comps: { Opt: Show([letv('x', hook('use', promise('p')))], el('option', { value: v('x') }, v('x'))) },
+  promises: [{ n: 'p', kind: 'pending', value: 'b', step: 1 }] });
 
 process.stdout.write(JSON.stringify({ cases }, null, 1) + '\n');

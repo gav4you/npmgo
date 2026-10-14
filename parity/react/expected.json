@@ -2402,17 +2402,15 @@
   {
    "name": "useId: inside suspense and context",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$--><span id=\"_R_1_\">_R_1_</span><span id=\"_R_2_\">_R_2_</span><!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<span id=\"_R_1_\">_R_1_</span><span id=\"_R_2_\">_R_2_</span>"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$--><span id=\"_R_1_\">_R_1_</span><span id=\"_R_2_\">_R_2_</span><!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -2489,17 +2487,15 @@
   {
    "name": "use: tagged fulfilled promise reads synchronously",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$-->tagged<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "tagged"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$-->tagged<!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -2525,39 +2521,37 @@
   {
    "name": "use: resolved promise is cached for the next render",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-    "error2": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$!--><template></template>F<!--/$-->",
+    "html2": "<!--$-->cached<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-    "error2": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "F",
+    "html2": "cached"
    }
   },
   {
    "name": "use: pending promise resolved before second render",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-    "error2": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$!--><template></template>F<!--/$-->",
+    "html2": "<!--$-->later<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-    "error2": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "F",
+    "html2": "later"
    }
   },
   {
    "name": "use: synchronous thenable",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$-->sync-value<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "sync-value"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$-->sync-value<!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -2566,17 +2560,16 @@
   {
    "name": "use: synchronous rejecting thenable",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$!--><template></template>F<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "F"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$!--><template></template>F<!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "error:sync boom",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -2604,17 +2597,16 @@
   {
    "name": "use: tagged rejected inside suspense",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$!--><template></template>F<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "F"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$!--><template></template>F<!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "error:in boundary",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -2695,17 +2687,15 @@
   {
    "name": "use: pending thenable child in suspense",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$!--><template></template>wait<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "wait"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$-->resolved child<!-- --><!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -2714,17 +2704,15 @@
   {
    "name": "use: two uses in one component",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$!--><template></template>F<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "F"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$-->A+B<!-- --><!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -2733,17 +2721,15 @@
   {
    "name": "use: try/catch around use rethrows",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$!--><template></template>F<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "F"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$-->unreached<!-- --><!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -2786,17 +2772,15 @@
   {
    "name": "suspense: nested boundaries",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$--><div><!--$!--><template></template>inner<!--/$--></div><!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<div>inner</div>"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$--><div><!--$?--><template id=\"B:0\"></template>inner<!--/$--></div><!--/$--><script>requestAnimationFrame(function(){$RT=performance.now()});</script><div hidden id=\"S:0\">deep<!-- --></div><script>$RB=[];$RV=function(a){$RT=performance.now();for(var b=0;b<a.length;b+=2){var c=a[b],e=a[b+1];null!==e.parentNode&&e.parentNode.removeChild(e);var f=c.parentNode;if(f){var g=c.previousSibling,h=0;do{if(c&&8===c.nodeType){var d=c.data;if(\"/$\"===d||\"/&\"===d)if(0===h)break;else h--;else\"$\"!==d&&\"$?\"!==d&&\"$~\"!==d&&\"$!\"!==d&&\"&\"!==d||h++}d=c.nextSibling;f.removeChild(c);c=d}while(c);for(;e.firstChild;)f.insertBefore(e.firstChild,c);g.data=\"$\";g._reactRetry&&requestAnimationFrame(g._reactRetry)}}a.length=0};\n$RC=function(a,b){if(b=document.getElementById(b))(a=document.getElementById(a))?(a.previousSibling.data=\"$~\",$RB.push(a,b),2===$RB.length&&(\"number\"!==typeof $RT?requestAnimationFrame($RV.bind(null,$RB)):(a=performance.now(),setTimeout($RV.bind(null,$RB),2300>a&&2E3<a?2300-a:$RT+300-a)))):b.parentNode.removeChild(b)};$RC(\"B:0\",\"S:0\")</script>",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -2875,19 +2859,17 @@
   {
    "name": "suspense: error in fallback",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "error": "A component suspended while responding to synchronous input. This will cause the UI to be replaced with a loading indicator. To fix, updates that suspend should be wrapped with startTransition."
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "error": "A component suspended while responding to synchronous input. This will cause the UI to be replaced with a loading indicator. To fix, updates that suspend should be wrapped with startTransition."
    },
    "stream": {
     "html": "",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "allReady",
-     "end"
+     "error:fallback broke",
+     "shellError:fallback broke",
+     "destroy:fallback broke"
     ]
    }
   },
@@ -3061,17 +3043,15 @@
   {
    "name": "suspense: nested boundary completes before outer",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$!--><template></template>outer<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "outer"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$-->A<!-- --><!--$-->B<!-- --><!--/$--><!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -3102,17 +3082,15 @@
   {
    "name": "suspense: segment inside resolved boundary (partial)",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$!--><template></template>outer<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "outer"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$--><div>A<!-- -->B<!-- --></div><!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -3172,17 +3150,15 @@
   {
    "name": "lazy: pending module in suspense",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$!--><template></template>F<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "F"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$--><b>lazy:<!-- -->async</b><!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -3191,17 +3167,15 @@
   {
    "name": "lazy: resolved promise module suspends once",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$!--><template></template>F<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "F"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$--><b>lazy:<!-- -->resolved</b><!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -3248,17 +3222,16 @@
   {
    "name": "lazy: rejected module",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<!--$!--><template></template>F<!--/$-->"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "F"
    },
    "stream": {
-    "html": "",
+    "html": "<!--$!--><template></template>F<!--/$-->",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "error:module failed",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -4880,17 +4853,15 @@
   {
    "name": "doc: suspense around html",
    "string": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<html><head></head><body><!--$-->x<!--/$--></body></html>"
    },
    "static": {
-    "error": "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object."
+    "html": "<html><head></head><body>x</body></html>"
    },
    "stream": {
-    "html": "",
+    "html": "<!DOCTYPE html><html><head></head><body><!--$--><!--html--><!--body-->x<!--/$--></body></html>",
     "events": [
-     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "shellError:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
-     "destroy:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object.",
+     "shellReady",
      "allReady",
      "end"
     ]
@@ -5769,6 +5740,306 @@
    },
    "stream": {
     "html": "yes",
+    "events": [
+     "shellReady",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "attr: attribute value escaping and bigint",
+   "string": {
+    "html": "<div title=\"a&quot;b&#x27;c&lt;d&gt;e&amp;f\" data-n=\"123456789012345678901234567890\" id=\"0\" lang=\"0\">x</div>"
+   },
+   "static": {
+    "html": "<div title=\"a&quot;b&#x27;c&lt;d&gt;e&amp;f\" data-n=\"123456789012345678901234567890\" id=\"0\" lang=\"0\">x</div>"
+   },
+   "stream": {
+    "html": "<div title=\"a&quot;b&#x27;c&lt;d&gt;e&amp;f\" data-n=\"123456789012345678901234567890\" id=\"0\" lang=\"0\">x</div>",
+    "events": [
+     "shellReady",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "attr: symbol style value is a TypeError",
+   "string": {
+    "error": "Cannot convert a Symbol value to a string"
+   },
+   "static": {
+    "error": "Cannot convert a Symbol value to a string"
+   },
+   "stream": {
+    "html": "",
+    "events": [
+     "error:Cannot convert a Symbol value to a string",
+     "shellError:Cannot convert a Symbol value to a string",
+     "destroy:Cannot convert a Symbol value to a string",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "attr: bigint cols is a TypeError",
+   "string": {
+    "error": "Cannot convert a BigInt value to a number"
+   },
+   "static": {
+    "error": "Cannot convert a BigInt value to a number"
+   },
+   "stream": {
+    "html": "",
+    "events": [
+     "error:Cannot convert a BigInt value to a number",
+     "shellError:Cannot convert a BigInt value to a number",
+     "destroy:Cannot convert a BigInt value to a number",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "ctx: values restored when suspended tasks resume",
+   "string": {
+    "html": "<div><!--$!--><template></template>f1<!--/$--><i>a1/b1</i><!--$!--><template></template>f2<!--/$--><i>a2/b0</i><i>a0/b0</i></div>"
+   },
+   "static": {
+    "html": "<div>f1<i>a1/b1</i>f2<i>a2/b0</i><i>a0/b0</i></div>"
+   },
+   "stream": {
+    "html": "<div><!--$?--><template id=\"B:0\"></template>f1<!--/$--><i>a1/b1</i><!--$?--><template id=\"B:1\"></template>f2<!--/$--><i>a2/b0</i><i>a0/b0</i></div><script>requestAnimationFrame(function(){$RT=performance.now()});</script><div hidden id=\"S:1\"><i>Q:a2/b0</i></div><script>$RB=[];$RV=function(a){$RT=performance.now();for(var b=0;b<a.length;b+=2){var c=a[b],e=a[b+1];null!==e.parentNode&&e.parentNode.removeChild(e);var f=c.parentNode;if(f){var g=c.previousSibling,h=0;do{if(c&&8===c.nodeType){var d=c.data;if(\"/$\"===d||\"/&\"===d)if(0===h)break;else h--;else\"$\"!==d&&\"$?\"!==d&&\"$~\"!==d&&\"$!\"!==d&&\"&\"!==d||h++}d=c.nextSibling;f.removeChild(c);c=d}while(c);for(;e.firstChild;)f.insertBefore(e.firstChild,c);g.data=\"$\";g._reactRetry&&requestAnimationFrame(g._reactRetry)}}a.length=0};\n$RC=function(a,b){if(b=document.getElementById(b))(a=document.getElementById(a))?(a.previousSibling.data=\"$~\",$RB.push(a,b),2===$RB.length&&(\"number\"!==typeof $RT?requestAnimationFrame($RV.bind(null,$RB)):(a=performance.now(),setTimeout($RV.bind(null,$RB),2300>a&&2E3<a?2300-a:$RT+300-a)))):b.parentNode.removeChild(b)};$RC(\"B:1\",\"S:1\")</script><div hidden id=\"S:0\"><i>P:a1/b1</i></div><script>$RC(\"B:0\",\"S:0\")</script>",
+    "events": [
+     "shellReady",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "useId: stable across suspension",
+   "string": {
+    "html": "<div><span id=\"_R_1_\">_R_1_</span><!--$!--><template></template><span id=\"_R_2_\">_R_2_</span><!--/$--><span id=\"_R_3_\">_R_3_</span></div>"
+   },
+   "static": {
+    "html": "<div><span id=\"_R_1_\">_R_1_</span><span id=\"_R_2_\">_R_2_</span><span id=\"_R_3_\">_R_3_</span></div>"
+   },
+   "stream": {
+    "html": "<div><span id=\"_R_1_\">_R_1_</span><!--$?--><template id=\"B:0\"></template><span id=\"_R_2_\">_R_2_</span><!--/$--><span id=\"_R_3_\">_R_3_</span></div><script>requestAnimationFrame(function(){$RT=performance.now()});</script><div hidden id=\"S:0\"><span id=\"_R_2_\">resumed</span></div><script>$RB=[];$RV=function(a){$RT=performance.now();for(var b=0;b<a.length;b+=2){var c=a[b],e=a[b+1];null!==e.parentNode&&e.parentNode.removeChild(e);var f=c.parentNode;if(f){var g=c.previousSibling,h=0;do{if(c&&8===c.nodeType){var d=c.data;if(\"/$\"===d||\"/&\"===d)if(0===h)break;else h--;else\"$\"!==d&&\"$?\"!==d&&\"$~\"!==d&&\"$!\"!==d&&\"&\"!==d||h++}d=c.nextSibling;f.removeChild(c);c=d}while(c);for(;e.firstChild;)f.insertBefore(e.firstChild,c);g.data=\"$\";g._reactRetry&&requestAnimationFrame(g._reactRetry)}}a.length=0};\n$RC=function(a,b){if(b=document.getElementById(b))(a=document.getElementById(a))?(a.previousSibling.data=\"$~\",$RB.push(a,b),2===$RB.length&&(\"number\"!==typeof $RT?requestAnimationFrame($RV.bind(null,$RB)):(a=performance.now(),setTimeout($RV.bind(null,$RB),2300>a&&2E3<a?2300-a:$RT+300-a)))):b.parentNode.removeChild(b)};$RC(\"B:0\",\"S:0\")</script>",
+    "events": [
+     "shellReady",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "doc: suspense inside head",
+   "string": {
+    "html": "<html><head><!--$!--><template></template><!--/$--></head><body>b</body></html>"
+   },
+   "static": {
+    "html": "<html><head></head><body>b</body></html>"
+   },
+   "stream": {
+    "html": "<!DOCTYPE html><html><head><!--$?--><template id=\"B:0\"></template><!--/$--></head><body>b<script id=\"_R_\">requestAnimationFrame(function(){$RT=performance.now()});</script><div hidden id=\"S:0\"><style>.late{}</style></div><script>$RB=[];$RV=function(a){$RT=performance.now();for(var b=0;b<a.length;b+=2){var c=a[b],e=a[b+1];null!==e.parentNode&&e.parentNode.removeChild(e);var f=c.parentNode;if(f){var g=c.previousSibling,h=0;do{if(c&&8===c.nodeType){var d=c.data;if(\"/$\"===d||\"/&\"===d)if(0===h)break;else h--;else\"$\"!==d&&\"$?\"!==d&&\"$~\"!==d&&\"$!\"!==d&&\"&\"!==d||h++}d=c.nextSibling;f.removeChild(c);c=d}while(c);for(;e.firstChild;)f.insertBefore(e.firstChild,c);g.data=\"$\";g._reactRetry&&requestAnimationFrame(g._reactRetry)}}a.length=0};\n$RC=function(a,b){if(b=document.getElementById(b))(a=document.getElementById(a))?(a.previousSibling.data=\"$~\",$RB.push(a,b),2===$RB.length&&(\"number\"!==typeof $RT?requestAnimationFrame($RV.bind(null,$RB)):(a=performance.now(),setTimeout($RV.bind(null,$RB),2300>a&&2E3<a?2300-a:$RT+300-a)))):b.parentNode.removeChild(b)};$RC(\"B:0\",\"S:0\")</script></body></html>",
+    "events": [
+     "shellReady",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "suspense: fallback that suspends",
+   "string": {
+    "error": "A component suspended while responding to synchronous input. This will cause the UI to be replaced with a loading indicator. To fix, updates that suspend should be wrapped with startTransition."
+   },
+   "static": {
+    "error": "A component suspended while responding to synchronous input. This will cause the UI to be replaced with a loading indicator. To fix, updates that suspend should be wrapped with startTransition."
+   },
+   "stream": {
+    "html": "<div><!--$?--><template id=\"B:0\"></template>fallback-ready<!--/$--></div><script>requestAnimationFrame(function(){$RT=performance.now()});</script><div hidden id=\"S:0\">content-ready<!-- --></div><script>$RB=[];$RV=function(a){$RT=performance.now();for(var b=0;b<a.length;b+=2){var c=a[b],e=a[b+1];null!==e.parentNode&&e.parentNode.removeChild(e);var f=c.parentNode;if(f){var g=c.previousSibling,h=0;do{if(c&&8===c.nodeType){var d=c.data;if(\"/$\"===d||\"/&\"===d)if(0===h)break;else h--;else\"$\"!==d&&\"$?\"!==d&&\"$~\"!==d&&\"$!\"!==d&&\"&\"!==d||h++}d=c.nextSibling;f.removeChild(c);c=d}while(c);for(;e.firstChild;)f.insertBefore(e.firstChild,c);g.data=\"$\";g._reactRetry&&requestAnimationFrame(g._reactRetry)}}a.length=0};\n$RC=function(a,b){if(b=document.getElementById(b))(a=document.getElementById(a))?(a.previousSibling.data=\"$~\",$RB.push(a,b),2===$RB.length&&(\"number\"!==typeof $RT?requestAnimationFrame($RV.bind(null,$RB)):(a=performance.now(),setTimeout($RV.bind(null,$RB),2300>a&&2E3<a?2300-a:$RT+300-a)))):b.parentNode.removeChild(b)};$RC(\"B:0\",\"S:0\")</script>",
+    "events": [
+     "shellReady",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "suspense: abort with a suspended fallback",
+   "stream": {
+    "html": "",
+    "events": [
+     "error:gone",
+     "error:gone",
+     "shellError:gone",
+     "destroy:gone"
+    ]
+   }
+  },
+  {
+   "name": "suspense: error in both content and fallback",
+   "string": {
+    "error": "fallback broke"
+   },
+   "static": {
+    "error": "fallback broke"
+   },
+   "stream": {
+    "html": "",
+    "events": [
+     "error:content broke",
+     "error:fallback broke",
+     "shellError:fallback broke",
+     "destroy:fallback broke",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "suspense: sibling rejection and resolution in one flush",
+   "string": {
+    "html": "<div><!--$!--><template></template>f1<!--/$--><!--$!--><template></template>f2<!--/$--></div>"
+   },
+   "static": {
+    "html": "<div>f1f2</div>"
+   },
+   "stream": {
+    "html": "<div><!--$?--><template id=\"B:0\"></template>f1<!--/$--><!--$?--><template id=\"B:1\"></template>f2<!--/$--></div><script>requestAnimationFrame(function(){$RT=performance.now()});</script><script>$RX=function(b,c,d,e,f){var a=document.getElementById(b);a&&(b=a.previousSibling,b.data=\"$!\",a=a.dataset,c&&(a.dgst=c),d&&(a.msg=d),e&&(a.stck=e),f&&(a.cstck=f),b._reactRetry&&b._reactRetry())};;$RX(\"B:1\",\"D:Q failed\")</script><div hidden id=\"S:0\">P<!-- --></div><script>$RB=[];$RV=function(a){$RT=performance.now();for(var b=0;b<a.length;b+=2){var c=a[b],e=a[b+1];null!==e.parentNode&&e.parentNode.removeChild(e);var f=c.parentNode;if(f){var g=c.previousSibling,h=0;do{if(c&&8===c.nodeType){var d=c.data;if(\"/$\"===d||\"/&\"===d)if(0===h)break;else h--;else\"$\"!==d&&\"$?\"!==d&&\"$~\"!==d&&\"$!\"!==d&&\"&\"!==d||h++}d=c.nextSibling;f.removeChild(c);c=d}while(c);for(;e.firstChild;)f.insertBefore(e.firstChild,c);g.data=\"$\";g._reactRetry&&requestAnimationFrame(g._reactRetry)}}a.length=0};\n$RC=function(a,b){if(b=document.getElementById(b))(a=document.getElementById(a))?(a.previousSibling.data=\"$~\",$RB.push(a,b),2===$RB.length&&(\"number\"!==typeof $RT?requestAnimationFrame($RV.bind(null,$RB)):(a=performance.now(),setTimeout($RV.bind(null,$RB),2300>a&&2E3<a?2300-a:$RT+300-a)))):b.parentNode.removeChild(b)};$RC(\"B:0\",\"S:0\")</script>",
+    "events": [
+     "shellReady",
+     "error:Q failed",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "suspense: abort then pipe in onAllReady",
+   "stream": {
+    "html": "<div><!--$!--><template data-dgst=\"D:late abort\"></template>F<!--/$--></div>",
+    "events": [
+     "shellReady",
+     "error:late abort",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "keys: Children.count with lazy child",
+   "string": {
+    "html": "<p>2</p>"
+   },
+   "static": {
+    "html": "<p>2</p>"
+   },
+   "stream": {
+    "html": "<p>2</p>",
+    "events": [
+     "shellReady",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "lazy: module that is the component itself",
+   "string": {
+    "html": "<!--$!--><template></template>F<!--/$-->"
+   },
+   "static": {
+    "html": "F"
+   },
+   "stream": {
+    "html": "<!--$!--><template></template>F<!--/$-->",
+    "events": [
+     "error:Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.",
+     "shellReady",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "form: useActionState postback key with special key characters",
+   "string": {
+    "html": "<div><form action=\"\"><input type=\"hidden\" name=\"n_0\"/><input type=\"hidden\" name=\"field\" value=\"v\"/><input type=\"hidden\" name=\"$ACTION_KEY\" value=\"k961792026\"/>init</form></div>"
+   },
+   "static": {
+    "html": "<div><form action=\"\"><input type=\"hidden\" name=\"n_0\"/><input type=\"hidden\" name=\"field\" value=\"v\"/><input type=\"hidden\" name=\"$ACTION_KEY\" value=\"k961792026\"/>init</form></div>"
+   },
+   "stream": {
+    "html": "<div><form action=\"\"><input type=\"hidden\" name=\"n_0\"/><input type=\"hidden\" name=\"field\" value=\"v\"/><input type=\"hidden\" name=\"$ACTION_KEY\" value=\"k11ca5c9b772b6490ef2b33a687d69c3a\"/>init</form></div>",
+    "events": [
+     "shellReady",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "stream: formState shorter than four entries",
+   "stream": {
+    "html": "<!--F!--><form action=\"javascript:throw new Error(&#x27;React form unexpectedly submitted.&#x27;)\">restored</form><script>addEventListener(\"submit\",function(a){if(!a.defaultPrevented){var c=a.target,d=a.submitter,e=c.action,b=d;if(d){var f=d.getAttribute(\"formAction\");null!=f&&(e=f,b=null)}\"javascript:throw new Error('React form unexpectedly submitted.')\"===e&&(a.preventDefault(),b?(a=document.createElement(\"input\"),a.name=b.name,a.value=b.value,b.parentNode.insertBefore(a,b),b=new FormData(c),a.parentNode.removeChild(a)):b=new FormData(c),a=c.ownerDocument||c,(a.$$reactFormReplay=a.$$reactFormReplay||[]).push(c,d,b))}});</script>",
+    "events": [
+     "shellReady",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "use: rejected thenable child",
+   "string": {
+    "html": "<div><!--$!--><template></template>F<!--/$-->after</div>"
+   },
+   "static": {
+    "html": "<div>Fafter</div>"
+   },
+   "stream": {
+    "html": "<div><!--$!--><template></template>F<!--/$-->after</div>",
+    "events": [
+     "error:child rejected",
+     "shellReady",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "resources: async script image and preload from a late boundary",
+   "string": {
+    "html": "<div><!--$!--><template></template>F<!--/$--></div>"
+   },
+   "static": {
+    "html": "<div>F</div>"
+   },
+   "stream": {
+    "html": "<div><!--$?--><template id=\"B:0\"></template>F<!--/$--></div><script>requestAnimationFrame(function(){$RT=performance.now()});</script><link rel=\"preload\" href=\"late-font.woff2\" as=\"font\" crossorigin=\"\"/><link rel=\"preload\" as=\"image\" href=\"late.png\"/><script async=\"\" src=\"late.js\"></script><div hidden id=\"S:0\"><img src=\"late.png\"/>late content<!-- --></div><script>$RB=[];$RV=function(a){$RT=performance.now();for(var b=0;b<a.length;b+=2){var c=a[b],e=a[b+1];null!==e.parentNode&&e.parentNode.removeChild(e);var f=c.parentNode;if(f){var g=c.previousSibling,h=0;do{if(c&&8===c.nodeType){var d=c.data;if(\"/$\"===d||\"/&\"===d)if(0===h)break;else h--;else\"$\"!==d&&\"$?\"!==d&&\"$~\"!==d&&\"$!\"!==d&&\"&\"!==d||h++}d=c.nextSibling;f.removeChild(c);c=d}while(c);for(;e.firstChild;)f.insertBefore(e.firstChild,c);g.data=\"$\";g._reactRetry&&requestAnimationFrame(g._reactRetry)}}a.length=0};\n$RC=function(a,b){if(b=document.getElementById(b))(a=document.getElementById(a))?(a.previousSibling.data=\"$~\",$RB.push(a,b),2===$RB.length&&(\"number\"!==typeof $RT?requestAnimationFrame($RV.bind(null,$RB)):(a=performance.now(),setTimeout($RV.bind(null,$RB),2300>a&&2E3<a?2300-a:$RT+300-a)))):b.parentNode.removeChild(b)};$RC(\"B:0\",\"S:0\")</script>",
+    "events": [
+     "shellReady",
+     "allReady",
+     "end"
+    ]
+   }
+  },
+  {
+   "name": "form: select value survives suspension",
+   "string": {
+    "html": "<select><!--$!--><template></template><option value=\"x\">wait</option><!--/$--><option value=\"c\">C</option></select>"
+   },
+   "static": {
+    "html": "<select><option value=\"x\">wait</option><option value=\"c\">C</option></select>"
+   },
+   "stream": {
+    "html": "<select><!--$?--><template id=\"B:0\"></template><option value=\"x\">wait</option><!--/$--><option value=\"c\">C</option></select><script>requestAnimationFrame(function(){$RT=performance.now()});</script><div hidden id=\"S:0\"><option value=\"b\" selected=\"\">b</option></div><script>$RB=[];$RV=function(a){$RT=performance.now();for(var b=0;b<a.length;b+=2){var c=a[b],e=a[b+1];null!==e.parentNode&&e.parentNode.removeChild(e);var f=c.parentNode;if(f){var g=c.previousSibling,h=0;do{if(c&&8===c.nodeType){var d=c.data;if(\"/$\"===d||\"/&\"===d)if(0===h)break;else h--;else\"$\"!==d&&\"$?\"!==d&&\"$~\"!==d&&\"$!\"!==d&&\"&\"!==d||h++}d=c.nextSibling;f.removeChild(c);c=d}while(c);for(;e.firstChild;)f.insertBefore(e.firstChild,c);g.data=\"$\";g._reactRetry&&requestAnimationFrame(g._reactRetry)}}a.length=0};\n$RC=function(a,b){if(b=document.getElementById(b))(a=document.getElementById(a))?(a.previousSibling.data=\"$~\",$RB.push(a,b),2===$RB.length&&(\"number\"!==typeof $RT?requestAnimationFrame($RV.bind(null,$RB)):(a=performance.now(),setTimeout($RV.bind(null,$RB),2300>a&&2E3<a?2300-a:$RT+300-a)))):b.parentNode.removeChild(b)};$RC(\"B:0\",\"S:0\")</script>",
     "events": [
      "shellReady",
      "allReady",
