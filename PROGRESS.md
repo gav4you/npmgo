@@ -17,6 +17,38 @@ Run all checks: `go test ./...`  ·  Re-record a package's originals: see the he
 | react | 19.2.4 | MIT | ✅ match (server rendering) | verified through react-dom/server below: elements, `Children`, `cloneElement`, context, every hook React serves on the server, `forwardRef`, `memo`, `lazy`, class components, promises / thenables |
 | react-dom (server: `renderToString`, `renderToStaticMarkup`, `renderToPipeableStream`; resource hints, form hooks, `flushSync`, `createPortal`) | 19.2.4 | MIT | ✅ match (server stage; client renderer not started) | 359 cases → 1021 checks: 332 `renderToString`, 332 `renderToStaticMarkup`, 357 `renderToPipeableStream` (HTML + callback order, with scripted promise resolution, pipe timing and aborts); 181 error results. 310 of the stream cases are also rendered through the public `Pipe` / `Wait` API. Plus Go API tests (`api_test.go`, clean under `-race`) |
 | scheduler | 0.27.0 | MIT | N/A for this stage: only `react-dom/client` requires it (neither server build does); deferred to the client-renderer stage | - |
+| chalk | 4.1.2 | MIT | ✅ match | 1,304 checks: `require('chalk')` in 121 pinned environments (level, supportsColor, stderr, `new Instance()`), level option, 44 styles + visible × 4 levels, 8 colour models × fg/bg × 4 levels over edge values (736), 87 calls (long chains, nesting with embedded codes, LF / CRLF, empty strings, argument coercion and joining, the level setter), 150 templates (nesting, `~`, arguments, escapes, every error), util.js |
+| ansi-styles | 4.3.0 | MIT | ✅ match | 1,836 checks: every style's codes, groups, `codes`, the six dynamic tables × 15 models over the color-convert inputs |
+| supports-color | 7.2.0 | MIT | ✅ match | 121 pinned environments × stdout, stderr and `supportsColor(stream)` for 4 streams = 726 checks |
+| has-flag | 4.0.0 | MIT | ✅ match | 25 cases |
+| color-convert | 2.0.1 | MIT | ✅ match (`**` routes within 1e-9) | 210 routes (`.conversion`), 8,484 conversions (303 inputs through every route, rounded and raw): 3,894 input/route pairs exact, 348 on `**` routes within 1e-9 (largest deviation 1.8e-12) |
+| color-name | 1.1.4 | MIT | ✅ match | 148 colours in key order |
+| es-errors | 1.3.0 | MIT | N/A: re-export of the built-in Error constructors (`Error`, `TypeError`, …); Go returns its own error values | - |
+| call-bind | 1.0.8 | MIT | N/A: intrinsic shim, `Function.prototype.call.bind(fn)` with a corrected `length`; Go calls functions and methods directly | - |
+| call-bound | 1.0.4 | MIT | N/A: intrinsic shim, call-bound built-ins by name (`%String.prototype.indexOf%` …); Go calls the operation directly | - |
+| call-bind-apply-helpers | 1.0.2 | MIT | N/A: intrinsic shim, the `call` / `apply` / `bind` helpers behind call-bind | - |
+| get-intrinsic | 1.3.0 | MIT | N/A: intrinsic shim, JS built-ins cached by name against later monkey-patching; Go has no mutable built-ins | - |
+| es-object-atoms | 1.1.1 | MIT | N/A: re-export of `Object`, `ToObject`, `RequireObjectCoercible` | - |
+| gopd | 1.2.0 | MIT | N/A: intrinsic shim, `Object.getOwnPropertyDescriptor` (IE 8 workaround) | - |
+| hasown | 2.0.2 | MIT | N/A: intrinsic shim, call-bound `Object.prototype.hasOwnProperty`; Go uses map lookups and struct fields | - |
+| hasown | 2.0.4 | MIT | N/A: as 2.0.2 (same `index.js`) | - |
+| has-symbols | 1.1.0 | MIT | N/A: engine probe, whether `Symbol` exists (always on supported Node) | - |
+| has-tostringtag | 1.0.2 | MIT | N/A: engine probe, whether `Symbol.toStringTag` exists | - |
+| get-proto | 1.0.1 | MIT | N/A: intrinsic shim, `[[Prototype]]` through `Reflect.getPrototypeOf` / `__proto__`; Go types have no prototype chain | - |
+| function-bind | 1.1.2 | MIT | N/A: intrinsic shim, `Function.prototype.bind` or its polyfill; Go uses closures and method values | - |
+| has-property-descriptors | 1.0.2 | MIT | N/A: engine probe, whether `Object.defineProperty` works (IE 8 bug check) | - |
+| es-set-tostringtag | 2.1.0 | MIT | N/A: intrinsic shim, defines `Symbol.toStringTag` on an object | - |
+| es-define-property | 1.0.1 | MIT | N/A: intrinsic shim, `Object.defineProperty` (IE 8 workaround) | - |
+| define-data-property | 1.1.4 | MIT | N/A: intrinsic shim, `Object.defineProperty` for a data property, falling back to assignment | - |
+| math-intrinsics | 1.1.0 | MIT | N/A: intrinsic shim, cached `Math` / `Number` built-ins (`abs`, `floor`, `isNaN`, `MAX_SAFE_INTEGER` …) and one-line helpers on them; Go uses `math` | - |
+| dunder-proto | 1.0.1 | MIT | N/A: intrinsic shim, call-bound `__proto__` getter and setter | - |
+| set-function-length | 1.2.2 | MIT | N/A: intrinsic shim, sets a function's `length` property; Go functions have none | - |
+| safe-buffer | 5.2.1 | MIT | N/A: re-export of Node's `buffer` (a polyfill on old Node); covered by a future Phase 1b `Buffer` port (not started) | - |
+| safe-buffer | 5.1.2 | MIT | N/A: as 5.2.1 (re-export of `buffer`); covered by the future Phase 1b `Buffer` port (not started) | - |
+
+Licences of the N/A rows were checked in each tarball (`LICENSE` with the MIT text and copyright, and the
+`package.json` licence field). Other versions of the chalk family in the ranking are not yet ported: chalk 5.6.2,
+ansi-styles 5.2.0 and 6.2.3, supports-color 5.5.0 and 8.1.1, has-flag 3.0.0.
 
 ## Adapters (Go stand-ins for V8 internals) — `internal/nodeutil/adapters.go`
 - `Proxy{Target, Handler, Revoked}` — what getProxyDetails returns.
@@ -94,6 +126,83 @@ Review notes:
 ## ms
 - Matches on every case, including case-folding (`1 S`, `1 ſ`), over-length and non-ASCII input.
   `Parse` counts the 100-character limit in UTF-16 code units like `String.prototype.length`.
+
+## chalk
+chalk 4.1.2 and its dependency tree: `pkgs/chalk`, `pkgs/ansi-styles`, `pkgs/supports-color`, `pkgs/has-flag`,
+`pkgs/color-convert`, `pkgs/color-name`.
+
+Verification: `parity/oracle_chalk.cjs` loads the six original packages from a `node_modules` layout and records
+`parity/chalk/expected.json` (Node v25.9.0, win32-x64); each package's `parity_test.go` diffs its section. Results are
+encoded so that `-0`, `NaN`, `undefined` and thrown errors (name and V8 message) are compared as well. supports-color's
+and chalk's load-time state is recorded in a fresh child process per environment row, with `process.argv`,
+`process.env` (a plain, case-sensitive object), `process.platform`, `os.release()` and `tty.isatty()` pinned before
+anything is required, so nothing of the recording machine reaches the expected output; every other chalk case creates
+its instance with an explicit level.
+
+Go API: getters are methods (`c.Red().Bold()`, `c.RGB(…)`, `c.BgHex(…)`, `c.Visible()`), calling is `Sprint`, the tagged
+template is `Tag(literals, values...)` or `Template(text)`, `new chalk.Instance(options)` is `c.Instance(…)` / `New(…)`,
+`require('chalk')` is `Default` (`Load(supportscolor.Stdout, supportscolor.Stderr)`). `Instance()` without options
+detects the level (JavaScript's `undefined` or `{}`); `Instance(Options{})` is `{level: 0}`. supports-color's inputs are
+an explicit `Env`: `Load(env)` is the module body as a pure function and `ProcessEnv()` reads the real process. Where
+JavaScript throws, Go panics with the same message (the level option, colour models that cannot convert or whose level
+is outside 0 to 3); templates return their errors.
+
+Numbers follow V8 through `internal/jsnum`: `Math.round`, `%`, the bitwise operators (`ToInt32`), `parseInt(s, 10)`
+(`FORCE_COLOR=0x3` is 0), `Number()` and number-to-string. `Math.atan2`, `Math.sin` and `Math.cos` (lab ↔ lch) are a
+translation of fdlibm, which V8 uses on every platform; it matched V8 bit for bit on 193,468 inputs across the double
+range, huge arguments included. Products that feed an addition are wrapped in `float64()`, and the arm64, ppc64le,
+s390x and riscv64 assembly of `internal/jsnum` and `pkgs/color-convert` contains no fused multiply-add, so the exact
+routes hold on those architectures too.
+
+Limits and deviations:
+- `**` (color-convert's rgb.xyz, rgb.lab, xyz.rgb, xyz.lab and lab.xyz, and the routes through them): V8 computes it
+  with the C library's pow (the UCRT on Windows, glibc on Linux; on an 80,000-input probe these agreed with each other in
+  99.86% of cases and with fdlibm in 91%), so Node's own last bits depend on the platform. Go uses `math.Pow`. 348 of
+  the 4,242 input/route pairs on these routes differ in the last bits (largest 1.8e-12 relative to max(1, |x|)) and are
+  compared within 1e-9; their rounded results are equal, and so are the ansi-styles codes computed from xyz, lab and
+  lch. On these routes the hue of an achromatic colour (chroma or saturation below 1e-6) is the angle of rounding noise
+  and is not compared (none differed in this recording). Re-recording on another platform may move these last bits.
+- The nearest-keyword distance squares with `** 2`; Go uses `d*d`, which is exact for integer channels and otherwise
+  the correctly rounded square that a platform pow may miss by a bit.
+- Colour-model values are typed. JavaScript's loose arguments are not modelled: a string given to a numeric model
+  (read character by character), a one-element array argument (a one-element `[]float64` reads as its number here),
+  missing channels (which leave `undefined` in raw results; here they read as NaN).
+- color-name's object also answers to `Object.prototype` members (`constructor`, `toString`, `__proto__` …), so a
+  JavaScript keyword lookup of such a name finds a function or an object and yields NaN codes or other TypeErrors; in
+  Go they are unknown keywords. `keyword → rgb` returns a copy (JavaScript returns the shared table array).
+- color-convert's labels of rgb … lch are strings in JavaScript; `Labels` splits them, one per channel.
+- ansi-styles assembles a fresh object on every `require`; the Go tables are shared and read-only. `Codes` is a Go map
+  (JavaScript's `Map` also keeps insertion order). The dynamic tables take typed values (JavaScript's
+  `color.ansi.ansi('31')` concatenates to `\x1b[310m`, `color.ansi16m.rgb(1)` writes `undefined`).
+- supports-color: `Env.Env` is case-sensitive (Node's `process.env` is not on Windows, so `ProcessEnv` upper-cases
+  the names there); `ProcessEnv` fills `OSRelease` only on Windows (it is read only for win32), takes `os.Args` for
+  `process.argv` (which starts with node and the script) and `golang.org/x/term` for `tty.isatty`. A level beyond the
+  int range (a FORCE_COLOR of 19 or more digits) saturates. `browser.js` is not ported. has-flag's `Has` reads `os.Args`.
+- chalk levels are `int`. JavaScript accepts any value through its truthiness check and the unchecked setter
+  (`{level: NaN}`, `chalk.level = 1.5`, which styles but breaks the colour models).
+- Argument coercion (`'' + arg`, `join(' ')`) follows `jsvalue.ToString`: numbers as JavaScript prints them, `nil` as
+  `null`, slices joined with commas, errors as `Error: …`, `fmt.Stringer`s through `String`, anything else
+  `[object Object]`. A JavaScript object's own `toString` / `valueOf` cannot run, and symbols cannot be passed.
+- Templates: a style name that is another property of a chalk object (`level`, `constructor`, `template`, `Instance`,
+  `supportsColor`, `stderr`, `name`, `length`, `call`, `_styler` …) reports `Unknown Chalk style` here, where
+  JavaScript reads the property (a TypeError, the deprecation error or, on a builder, the `Function` constructor). A
+  colour model given arguments that JavaScript passes on unchecked (fewer than three numbers for rgb / hsl / hsv /
+  hwb, a string first argument for a numeric model) returns an error instead of codes such as
+  `38;2;0;undefined;undefined`. Escapes that produce a lone surrogate give U+FFFD in the returned string; halves that
+  meet are joined, as in JavaScript.
+- A colour model used without arguments in a template (`{rgb text}`) throws in JavaScript, with a message the port
+  reproduces: the `_styler` read, or the conversion's TypeError for an unknown keyword and for an hsv text whose first
+  character is not a digit or whitespace (the keyword caveat above applies).
+- `Instance` is also a method of builders (JavaScript builders have none); `SupportsColor` and `Stderr` are fields of
+  every `*Chalk` but are set only on `Load`'s results; `chalk.template` (the instance itself) and the deprecated
+  `chalk.constructor()` are not ported. JavaScript caches each getter's builder on its object; Go builds a new one per
+  call, which the output cannot show.
+- `Default` is initialised from the real process. Where `require('chalk')` throws (FORCE_COLOR=-1 with nothing else
+  detected makes stderr's level −1), importing the package panics.
+- Go: a `*Chalk` is safe for concurrent use (the level is atomic, builders are immutable; checked under `-race`).
+
+Cannot be verified: the real-process conveniences (`supportscolor.ProcessEnv`, `Stdout`, `Stderr`, `chalk.Default`,
+`hasflag.Has`) depend on the machine and are covered by Go API tests only.
 
 ## React (`pkgs/react`, `pkgs/react-dom`, `pkgs/react-dom/server`)
 Translated from the production CJS builds: `react.production.js`, `react-dom.production.js`,

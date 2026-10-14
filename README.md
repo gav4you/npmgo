@@ -19,6 +19,12 @@ go test ./...
 | [Node `util.inspect` / `util.format`](internal/nodeutil) | Node v25.9.0 | 350 inspect, 145 format, ICU string width |
 | [`react`](pkgs/react) | 19.2.4 | verified through react-dom/server's cases |
 | [`react-dom`](pkgs/react-dom) server rendering ([`server`](pkgs/react-dom/server)) | 19.2.4 | 359 cases, 1021 checks: `renderToString`, `renderToStaticMarkup`, `renderToPipeableStream` |
+| [`chalk`](pkgs/chalk) | 4.1.2 | 1,304: styles and colour models at every level, templates, 121 pinned environments |
+| [`ansi-styles`](pkgs/ansi-styles) | 4.3.0 | 1,836 |
+| [`supports-color`](pkgs/supports-color) | 7.2.0 | 726 (121 pinned environments) |
+| [`has-flag`](pkgs/has-flag) | 4.0.0 | 25 |
+| [`color-convert`](pkgs/color-convert) | 2.0.1 | 210 routes, 8,484 conversions |
+| [`color-name`](pkgs/color-name) | 1.1.4 | 148 |
 
 The full ledger is in [`PROGRESS.md`](PROGRESS.md) and the plan is in [`ROADMAP.md`](ROADMAP.md).
 The pilot is the dependency tree of [Postiz](https://github.com/gitroomhq/postiz-app) (3,972 packages),

@@ -4,9 +4,9 @@
 no Node runtime, no embedded JavaScript engine, no compatibility VM. The output is ordinary Go
 modules (`go get`) and, eventually, whole applications compiled to a single binary.
 
-Status as of 2026-10-14: Phase 1 is underway (`ms`, `debug`, Node's `util.inspect`/`util.format` and
-React 19's server renderer — `react` plus `react-dom/server` — are ported and verified; see
-`PROGRESS.md`).
+Status as of 2026-10-14: Phase 1 is underway (`ms`, `debug`, Node's `util.inspect`/`util.format`,
+React 19's server renderer — `react` plus `react-dom/server` — and `chalk` 4 with its dependency tree
+are ported and verified; see `PROGRESS.md`).
 
 ---
 
@@ -44,7 +44,10 @@ fetch tarball → licence gate → classify → translate → record Node output
 
 Classification outcomes:
 - **Port**: has runtime behaviour.
-- **N/A**: types-only (`@types/*`), build tooling, or compiler helpers (e.g. `tslib`), with the reason recorded.
+- **N/A**: types-only (`@types/*`), build tooling, compiler helpers (e.g. `tslib`), and JS-engine intrinsic
+  shims and re-exports of built-ins (e.g. `get-intrinsic`, `call-bind`, `hasown`, `es-errors`, `safe-buffer`): Go
+  callers use the native operation directly, and a re-exported Node API (`safe-buffer`'s `buffer`) is covered by its
+  1b port. The reason is recorded.
 - **Blocked**: licence does not permit redistribution, or needs a capability Go cannot provide; listed
   with the reason.
 
