@@ -10,9 +10,9 @@ Run all checks: `go test ./...`  ·  Re-record a package's originals: see the he
 
 | Pkg | Version | License | Status | Parity checks |
 |---|---|---|---|---|
-| ms | 2.1.3 | MIT | ✅ match | 39 parse, 33 short, 33 long, 2 errors |
-| Node `util.inspect` / `util.format` (dependency of debug) | Node v25.9.0 | MIT (Node.js) | ✅ match | 194 inspect, 46 format, ICU string-width suite (proxies, custom inspect, Promise, WeakMap/WeakSet, iterators, coloured stack traces, RegExp highlighting, prototype chains, ArrayBuffer/SharedArrayBuffer/DataView, all typed-array kinds, URL/URLSearchParams, module namespaces incl. TDZ, AggregateError, getters modes, custom sort) |
-| debug | 4.4.3 | MIT | ✅ match | ×2 env modes (plain, colored): 14 colors, 13×10 enable matrix, 13 disable, 18 log lines, extend, custom formatter, enabled override |
+| ms | 2.1.3 | MIT | ✅ match (reviewed) | 65 parse (+1 over-length), 43 short, 43 long, 2 errors |
+| Node `util.inspect` / `util.format` (dependency of debug) | Node v25.9.0 | MIT (Node.js) | ✅ match (reviewed) | 350 inspect, 145 format, ICU string-width suite (58 strings ×2 modes, 22 code points): proxies, custom inspect, Promise, WeakMap/WeakSet, iterators, coloured stack traces, RegExp highlighting, prototype chains, ArrayBuffer/SharedArrayBuffer/DataView, all typed-array kinds, URL/URLSearchParams, module namespaces incl. TDZ, AggregateError, getters modes, custom sort, every numeric option at Infinity / NaN / negative / fractional values, non-string error stacks, showHidden own properties, %s/%d/%i/%f/%j coercions |
+| debug | 4.4.3 | MIT | ✅ match (reviewed) | ×3 env modes (plain, colored, every DEBUG_* coercion): 14 colors, 18×16 enable matrix, 18 disable, 36 log lines (incl. per-instance inspectOpts snapshot vs global), extend, custom formatter, enabled override |
 | tslib | 2.8.1 | 0BSD | N/A: TypeScript compiler helpers (`__extends`, `__awaiter`…); Go has these natively | - |
 | react | 19.2.4 | MIT | ✅ match (server rendering) | verified through react-dom/server below: elements, `Children`, `cloneElement`, context, every hook React serves on the server, `forwardRef`, `memo`, `lazy`, class components, promises / thenables |
 | react-dom (server: `renderToString`, `renderToStaticMarkup`, `renderToPipeableStream`; resource hints, form hooks, `flushSync`, `createPortal`) | 19.2.4 | MIT | ✅ match (server stage; client renderer not started) | 359 cases → 1021 checks: 332 `renderToString`, 332 `renderToStaticMarkup`, 357 `renderToPipeableStream` (HTML + callback order, with scripted promise resolution, pipe timing and aborts); 181 error results. 310 of the stream cases are also rendered through the public `Pipe` / `Wait` API. Plus Go API tests (`api_test.go`, clean under `-race`) |
@@ -27,16 +27,73 @@ Run all checks: `go test ./...`  ·  Re-record a package's originals: see the he
 - `Cwd` and `BuiltinModules` feed stack-trace colouring.
 
 ## Remaining gaps in nodeutil
+Not modelled (the value model has no field for it):
+- Functions' own hidden properties (`length`, `name`, `prototype`, and the `Symbol.toStringTag` of
+  async / generator functions) and arguments objects' `callee` / `Symbol.iterator`, so `showHidden`
+  and `%o` print `[Function: f]` where Node adds `{ [length]: 0, [name]: 'f', [prototype]: … }`.
+- The prototype getters Node lists with `showHidden` for `Float16Array` and `SharedArrayBuffer`
+  (their constructors are not in `builtInObjects`, see below).
+- V8's internal constructor name for a null-prototype object: `Object.setPrototypeOf(new Foo(), null)`
+  prints `[Foo: null prototype]` in Node and `[Object: null prototype]` here; an own *enumerable*
+  `Symbol.toStringTag` likewise names the prefix in Node. Built-in prototype objects themselves
+  (`Array.prototype` → `Object(0) []`, `Map.prototype` → `Object [Map] {}`).
+- `Date` / `RegExp` / `Error` values whose constructor name is `Object` take Node's plain-object
+  branch; the Go types always print as their kind.
+- User `toString` / `Symbol.toPrimitive` methods cannot run: `%s` on such an object prints
+  `[object Object]`; `String(date)` uses Go's zone abbreviation, not ICU's long zone name (only the
+  NaN-ness matters for `%i` / `%f`).
+- `depth: null` cannot be passed to a custom inspector (Go has no null; it receives `+Inf`); an error's
+  non-string `stack` is formatted with Node's NaN recursion depth (`ctx.nanDepth`).
+- A getter that returns a function: Node's `formatPrimitive` throws and prints
+  `<Inspection threw (TypeError … with a V8 stack)>`; Go prints the function.
+Deliberate differences:
+- A `node_modules/<name>` stack frame with no separator after the module name makes Node loop
+  forever in `markNodeModules` (verified: `at f (/a/node_modules/foo)` hangs); the Go port returns the
+  line with the module name underlined.
+- A fractional or NaN `maxArrayLength` on typed arrays, iterators and weak collections throws
+  `RangeError: Invalid array length` in Node (`new Array(maxLength)`); Go prints `floor(maxLength)`
+  entries. Arrays, Sets, Maps, ArrayBuffers and strings follow Node exactly (`… 1.5 more items`).
+- `highlightRegExp` with an empty or invalid `RegExpColors` palette throws in Node and panics here.
+- A `%j` of a BigInt throws in Node and panics here (`TypeError: Do not know how to serialize a BigInt`).
+Cannot be verified / reproduced:
 - External values are translated but cannot be verified against Node without a native addon.
 - Cross-context (vm) objects: the stripped options object passed to their custom hooks.
 - "Maximum call stack size exceeded" interruption (Go recursion depth differs from V8).
 - Mutating `inspect.defaultOptions` / `inspect.styles` / `inspect.colors`, and the legacy positional
   `inspect(obj, showHidden, depth, colors)` form.
 - Lone UTF-16 surrogates in strings (Go strings cannot hold them).
+- NFC normalisation before the ICU width uses golang.org/x/text (Unicode 15.0); Node's ICU 78 is
+  Unicode 17.0, so a string containing a composition added after Unicode 15 may differ in width.
+  The per-code-point width table itself is generated from Node's ICU.
+Review notes:
+- `builtInObjects` (proto.go) is the set inspect.js captures when it loads, before Node installs
+  Buffer, the web globals, SharedArrayBuffer, Float16Array and WebAssembly; `tools/builtin_objects.cjs`
+  measures it through `util.format('%s')`. It decides `%s` (inspect vs `String()`), when prototype
+  properties are listed, and where the prototype walk stops.
+- Numeric options in `parity/nodeutil/cases.json` may be the strings `"Infinity"` / `"NaN"`; an
+  error spec's `stack` may be any spec (object, `false`, `0`, `null`); `nullProto`, `lastIndex`,
+  iterator `props` and `id` on `fn` / `err` specs are supported by both builders.
 
 ## debug
+- Each Debugger copies `InspectOpts` when created (`createDebug.init`); `%o` / `%O` format with that
+  copy after setting its `colors` to the instance's `UseColors`, while the final
+  `util.formatWithOptions` call and `hideDate` read the live global, exactly as in `node.js`. The
+  parity "snap" / "mix" / "nocolor" log lines pin this down.
+- `DEBUG_*` coercions follow `node.js` + `util.inspect`'s comparisons: booleans count as 0 / 1 where a
+  number is expected, `null` is Infinity for depth / maxArrayLength / maxStringLength but 0 for
+  breakLength, `null` or NaN compact disables the compact layout, `getters` only for `true`. A
+  non-integer `compact` is truncated.
 - The optional `supports-color` 256-colour palette isn't used (Postiz doesn't install it); the deprecated
-  `destroy()` stub is omitted.
+  `destroy()` stub is omitted. `Debugger.Log` receives the formatted line (Node's `log(...args)`
+  receives the raw arguments and formats them itself).
+- Go: `Enable`, `Disable`, `Enabled` and a Debugger's methods are safe for concurrent use (checked
+  under `-race`); `Formatters`, `InspectOpts`, `Log` and `Now` are process-wide settings to configure
+  before logging from several goroutines. A `Formatter` runs with the Debugger locked, so it must not
+  log through that Debugger. `Print` copies its argument slice (Node splices its own array).
+
+## ms
+- Matches on every case, including case-folding (`1 S`, `1 ſ`), over-length and non-ASCII input.
+  `Parse` counts the 100-character limit in UTF-16 code units like `String.prototype.length`.
 
 ## React (`pkgs/react`, `pkgs/react-dom`, `pkgs/react-dom/server`)
 Translated from the production CJS builds: `react.production.js`, `react-dom.production.js`,

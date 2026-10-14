@@ -14,9 +14,9 @@ go test ./...
 
 | Package | Version | Parity checks |
 |---|---|---|
-| [`ms`](pkgs/ms) | 2.1.3 | 107 |
-| [`debug`](pkgs/debug) | 4.4.3 | colours, enable/disable matrix, log lines, extend, formatters, in 2 env modes |
-| [Node `util.inspect` / `util.format`](internal/nodeutil) | Node v25.9.0 | 194 inspect, 46 format, ICU string width |
+| [`ms`](pkgs/ms) | 2.1.3 | 154 |
+| [`debug`](pkgs/debug) | 4.4.3 | colours, enable/disable matrix, log lines, extend, formatters, in 3 env modes |
+| [Node `util.inspect` / `util.format`](internal/nodeutil) | Node v25.9.0 | 350 inspect, 145 format, ICU string width |
 | [`react`](pkgs/react) | 19.2.4 | verified through react-dom/server's cases |
 | [`react-dom`](pkgs/react-dom) server rendering ([`server`](pkgs/react-dom/server)) | 19.2.4 | 359 cases, 1021 checks: `renderToString`, `renderToStaticMarkup`, `renderToPipeableStream` |
 
