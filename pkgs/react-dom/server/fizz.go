@@ -395,11 +395,15 @@ func (r *request) describeComponentStackByType(typ any) string {
 	case *react.MemoType:
 		return r.describeComponentStackByType(t.Type)
 	case *react.LazyType:
-		var resolved any
-		if _, panicked := try(func() { resolved = t.Init(r.loop) }); panicked {
-			return describeBuiltInComponentFrame("Lazy")
+		// JavaScript builds componentStack lazily (a getter), so an onError
+		// that never reads it never runs the lazy's loader. ErrorInfo is a
+		// plain value here, built for every error; describing an unresolved
+		// lazy type as "Lazy" instead of initialising it keeps that free of
+		// side effects.
+		if resolved, ok := t.Resolved(); ok {
+			return r.describeComponentStackByType(resolved)
 		}
-		return r.describeComponentStackByType(resolved)
+		return describeBuiltInComponentFrame("Lazy")
 	case react.Symbol:
 		switch t {
 		case react.SuspenseList:

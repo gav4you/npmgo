@@ -520,15 +520,22 @@ func (r *request) useActionState(action any, initialState any, permalink []strin
 	if a, ok := action.(*react.Action); ok && a != nil && a.FormAction != nil {
 		var nextPostbackStateKey *string
 		componentKeyPath := h.currentlyRenderingKeyPath
-		formState := r.formState
-		if fs := jsvalue.Items(formState); formState != nil && a.IsSignatureEqual != nil && len(fs) >= 4 {
-			postbackKey := fs[1]
-			if a.IsSignatureEqual(fs[2], fs[3]) {
+		if formState := r.formState; formState != nil && a.IsSignatureEqual != nil {
+			// formState[i]: undefined past the end, as JavaScript reads it.
+			fs := jsvalue.Items(formState)
+			at := func(i int) any {
+				if i < len(fs) {
+					return fs[i]
+				}
+				return jsvalue.Undefined{}
+			}
+			postbackKey := at(1)
+			if a.IsSignatureEqual(at(2), at(3)) {
 				k := r.createPostbackActionStateKey(permalink, componentKeyPath, hookIndex)
 				nextPostbackStateKey = &k
-				if postbackKey == k {
+				if jsvalue.StrictEquals(postbackKey, k) {
 					h.actionStateMatchingIndex = hookIndex
-					initialState = fs[0]
+					initialState = at(0)
 				}
 			}
 		}

@@ -60,8 +60,8 @@
 //
 // CreateContext, CreateRef, ForwardRef, Memo and Lazy return the
 // corresponding type objects. Lazy takes a loader returning a Thenable that
-// resolves to the component (or to an *Object module whose "default" property
-// is the component).
+// resolves to a module: an *Object whose "default" property is the component
+// (anything else is an undefined component, as in React).
 //
 // # Promises
 //

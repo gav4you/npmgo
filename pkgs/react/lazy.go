@@ -20,16 +20,41 @@ type LazyType struct {
 }
 
 // Lazy is React.lazy(load). load is called the first time the component
-// renders; the Thenable it returns resolves to the component, or to an
-// *Object module whose "default" property is the component.
+// renders; the Thenable it returns resolves to a module: an *Object whose
+// "default" property is the component (as `import()` resolves). Like React,
+// a module that is not an object yields an undefined component (an "Element
+// type is invalid" error when rendered).
 func Lazy(load func() Thenable) *LazyType {
 	return &LazyType{status: -1, load: load}
 }
 
+// Resolved returns the component (the module's "default" export) once the
+// loader's thenable has resolved to a module Init can read. It never triggers
+// loading and never panics.
+func (l *LazyType) Resolved() (component any, ok bool) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if l.status != 1 || jsvalue.IsNullish(l.result) {
+		return nil, false
+	}
+	return moduleDefault(l.result), true
+}
+
+// moduleDefault is `module.default`.
+func moduleDefault(module any) any {
+	if m, ok := module.(*Object); ok && m != nil {
+		return m.Get("default")
+	}
+	if jsvalue.IsNullish(module) {
+		panic(&jsvalue.TypeError{Message: "Cannot read properties of " + jsvalue.ToString(module) + " (reading 'default')"})
+	}
+	return Undefined{}
+}
+
 // Init is the lazy type's _init (React's lazyInitializer). It returns the
-// component or panics with what JavaScript throws: the pending thenable, or
-// the rejection reason. q is the caller's microtask queue (nil outside a
-// render).
+// component (the resolved module's "default" property) or panics with what
+// JavaScript throws: the pending thenable, or the rejection reason. q is the
+// caller's microtask queue (nil outside a render).
 func (l *LazyType) Init(q Microtasks) any {
 	l.initMu.Lock()
 	l.mu.Lock()
@@ -68,10 +93,7 @@ func (l *LazyType) Init(q Microtasks) any {
 	status, result := l.status, l.result
 	l.mu.Unlock()
 	if status == 1 {
-		if m, ok := result.(*Object); ok {
-			return m.Get("default")
-		}
-		return result
+		return moduleDefault(result)
 	}
 	panic(Throw(result))
 }

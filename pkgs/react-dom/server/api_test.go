@@ -176,7 +176,7 @@ func TestConcurrentRenders(t *testing.T) {
 	}}
 	lazy := react.Lazy(func() react.Thenable {
 		p, resolve, _ := react.NewPromise()
-		go resolve(inner)
+		go resolve(react.Obj("default", inner))
 		return p
 	})
 	app := func(n int) react.Node {
@@ -245,6 +245,80 @@ func TestResourceHintsNeedTheRendersHooks(t *testing.T) {
 	want := `<link rel="preload" href="/font.woff2" as="font" crossorigin=""/><p>x</p>`
 	if got := mustRender(t, h("p", nil, h(comp, nil))); got != want {
 		t.Fatalf("got  %s\nwant %s", got, want)
+	}
+}
+
+// syncThenable calls back from Then, like a thenable React can read without
+// suspending (a Promise always suspends once, as in JavaScript).
+type syncThenable struct {
+	react.ThenableState
+	value any
+}
+
+func (s *syncThenable) Then(onFulfilled, _ func(any)) { onFulfilled(s.value) }
+
+// React.lazy resolves to a module; a loader that resolves to the component
+// itself yields an undefined element type, as in React (checked by the parity
+// case "lazy: module that is the component itself").
+func TestLazyNeedsAModuleObject(t *testing.T) {
+	comp := &react.FunctionComponent{Name: "Comp", Render: func() react.Node { return "x" }}
+	lazyOf := func(module any) *react.LazyType {
+		return react.Lazy(func() react.Thenable { return &syncThenable{value: module} })
+	}
+	_, err := server.RenderToString(h(lazyOf(comp), nil))
+	if err == nil || !strings.Contains(err.Error(), "but got: undefined.") {
+		t.Fatalf("component as module: %v", err)
+	}
+	if got := mustRender(t, h(lazyOf(react.Obj("default", comp)), nil)); got != "x" {
+		t.Fatalf("got %q", got)
+	}
+	if _, err := server.RenderToString(h(lazyOf(nil), nil)); err == nil || err.Error() != "Cannot read properties of null (reading 'default')" {
+		t.Fatalf("null module: %v", err)
+	}
+}
+
+// ErrorInfo.ComponentStack names a resolved lazy type by its component and a
+// pending one as "Lazy", without touching the loader (JavaScript builds the
+// stack only when it is read).
+func TestComponentStackOfLazyTypes(t *testing.T) {
+	boom := &react.FunctionComponent{Name: "Boom", Render: func() react.Node { panic(errBoom) }}
+	resolved := react.Lazy(func() react.Thenable {
+		m := react.Obj("default", boom)
+		p := react.ResolvedPromise(m)
+		p.SetThenableStatus("fulfilled", m, nil)
+		return p
+	})
+	loads := 0
+	pending := react.Lazy(func() react.Thenable {
+		loads++
+		p, _, _ := react.NewPromise()
+		return p
+	})
+	render := func(child react.Node, abort bool) string {
+		var stacks []string
+		s := server.RenderToPipeableStream(h("div", nil, h(react.Suspense, react.Obj("fallback", "fb"), child)), &server.StreamOptions{
+			OnError: func(err error, info server.ErrorInfo) string { stacks = append(stacks, info.ComponentStack); return "" },
+		})
+		if abort {
+			s.Abort(errors.New("stop"))
+		}
+		var buf bytes.Buffer
+		if err := s.Pipe(&buf); err != nil {
+			t.Fatal(err)
+		}
+		if len(stacks) != 1 {
+			t.Fatalf("stacks %q", stacks)
+		}
+		return stacks[0]
+	}
+	if got := render(h(resolved, nil), false); got != "\n    at Boom (<anonymous>)\n    at Suspense (<anonymous>)\n    at div (<anonymous>)" {
+		t.Fatalf("resolved lazy: %q", got)
+	}
+	if got := render(h(pending, nil), true); got != "\n    at Lazy (<anonymous>)\n    at Suspense (<anonymous>)\n    at div (<anonymous>)" {
+		t.Fatalf("pending lazy: %q", got)
+	}
+	if loads != 1 {
+		t.Fatalf("loader ran %d times", loads)
 	}
 }
 
