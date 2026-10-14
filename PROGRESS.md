@@ -17,12 +17,12 @@ Run all checks: `go test ./...`  ·  Re-record a package's originals: see the he
 | react | 19.2.4 | MIT | ✅ match (server rendering) | verified through react-dom/server below: elements, `Children`, `cloneElement`, context, every hook React serves on the server, `forwardRef`, `memo`, `lazy`, class components, promises / thenables |
 | react-dom (server: `renderToString`, `renderToStaticMarkup`, `renderToPipeableStream`; resource hints, form hooks, `flushSync`, `createPortal`) | 19.2.4 | MIT | ✅ match (server stage; client renderer not started) | 359 cases → 1021 checks: 332 `renderToString`, 332 `renderToStaticMarkup`, 357 `renderToPipeableStream` (HTML + callback order, with scripted promise resolution, pipe timing and aborts); 181 error results. 310 of the stream cases are also rendered through the public `Pipe` / `Wait` API. Plus Go API tests (`api_test.go`, clean under `-race`) |
 | scheduler | 0.27.0 | MIT | N/A for this stage: only `react-dom/client` requires it (neither server build does); deferred to the client-renderer stage | - |
-| chalk | 4.1.2 | MIT | ✅ match | 1,304 checks: `require('chalk')` in 121 pinned environments (level, supportsColor, stderr, `new Instance()`), level option, 44 styles + visible × 4 levels, 8 colour models × fg/bg × 4 levels over edge values (736), 87 calls (long chains, nesting with embedded codes, LF / CRLF, empty strings, argument coercion and joining, the level setter), 150 templates (nesting, `~`, arguments, escapes, every error), util.js |
-| ansi-styles | 4.3.0 | MIT | ✅ match | 1,836 checks: every style's codes, groups, `codes`, the six dynamic tables × 15 models over the color-convert inputs |
-| supports-color | 7.2.0 | MIT | ✅ match | 121 pinned environments × stdout, stderr and `supportsColor(stream)` for 4 streams = 726 checks |
-| has-flag | 4.0.0 | MIT | ✅ match | 25 cases |
-| color-convert | 2.0.1 | MIT | ✅ match (`**` routes within 1e-9) | 210 routes (`.conversion`), 8,484 conversions (303 inputs through every route, rounded and raw): 3,894 input/route pairs exact, 348 on `**` routes within 1e-9 (largest deviation 1.8e-12) |
-| color-name | 1.1.4 | MIT | ✅ match | 148 colours in key order |
+| chalk | 4.1.2 | MIT | ✅ match (reviewed) | 1,304 checks: `require('chalk')` in 121 pinned environments (level, supportsColor, stderr, `new Instance()`), level option, 44 styles + visible × 4 levels, 8 colour models × fg/bg × 4 levels over edge values (736), 87 calls (long chains, nesting with embedded codes, LF / CRLF, empty strings, argument coercion and joining, the level setter), 150 templates (nesting, `~`, arguments, escapes, every error), util.js |
+| ansi-styles | 4.3.0 | MIT | ✅ match (reviewed) | 1,836 checks: every style's codes, groups, `codes`, the six dynamic tables × 15 models over the color-convert inputs |
+| supports-color | 7.2.0 | MIT | ✅ match (reviewed) | 121 pinned environments × stdout, stderr and `supportsColor(stream)` for 4 streams = 726 checks |
+| has-flag | 4.0.0 | MIT | ✅ match (reviewed) | 25 cases |
+| color-convert | 2.0.1 | MIT | ✅ match (reviewed; `**` routes within 1e-9) | 210 routes (`.conversion`), 8,484 conversions (303 inputs through every route, rounded and raw): 3,894 input/route pairs exact, 348 on `**` routes within 1e-9 (largest deviation 1.8e-12) |
+| color-name | 1.1.4 | MIT | ✅ match (reviewed) | 148 colours in key order |
 | es-errors | 1.3.0 | MIT | N/A: re-export of the built-in Error constructors (`Error`, `TypeError`, …); Go returns its own error values | - |
 | call-bind | 1.0.8 | MIT | N/A: intrinsic shim, `Function.prototype.call.bind(fn)` with a corrected `length`; Go calls functions and methods directly | - |
 | call-bound | 1.0.4 | MIT | N/A: intrinsic shim, call-bound built-ins by name (`%String.prototype.indexOf%` …); Go calls the operation directly | - |
@@ -156,14 +156,19 @@ routes hold on those architectures too.
 
 Limits and deviations:
 - `**` (color-convert's rgb.xyz, rgb.lab, xyz.rgb, xyz.lab and lab.xyz, and the routes through them): V8 computes it
-  with the C library's pow (the UCRT on Windows, glibc on Linux; on an 80,000-input probe these agreed with each other in
-  99.86% of cases and with fdlibm in 91%), so Node's own last bits depend on the platform. Go uses `math.Pow`. 348 of
-  the 4,242 input/route pairs on these routes differ in the last bits (largest 1.8e-12 relative to max(1, |x|)) and are
-  compared within 1e-9; their rounded results are equal, and so are the ansi-styles codes computed from xyz, lab and
-  lch. On these routes the hue of an achromatic colour (chroma or saturation below 1e-6) is the angle of rounding noise
-  and is not compared (none differed in this recording). Re-recording on another platform may move these last bits.
-- The nearest-keyword distance squares with `** 2`; Go uses `d*d`, which is exact for integer channels and otherwise
-  the correctly rounded square that a platform pow may miss by a bit.
+  with the C library's pow (its default `--use-std-math-pow`; the UCRT on Windows, glibc on Linux; on an 80,000-input
+  probe these agreed with each other in 99.86% of cases and with fdlibm in 91%), so Node's own last bits depend on the
+  platform. Go uses `math.Pow`. 348 of the 4,242 input/route pairs on these routes differ in the last bits (largest
+  1.8e-12 relative to max(1, |x|)) and are compared within 1e-9; their rounded results are equal, and so are the
+  ansi-styles codes computed from xyz, lab and lch. All 348 are pow's rounding: with a correctly rounded pow (math/big,
+  tried in review) every pair matches bit for bit, so the UCRT's results on these inputs are the correctly rounded
+  ones. A correctly rounded pow is not adopted because the C libraries are not correctly rounded either (on a
+  79,000-input probe the UCRT missed the correctly rounded result in 0.02-0.6% of cases, so a tolerance would stay) and
+  it would be far slower; the deviation grows with the input (2.8e-10 at channels of 1e21), hence 1e-9. On these
+  routes the hue of an achromatic colour (chroma or saturation below 1e-6) is the angle of rounding noise and is not
+  compared (none differed in this recording). Re-recording on another platform may move these last bits.
+- The nearest-keyword distance squares with `** 2`, which V8's std-pow path evaluates as `x * x` (it special-cases the
+  exponents 2 and 0.5 before calling pow); Go's `d*d` is the same operation.
 - Colour-model values are typed. JavaScript's loose arguments are not modelled: a string given to a numeric model
   (read character by character), a one-element array argument (a one-element `[]float64` reads as its number here),
   missing channels (which leave `undefined` in raw results; here they read as NaN).
@@ -203,6 +208,16 @@ Limits and deviations:
 
 Cannot be verified: the real-process conveniences (`supportscolor.ProcessEnv`, `Stdout`, `Stderr`, `chalk.Default`,
 `hasflag.Has`) depend on the machine and are covered by Go API tests only.
+
+Review notes:
+- Reviewed line by line against the originals and with further cases outside the recording, run through the same
+  originals: 14 has-flag calls (terminators, multi-unit flags); 76 environments (FORCE_COLOR and TERM_PROGRAM_VERSION
+  coercions, the TEAMCITY and TERM expressions, win32 release strings, flag precedence); 52 calls (nested reopen
+  chains, CRLF runs, number, array, object and symbol arguments); 118 templates (key order of numeric style names, `~`
+  on colour models, whitespace and escape edge cases, 60 spellings of numeric arguments, model errors at every level);
+  5,488 color-convert checks on boundary, huge, subnormal and -0 inputs; jsnum's Number, parseInt, String, round and
+  ToInt32, and 20,899 atan2 / sin / cos calls. Only the documented deviations differed (FORCE_COLOR beyond the int
+  range, string arguments to a numeric model in a template, Object.prototype names as keywords).
 
 ## React (`pkgs/react`, `pkgs/react-dom`, `pkgs/react-dom/server`)
 Translated from the production CJS builds: `react.production.js`, `react-dom.production.js`,
