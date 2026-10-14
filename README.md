@@ -25,6 +25,7 @@ go test ./...
 | [`has-flag`](pkgs/has-flag) | 4.0.0 | 25 |
 | [`color-convert`](pkgs/color-convert) | 2.0.1 | 210 routes, 8,484 conversions |
 | [`color-name`](pkgs/color-name) | 1.1.4 | 148 |
+| [`graceful-fs`](pkgs/graceful-fs) | 4.2.11 | 193 cases, 11,753 checks: full traces on a virtual clock over a scripted fs module |
 
 The full ledger is in [`PROGRESS.md`](PROGRESS.md) and the plan is in [`ROADMAP.md`](ROADMAP.md).
 The pilot is the dependency tree of [Postiz](https://github.com/gitroomhq/postiz-app) (3,972 packages),
@@ -36,7 +37,7 @@ ported in order of how many other packages depend on each one.
 |---|---|
 | `pkgs/<name>/` | Go port + the original package's `LICENSE` |
 | `internal/nodeutil/` | Node `util.inspect` / `util.format` port + Node.js `LICENSE` |
-| `internal/jsvalue/`, `internal/jsloop/` | JavaScript value semantics and a Node-like event loop, used by the React port |
+| `internal/jsvalue/`, `internal/jsloop/` | JavaScript value semantics, a Node-like event loop (used by the React port) and a virtual-clock loop (used by graceful-fs's parity tests) |
 | `parity/` | value specs, Node oracle scripts, test cases, recorded Node outputs |
 | `tools/` | generators that derive data tables from Node |
 

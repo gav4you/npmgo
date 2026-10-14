@@ -23,6 +23,7 @@ Run all checks: `go test ./...`  ·  Re-record a package's originals: see the he
 | has-flag | 4.0.0 | MIT | ✅ match (reviewed) | 25 cases |
 | color-convert | 2.0.1 | MIT | ✅ match (reviewed; `**` routes within 1e-9) | 210 routes (`.conversion`), 8,484 conversions (303 inputs through every route, rounded and raw): 3,894 input/route pairs exact, 348 on `**` routes within 1e-9 (largest deviation 1.8e-12) |
 | color-name | 1.1.4 | MIT | ✅ match (reviewed) | 148 colours in key order |
+| graceful-fs | 4.2.11 | ISC | ✅ match (pending review) | 193 cases, 11,753 checks: the whole trace of each case on a virtual clock (10,746 events: every call graceful-fs makes to a scripted fs module, every callback, step result, exception and stream event), end time, timer fires (count and hash of their times), the queue left over and the functions of the loaded module (965), and 6 scheduler programs (42 events) |
 | es-errors | 1.3.0 | MIT | N/A: re-export of the built-in Error constructors (`Error`, `TypeError`, …); Go returns its own error values | - |
 | call-bind | 1.0.8 | MIT | N/A: intrinsic shim, `Function.prototype.call.bind(fn)` with a corrected `length`; Go calls functions and methods directly | - |
 | call-bound | 1.0.4 | MIT | N/A: intrinsic shim, call-bound built-ins by name (`%String.prototype.indexOf%` …); Go calls the operation directly | - |
@@ -218,6 +219,113 @@ Review notes:
   5,488 color-convert checks on boundary, huge, subnormal and -0 inputs; jsnum's Number, parseInt, String, round and
   ToInt32, and 20,899 atan2 / sin / cos calls. Only the documented deviations differed (FORCE_COLOR beyond the int
   range, string arguments to a numeric model in a template, Object.prototype names as keywords).
+
+## graceful-fs
+graceful-fs 4.2.11 in `pkgs/graceful-fs` (Go package `gracefulfs`, named like the other ports), translated from
+`graceful-fs.js`, `polyfills.js` and `clone.js`.
+
+Verification: a deterministic trace diff, which checks graceful-fs's own logic against a scripted fs module and a
+virtual clock rather than the real disk. `parity/oracle_gracefulfs.cjs` loads the original afresh for every case (a
+clean `require.cache`) over a fake fs module injected with a `Module._load` hook (graceful-fs captures fs's functions
+when it loads), with `Date.now`, `setTimeout`, `clearTimeout` and `process.nextTick` replaced by one virtual scheduler;
+`parity_test.go` runs the same cases through the Go port over the same fake on `internal/jsloop`'s `Virtual`, the Go
+twin of that scheduler (ticks before tasks and after every task, tasks by due time then scheduling order, Node's
+setTimeout clamp: 0 ms runs after 1 ms). The fake completes each asynchronous call as a task `ms` later (never
+synchronously) with the next scripted outcome for that function, and each error carries the number of the call that
+produced it, so the trace shows which error reached a callback. Compared per case: every call to the fs module (its
+arguments and virtual time), every user callback and its arguments, step results and exceptions, uncaught exceptions,
+stream events, the end time, the queue left over, the functions the loaded module has, and the timer fires as a count
+and an FNV-1a hash of their times (an entry in 100 ms backoff fires the retry timer every millisecond, so they are not
+listed). The scheduler models are also diffed on their own (6 programs). Cases come from
+`tools/gen_gracefulfs_cases.cjs`; recorded with Node v25.9.0 on win32-x64 (nothing in the recording depends on the
+machine). The oracle refuses a case whose script runs out, even where graceful-fs swallows the exception itself
+(lutimesSync's closeSync).
+
+Covered: N EMFILE / ENFILE then success through open, readFile, writeFile, appendFile, copyFile, readdir and the
+streams; several entries rotating through the queue under backoff; the 60 s cutoff (59999 retries, 60000 fails with
+the latest error, failures delivered after 60 s, the cutoff counted from the first failure, not the first call); a
+clock at 0, where `startTime || Date.now()` restarts the window; a successful close, closeSync, close or closeSync
+through the underlying module, and lutimes's close resetting the queue (the next attempt still waits 2 ms), failed or
+throwing ones not; a reset while the call is in flight; re-entrancy (a timeout callback calling closeSync); a retried
+call or a timeout callback that throws, which stops the retry timer until the next reset; two loaded copies over one
+fs module and over two (one queue, two retry timers, only the first copy patches close); every argument shape of the
+optional options / mode / flags / callback; readdir sorting by UTF-16 code units (astral against U+E000–U+FFFF),
+Buffers by their WHATWG UTF-8 decoding (maximal subparts), Dirents never reordered, mixed values, errors that come
+with names; chown, fchown, lchown, chmod, fchmod, lchmod and their Sync forms as root, non-root and without getuid
+over EPERM, EINVAL, ENOSYS and other errors; the no-op lchmod, lchown and lutimes (and when they stay absent); the
+O_SYMLINK lutimes and lutimesSync (open through the queue, error precedence); statFix on stat, fstat, lstat and the
+Sync forms, with the two- or three-argument call decided by the truthiness of options; win32 rename (backoff 1, 10, …
+100 ms, the stat of the destination, the 59999 / 60000 window, a missing callback throwing, GRACEFUL_FS_PLATFORM
+overriding process.platform, empty or not); read and readSync after 10 and 11 EAGAINs, and the short form `read(fd,
+cb)`, which graceful-fs does not retry. A mutation check of the harness (39 deliberate changes to the port: `>` for
+`>=`, factor 1.25, cap 99, every copy patching close, an unstable sort, root counted as non-root …) detected every
+change that alters behaviour; the three it passed cannot (`setTimeout(retry, 1)`, which the clamp makes equal to 0,
+and two controls).
+
+Go API: `(*Runtime).Load(base)` is `require('graceful-fs')` where `require('fs')` is `base`, an `FS` (a struct of the
+functions graceful-fs reads, nil where the module has none), on a `Host` (the clock, timers and nextTick) with
+`Runtime.Platform`, `Getuid` and `OSymlink` for process.platform / GRACEFUL_FS_PLATFORM, process.getuid and
+constants.O_SYMLINK. Each `Load` is a freshly loaded copy with its own retry timer; the first copy over a base patches
+its `Close` / `CloseSync` in place (once), so a close made anywhere through the module resets the queue, and every copy
+uses that base's queue. The translation keeps JavaScript's shapes: values graceful-fs does not inspect are `any` (null
+is nil, undefined `jsvalue.Undefined{}`), a callback passed in the place of an optional argument is moved as in
+JavaScript (recognised by the operation's callback type), and a Runtime with the FS values loaded on it is
+single-threaded like JavaScript. For ordinary Go code the blocking functions (`Open`, `Close`, `ReadFile`, `WriteFile`,
+`AppendFile`, `ReadDir`, `ReadDirEntries`, `Stat`, `Lstat`, `Fstat`, `Chmod`, `Fchmod`, `Lchmod`, `Chown`, `Fchown`,
+`Lchown`, `Rename`, `Read`, `CreateReadStream`, `CreateWriteStream`) run graceful-fs over package os on one internal
+event-loop goroutine and may be called from any goroutine.
+
+Not ported (unreachable on supported Node, or with no Go counterpart):
+- `legacy-streams.js` (Node 0.8), the `lchmod` back-port of polyfills.js (Node 0.5 and 0.6.0 to 0.6.2), readdir
+  without options (Node 0 to 5), and queue entries without a startTime, which only older graceful-fs versions sharing
+  the queue push (`retry` would run them at once).
+- `gracefulify(fs)` and `TEST_GRACEFUL_FS_GLOBAL_PATCH`, which patch an fs module in place: Go has no global fs module
+  to patch, and `Load` returns a patched copy (patching the base's close in place, as graceful-fs patches
+  `require('fs')`). Copies of other graceful-fs versions sharing the queue are not modelled.
+- process.cwd caching: loading polyfills.js replaces `process.cwd` by a version that caches its first result and
+  `process.chdir` by one that clears the cache. graceful-fs never calls `process.cwd` itself, so nothing it does depends
+  on this; it changes a process-wide Node API Go does not have (`os.Getwd` is Go's own). The oracle restores both
+  after every case.
+- The `gfs4` debug log (NODE_DEBUG=gfs4: ENQUEUE / RETRY / TIMEOUT messages and an exit-time assertion that the queue
+  is empty); the oracle refuses to run with it set.
+- Node's ReadStream / WriteStream internals: only the open method graceful-fs installs is ported (`FS.ReadStream` and
+  `FS.WriteStream` take the stream's open method, the `Stream` interface is the part of a stream it uses). The JS class
+  mechanics (the ReadStream / WriteStream getters and setters, the FileReadStream / FileWriteStream aliases, calling
+  without `new`, `instanceof`) are not modelled.
+
+Deviations in the value model (none is reachable through Node's own fs):
+- A nil error stands for null, undefined and a missing error argument (the no-op lchmod, lchown and lutimes call back
+  with no argument, real functions with null); the trace records them alike. Callbacks receive their operation's
+  values; JavaScript's `cb.apply(this, arguments)` also passes `this` and any extra arguments the fs module gave.
+- Synchronous functions return an error instead of throwing, and the ones without a result return nothing (JavaScript
+  returns whatever the fs module returned). An fs function that throws synchronously (Node's argument checks) is a
+  panic from the backend, which propagates as the exception does (a retried call that throws stops the retry timer
+  in both).
+- `Stats.Uid` / `Gid` are int64; Node's bigint stats, where graceful-fs's `stats.uid += 0x100000000` throws on a
+  negative BigInt, are not modelled.
+- readdir's sort compares strings and `[]byte` (Buffers) by their UTF-16 forms, nil as "null", numbers and booleans by
+  their JavaScript string forms, anything else as "[object Object]"; `jsvalue.Undefined{}` goes last. Values with their
+  own `toString` are not modelled, and lone surrogates cannot be represented. A Go string that is not valid UTF-8 (a
+  raw Unix file name) sorts as Node would have decoded it (Node returns the replaced name itself).
+- A function passed in the place of an optional argument is moved only when it has the operation's callback type;
+  JavaScript moves any function.
+
+The real file system (blocking functions):
+- The fs module is package os where it matches Node's, and libuv's behaviour where package os differs: names in
+  strcmp order on Unix (libuv's scandir sorts them; Windows keeps directory order, and graceful-fs leaves Dirents in
+  it), chown / fchown / lchown succeed without doing anything on Windows, a read at the end of a file is 0 bytes (the
+  blocking `Read` returns `io.EOF`), uid and gid are 0 on Windows. Flags are `os.O_*` values and modes
+  `os.FileMode`; Node's flag strings and option objects are not interpreted. There is no copyFile, lchmod (so
+  graceful-fs's no-op applies, also on macOS where Node has one), futimes or lutimes. `Fchmod` on Windows needs a
+  handle opened for writing (Node reopens the handle for attribute access); on a read-only handle the EPERM is
+  ignored, as graceful-fs ignores it for every non-root process. A file closed directly (`f.Close()`) does not reset
+  the queue.
+- err.code of a real error: on Unix the errno's name (the nine codes graceful-fs reads); on Windows libuv 1.51.0's
+  `uv_translate_sys_error` (all 100 mappings, through x/sys/windows's constants; Go's invented errno values come out
+  as UNKNOWN). libuv's fs-layer special cases (such as EISDIR for ERROR_FILE_EXISTS on an O_CREAT open) are not
+  reproduced.
+- Machine-dependent, so covered by Go API tests rather than parity: real files and directories, a real Windows sharing
+  violation retried by rename until the handle closes, and a real-time EMFILE limit with 40 goroutines (`-race`).
 
 ## React (`pkgs/react`, `pkgs/react-dom`, `pkgs/react-dom/server`)
 Translated from the production CJS builds: `react.production.js`, `react-dom.production.js`,
