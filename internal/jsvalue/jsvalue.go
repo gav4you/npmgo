@@ -74,10 +74,17 @@ func (s Symbol) Description() string {
 // String renders the symbol like String(symbol): "Symbol(description)".
 func (s Symbol) String() string { return "Symbol(" + s.Description() + ")" }
 
-// TypeError is a JavaScript TypeError raised by a coercion.
+// TypeError is a JavaScript TypeError raised by a coercion or by a property
+// read on undefined; Message is V8's message.
 type TypeError struct{ Message string }
 
 func (e *TypeError) Error() string { return e.Message }
+
+// RangeError is a JavaScript RangeError (such as String.fromCodePoint's
+// "Invalid code point"); Message is V8's message.
+type RangeError struct{ Message string }
+
+func (e *RangeError) Error() string { return e.Message }
 
 // IsNull reports whether v is JavaScript null (nil, or a nil pointer, func,
 // map, channel or interface).

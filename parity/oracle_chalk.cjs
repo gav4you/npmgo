@@ -161,6 +161,80 @@ const out = { node: process.version };
   out.hasFlag = cases.hasFlag.map(([flag, argv]) => hasFlag(flag, argv));
 }
 
+// --- chalk: every instance is created with an explicit level (new chalk.Instance({level})), so no
+// result depends on the colour support of the machine running the oracle.
+{
+  const chalk = require(mod('chalk'));
+  const util = require(path.join(mod('chalk'), 'source', 'util.js'));
+  const k = cases.chalk;
+  const ch = {};
+  // val builds a call argument: JSON values, {"num": "NaN"} for the numbers JSON lacks,
+  // {"undef": true} for undefined, arrays of values, and {"chalk": {chain, args}} for the result of
+  // a nested call on the same instance.
+  const val = (x, inst) => {
+    if (Array.isArray(x)) return x.map(v => val(v, inst));
+    if (x !== null && typeof x === 'object') {
+      if ('num' in x) return num(x.num);
+      if (x.undef) return undefined;
+      if (x.chalk) return chain(inst, x.chalk.chain)(...x.chalk.args.map(v => val(v, inst)));
+      throw new Error('bad value ' + JSON.stringify(x));
+    }
+    return x;
+  };
+  // chain applies getters ([name]) and model calls ([name, ...args]) in turn.
+  const chain = (inst, items) => items.reduce((t, [name, ...args]) => (args.length ? t[name](...args.map(v => val(v, inst))) : t[name]), inst);
+  const instance = level => new chalk.Instance({ level });
+
+  ch.levelOption = k.levelOption.map(level => attempt(() => instance(level).level));
+
+  ch.styleNames = [...Object.keys(require(mod('ansi-styles'))), 'visible'];
+  ch.styles = [];
+  for (const level of k.styleMatrix.levels) {
+    for (const name of ch.styleNames) ch.styles.push(attempt(() => instance(level)[name](...k.styleMatrix.args)));
+  }
+
+  ch.modelOrder = Object.keys(k.modelMatrix.values);
+  ch.models = [];
+  for (const level of k.modelMatrix.levels) {
+    for (const model of ch.modelOrder) {
+      for (const v of k.modelMatrix.values[model]) {
+        for (const name of [model, 'bg' + model[0].toUpperCase() + model.slice(1)]) {
+          ch.models.push(attempt(() => {
+            const inst = instance(level);
+            return inst[name](...val(v, inst))(...k.modelMatrix.args);
+          }));
+        }
+      }
+    }
+  }
+
+  ch.calls = k.calls.map(c => attempt(() => {
+    const inst = instance(c.level);
+    if (c.setLevel !== undefined) inst.level = c.setLevel;
+    const target = chain(inst, c.chain);
+    if (c.builderLevel !== undefined) target.level = c.builderLevel;
+    return target(...c.args.map(v => val(v, inst)));
+  }));
+
+  ch.levelSet = k.levelSet.map(([initial, value]) => {
+    const inst = instance(initial);
+    inst.red.bold.level = value;
+    return inst.level;
+  });
+
+  ch.templates = k.templates.map(t => attempt(() => {
+    const inst = instance(t.level);
+    const target = t.chain ? chain(inst, t.chain) : inst;
+    const strings = t.tpl.slice();
+    strings.raw = t.tpl.slice();
+    return target(strings, ...(t.values || []).map(v => val(v, inst)));
+  }));
+
+  ch.replaceAll = k.replaceAll.map(([s, sub, rep]) => util.stringReplaceAll(s, sub, rep));
+  ch.encase = k.encase.map(([s, pre, post]) => util.stringEncaseCRLFWithFirstIndex(s, pre, post, s.indexOf('\n')));
+  out.chalk = ch;
+}
+
 // --- supports-color and chalk's load-time detection: one fresh child process per environment row.
 {
   const { spawnSync } = require('child_process');
