@@ -270,19 +270,27 @@ func RenderToPipeableStream(children react.Node, opts *StreamOptions) *PipeableS
 // with, or the first error writing to w. If w has a Flush method it is
 // called after each batch of writes. Pipe may be called once.
 func (s *PipeableStream) Pipe(w io.Writer) error {
-	if s.hasStartedFlowing {
-		return newError("React currently only supports piping to one writable stream.")
-	}
-	s.hasStartedFlowing = true
 	d := &writerDestination{w: w}
+	if err := s.attach(d); err != nil {
+		return err
+	}
 	s.dest = d
-	r := s.r
-	r.safelyEmitEarlyPreloads(r.pendingRootTasks == 0)
-	r.startFlowing(d)
 	if s.driving {
 		return nil
 	}
 	return s.drive()
+}
+
+// attach is the JavaScript pipe(destination) minus the event handlers.
+func (s *PipeableStream) attach(d destination) error {
+	if s.hasStartedFlowing {
+		return newError("React currently only supports piping to one writable stream.")
+	}
+	s.hasStartedFlowing = true
+	r := s.r
+	r.safelyEmitEarlyPreloads(r.pendingRootTasks == 0)
+	r.startFlowing(d)
+	return nil
 }
 
 // Wait drives the render on the calling goroutine until the stream has
