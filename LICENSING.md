@@ -11,6 +11,9 @@ for the whole repository:
   `internal/nodeutil/LICENSE`. `width_table.go` is generated from Node's ICU data.
 - `pkgs/react-dom/server/murmurhash.go` is translated from the MurmurHash3 implementation bundled in
   react-dom (MIT, Copyright (c) 2011 Gary Court); its notice is reproduced at the top of that file.
+- `pkgs/graceful-fs/errcode_windows.go` translates libuv's `uv_translate_sys_error` (libuv 1.51.0,
+  `src/win/error.c`, MIT, Copyright Joyent, Inc. and other Node contributors); its notice is reproduced at the
+  top of that file.
 - `internal/jsnum/fdlibm.go` is translated from fdlibm, the math library V8 uses for `Math.atan2`,
   `Math.sin` and `Math.cos` (Copyright (C) 1993 Sun Microsystems, Inc.; use, copying, modification
   and distribution freely granted provided the notice is preserved); its notice is reproduced at

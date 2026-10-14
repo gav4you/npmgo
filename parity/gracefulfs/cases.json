@@ -1,0 +1,10230 @@
+{
+ "scheduler": [
+  {
+   "name": "ticks first, then tasks by due time and scheduling order",
+   "ops": [
+    {
+     "timeout": 0,
+     "id": "t0"
+    },
+    {
+     "after": 0,
+     "id": "io0",
+     "then": [
+      {
+       "tick": "tick-in-io0"
+      },
+      {
+       "timeout": 1,
+       "id": "t-from-io0"
+      },
+      {
+       "after": 0,
+       "id": "io0b"
+      }
+     ]
+    },
+    {
+     "tick": "tick",
+     "then": [
+      {
+       "tick": "tick2",
+       "then": [
+        {
+         "tick": "tick3"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "after": 1,
+     "id": "io1"
+    },
+    {
+     "timeout": 1,
+     "id": "t1"
+    },
+    {
+     "after": 2,
+     "id": "io2",
+     "then": [
+      {
+       "timeout": 0,
+       "id": "t-from-io2"
+      },
+      {
+       "tick": "tick-in-io2"
+      },
+      {
+       "after": 0,
+       "id": "io2b"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "setTimeout clamps delays outside 1..2^31-1 to 1 ms",
+   "ops": [
+    {
+     "timeout": -5,
+     "id": "neg"
+    },
+    {
+     "timeout": 0,
+     "id": "zero"
+    },
+    {
+     "timeout": 1,
+     "id": "one"
+    },
+    {
+     "timeout": 2147483648,
+     "id": "over"
+    },
+    {
+     "timeout": 2147483647,
+     "id": "max"
+    },
+    {
+     "after": 0,
+     "id": "io"
+    },
+    {
+     "after": -3,
+     "id": "io-neg"
+    }
+   ]
+  },
+  {
+   "name": "clearTimeout",
+   "ops": [
+    {
+     "timeout": 5,
+     "id": "a"
+    },
+    {
+     "after": 1,
+     "id": "clear-a",
+     "then": [
+      {
+       "clear": "a"
+      }
+     ]
+    },
+    {
+     "timeout": 3,
+     "id": "self",
+     "then": [
+      {
+       "clear": "self"
+      }
+     ]
+    },
+    {
+     "timeout": 2,
+     "id": "b"
+    },
+    {
+     "timeout": 4,
+     "id": "clear-b-late",
+     "then": [
+      {
+       "clear": "b"
+      }
+     ]
+    },
+    {
+     "clear": "missing"
+    },
+    {
+     "timeout": 6,
+     "id": "c",
+     "then": [
+      {
+       "timeout": 1,
+       "id": "d"
+      }
+     ]
+    },
+    {
+     "after": 6,
+     "id": "clear-d-same-ms",
+     "then": [
+      {
+       "clear": "d"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "equal due times from different delays run in scheduling order",
+   "ops": [
+    {
+     "timeout": 10,
+     "id": "a"
+    },
+    {
+     "after": 5,
+     "id": "b",
+     "then": [
+      {
+       "timeout": 5,
+       "id": "c"
+      },
+      {
+       "after": 5,
+       "id": "d"
+      }
+     ]
+    },
+    {
+     "after": 10,
+     "id": "e"
+    }
+   ]
+  },
+  {
+   "name": "uncaught exceptions",
+   "ops": [
+    {
+     "after": 0,
+     "id": "a",
+     "panic": true,
+     "then": [
+      {
+       "tick": "not-reached"
+      }
+     ]
+    },
+    {
+     "tick": "t",
+     "panic": true
+    },
+    {
+     "tick": "u"
+    },
+    {
+     "after": 1,
+     "id": "b"
+    },
+    {
+     "timeout": 1,
+     "id": "c",
+     "panic": true
+    }
+   ]
+  },
+  {
+   "name": "a clock that starts at a real time",
+   "start": 1700000000000,
+   "ops": [
+    {
+     "timeout": 0,
+     "id": "a"
+    },
+    {
+     "after": 7,
+     "id": "b"
+    }
+   ]
+  }
+ ],
+ "cases": [
+  {
+   "name": "open: success",
+   "script": {
+    "open": [
+     {
+      "ok": 7
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: EMFILE 3 times, then success",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE",
+      "times": 3
+     },
+     {
+      "ok": 7
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: ENFILE 4 times, then success",
+   "script": {
+    "open": [
+     {
+      "err": "ENFILE",
+      "times": 4
+     },
+     {
+      "ok": 7
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: EMFILE and ENFILE alternating",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "ENFILE"
+     },
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "ENFILE"
+     },
+     {
+      "ok": 3
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: ENOENT is not retried",
+   "script": {
+    "open": [
+     {
+      "err": "ENOENT"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: EMFILE, then ENOENT ends the retries",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE",
+      "times": 2
+     },
+     {
+      "err": "ENOENT"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: EMFILE with completion delays",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE",
+      "ms": 3
+     },
+     {
+      "err": "EMFILE",
+      "ms": 7
+     },
+     {
+      "err": "EMFILE",
+      "ms": 1
+     },
+     {
+      "ok": 4,
+      "ms": 2
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: EMFILE until the 60 s cutoff",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE",
+      "times": 1000000
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: ENFILE until the 60 s cutoff, delivered late",
+   "script": {
+    "open": [
+     {
+      "err": "ENFILE",
+      "ms": 37,
+      "times": 1000000
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: a retry at 59999 ms still runs",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "EMFILE",
+      "ms": 59897
+     },
+     {
+      "ok": 9
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: at 60000 ms the cutoff wins, with the latest error",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "ENFILE",
+      "ms": 59898
+     },
+     {
+      "ok": 9
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: the cutoff checks the time of the retry, not of the failure",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "EMFILE",
+      "ms": 59997
+     },
+     {
+      "ok": 9
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: a failure delivered after 60 s times out at once",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "EMFILE",
+      "ms": 60000
+     },
+     {
+      "ok": 9
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: the cutoff without a callback",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "EMFILE",
+      "ms": 60000
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: a clock at 0 makes startTime 0, which || replaces",
+   "env": {
+    "clock": 0
+   },
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "EMFILE",
+      "ms": 59998
+     },
+     {
+      "ok": 9
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: the same script on a real clock times out",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "EMFILE",
+      "ms": 59998
+     },
+     {
+      "ok": 9
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: a clock at 0, EMFILE until the cutoff",
+   "env": {
+    "clock": 0
+   },
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE",
+      "times": 1000000
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: a negative clock",
+   "env": {
+    "clock": -5000
+   },
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE",
+      "times": 5
+     },
+     {
+      "ok": 2
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: three entries interleave under backoff",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 4
+     },
+     {
+      "ok": 10
+     }
+    ],
+    "open:b": [
+     {
+      "err": "EMFILE",
+      "times": 2
+     },
+     {
+      "ok": 11
+     }
+    ],
+    "open:c": [
+     {
+      "err": "ENFILE",
+      "times": 6
+     },
+     {
+      "ok": 12
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "b",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "c",
+      "r",
+      {
+       "cb": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: entries queued at different times",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 5
+     },
+     {
+      "ok": 10
+     }
+    ],
+    "open:b": [
+     {
+      "err": "EMFILE",
+      "times": 2,
+      "ms": 2
+     },
+     {
+      "ok": 11
+     }
+    ],
+    "open:c": [
+     {
+      "err": "ENFILE",
+      "times": 3
+     },
+     {
+      "ok": 12
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 7,
+     "call": "open",
+     "args": [
+      "b",
+      "w",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 13,
+     "call": "open",
+     "args": [
+      "c",
+      "a",
+      {
+       "cb": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: many entries in long backoff",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 12
+     },
+     {
+      "ok": 10
+     }
+    ],
+    "open:b": [
+     {
+      "err": "EMFILE",
+      "times": 9
+     },
+     {
+      "ok": 11
+     }
+    ],
+    "open:c": [
+     {
+      "err": "EMFILE",
+      "times": 11
+     },
+     {
+      "ok": 12
+     }
+    ],
+    "open:d": [
+     {
+      "err": "EMFILE",
+      "times": 3
+     },
+     {
+      "ok": 13
+     }
+    ],
+    "open:e": [
+     {
+      "err": "EMFILE",
+      "times": 10
+     },
+     {
+      "ok": 14
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "open",
+     "args": [
+      "b",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 6,
+     "call": "open",
+     "args": [
+      "c",
+      "r",
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 9,
+     "call": "open",
+     "args": [
+      "d",
+      "r",
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 12,
+     "call": "open",
+     "args": [
+      "e",
+      "r",
+      {
+       "cb": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: one entry times out while another succeeds",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 1000000
+     }
+    ],
+    "open:b": [
+     {
+      "err": "EMFILE",
+      "times": 2
+     },
+     {
+      "ok": 5,
+      "ms": 30000
+     },
+     {
+      "ok": 6
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 10,
+     "call": "open",
+     "args": [
+      "b",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "close: a successful close mid-backoff resets the delay",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 7
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 60,
+     "call": "close",
+     "args": [
+      5,
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "close: a failed close does not reset",
+   "script": {
+    "close": [
+     {
+      "err": "EBADF"
+     }
+    ],
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 7
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 60,
+     "call": "close",
+     "args": [
+      5,
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "close: completion delayed, reset when it completes",
+   "script": {
+    "close": [
+     {
+      "ms": 20
+     }
+    ],
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 7
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 40,
+     "call": "close",
+     "args": [
+      5,
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "close: without a callback",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 7
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 60,
+     "call": "close",
+     "args": [
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "close: several entries are all reset",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 7
+     }
+    ],
+    "open:b": [
+     {
+      "err": "ENFILE",
+      "times": 6
+     },
+     {
+      "ok": 8
+     }
+    ],
+    "readFile:c": [
+     {
+      "err": "EMFILE",
+      "times": 5
+     },
+     {
+      "ok": "c"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "open",
+     "args": [
+      "b",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "readFile",
+     "args": [
+      "c",
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 70,
+     "call": "close",
+     "args": [
+      5,
+      {
+       "cb": 4
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "closeSync: a successful closeSync resets",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 7
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 60,
+     "call": "closeSync",
+     "args": [
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "closeSync: a closeSync that throws does not reset",
+   "script": {
+    "closeSync": [
+     {
+      "err": "EBADF"
+     }
+    ],
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 7
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 60,
+     "call": "closeSync",
+     "args": [
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "close through the underlying fs module resets the queue",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 7
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 60,
+     "on": "b0",
+     "call": "close",
+     "args": [
+      5,
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "closeSync through the underlying fs module resets the queue",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 7
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 60,
+     "on": "b0",
+     "call": "closeSync",
+     "args": [
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "close: a reset restarts the 60 s cutoff",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE",
+      "times": 1000000
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 30000,
+     "call": "closeSync",
+     "args": [
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "close: a reset while the call is in flight keeps its startTime",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "EMFILE",
+      "ms": 59000
+     },
+     {
+      "err": "EMFILE",
+      "times": 1000000
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 100,
+     "call": "closeSync",
+     "args": [
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "close: an empty queue",
+   "steps": [
+    {
+     "at": 0,
+     "call": "close",
+     "args": [
+      5,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "closeSync",
+     "args": [
+      6
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readFile: EMFILE twice, then data",
+   "script": {
+    "readFile": [
+     {
+      "err": "EMFILE",
+      "times": 2
+     },
+     {
+      "ok": "data"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readFile",
+     "args": [
+      "f",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readFile: argument shapes",
+   "script": {
+    "readFile": [
+     {
+      "ok": "a"
+     },
+     {
+      "ok": "b"
+     },
+     {
+      "ok": "c"
+     },
+     {
+      "ok": {
+       "buf": "6869"
+      }
+     },
+     {
+      "ok": "e"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readFile",
+     "args": [
+      "f",
+      "utf8",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "readFile",
+     "args": [
+      "f",
+      {
+       "opts": {
+        "encoding": "utf8",
+        "flag": "r"
+       }
+      },
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "readFile",
+     "args": [
+      "f",
+      {
+       "undef": true
+      },
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "readFile",
+     "args": [
+      "f",
+      null,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "readFile",
+     "args": [
+      "f"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readFile: ENFILE until the cutoff",
+   "script": {
+    "readFile": [
+     {
+      "err": "ENFILE",
+      "times": 1000000
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readFile",
+     "args": [
+      "f",
+      "utf8",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "writeFile: EMFILE, then success; argument shapes",
+   "script": {
+    "writeFile:f": [
+     {
+      "err": "EMFILE"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "writeFile",
+     "args": [
+      "f",
+      "x",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "writeFile",
+     "args": [
+      "g",
+      {
+       "buf": "6162"
+      },
+      {
+       "opts": {
+        "mode": 420
+       }
+      },
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "writeFile",
+     "args": [
+      "h",
+      "y",
+      {
+       "undef": true
+      },
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "writeFile",
+     "args": [
+      "h",
+      "z"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "writeFile: ENOENT",
+   "script": {
+    "writeFile": [
+     {
+      "err": "ENOENT"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "writeFile",
+     "args": [
+      "f",
+      "x",
+      "utf8",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "appendFile: ENFILE, then success; argument shapes",
+   "script": {
+    "appendFile:f": [
+     {
+      "err": "ENFILE",
+      "times": 3
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "appendFile",
+     "args": [
+      "f",
+      "x",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "appendFile",
+     "args": [
+      "g",
+      "y",
+      {
+       "opts": {
+        "flag": "a"
+       }
+      },
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "appendFile",
+     "args": [
+      "g",
+      "z"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "appendFile: absent from the module stays absent",
+   "missing": [
+    "appendFile"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "appendFile",
+     "args": [
+      "f",
+      "x",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "copyFile: argument shapes; flags default to 0",
+   "steps": [
+    {
+     "at": 0,
+     "call": "copyFile",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "copyFile",
+     "args": [
+      "a",
+      "b",
+      1,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "copyFile",
+     "args": [
+      "a",
+      "b",
+      null,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "copyFile",
+     "args": [
+      "a",
+      "b",
+      {
+       "undef": true
+      },
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "copyFile",
+     "args": [
+      "a",
+      "b"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "copyFile: EMFILE, then success",
+   "script": {
+    "copyFile": [
+     {
+      "err": "EMFILE",
+      "times": 3
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "copyFile",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "copyFile: EEXIST is not retried",
+   "script": {
+    "copyFile": [
+     {
+      "err": "EEXIST"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "copyFile",
+     "args": [
+      "a",
+      "b",
+      1,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "copyFile: absent from the module stays absent",
+   "missing": [
+    "copyFile"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "copyFile",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "open: argument shapes",
+   "script": {
+    "open": [
+     {
+      "ok": 1
+     },
+     {
+      "ok": 2
+     },
+     {
+      "ok": 3
+     },
+     {
+      "ok": 4
+     },
+     {
+      "ok": 5
+     },
+     {
+      "ok": 6
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      438,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "undef": true
+      },
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "open",
+     "args": [
+      "a",
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "open",
+     "args": [
+      "a",
+      "r"
+     ]
+    },
+    {
+     "at": 5,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      null,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "the queue holds calls of every kind",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE",
+      "times": 3
+     },
+     {
+      "ok": 3
+     }
+    ],
+    "readFile": [
+     {
+      "err": "ENFILE",
+      "times": 2
+     },
+     {
+      "ok": "r"
+     }
+    ],
+    "writeFile": [
+     {
+      "err": "EMFILE",
+      "times": 4
+     },
+     {}
+    ],
+    "appendFile": [
+     {
+      "err": "EMFILE"
+     },
+     {}
+    ],
+    "copyFile": [
+     {
+      "err": "ENFILE",
+      "times": 2
+     },
+     {}
+    ],
+    "readdir": [
+     {
+      "err": "EMFILE",
+      "times": 3
+     },
+     {
+      "ok": [
+       "b",
+       "a"
+      ]
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "o",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "readFile",
+     "args": [
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "writeFile",
+     "args": [
+      "w",
+      "x",
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "appendFile",
+     "args": [
+      "p",
+      "y",
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "copyFile",
+     "args": [
+      "s",
+      "d",
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "readdir",
+     "args": [
+      "dir",
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readdir: EMFILE, then sorted names",
+   "script": {
+    "readdir": [
+     {
+      "err": "EMFILE",
+      "times": 2
+     },
+     {
+      "ok": [
+       "c",
+       "a",
+       "b"
+      ]
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readdir: argument shapes",
+   "script": {
+    "readdir": [
+     {
+      "ok": [
+       "b",
+       "a"
+      ]
+     },
+     {
+      "ok": [
+       {
+        "buf": "62"
+       },
+       {
+        "buf": "61"
+       }
+      ]
+     },
+     {
+      "ok": [
+       {
+        "dirent": "b"
+       },
+       {
+        "dirent": "a"
+       }
+      ]
+     },
+     {
+      "ok": [
+       "d",
+       "c"
+      ]
+     },
+     {
+      "ok": [
+       "f",
+       "e"
+      ]
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "readdir",
+     "args": [
+      "d",
+      "buffer",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "opts": {
+        "withFileTypes": true
+       }
+      },
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "undef": true
+      },
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "readdir",
+     "args": [
+      "d"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readdir: names sort by UTF-16 code units",
+   "script": {
+    "readdir": [
+     {
+      "ok": [
+       "b",
+       "B",
+       "a",
+       "_",
+       "~",
+       "10",
+       "9",
+       "é",
+       "é",
+       "😀",
+       "",
+       "～",
+       "�",
+       "􏿿",
+       "𐀀",
+       "日本",
+       "",
+       "a\u0000",
+       " ",
+       "Z",
+       "aa",
+       "a-b",
+       "a.b",
+       "ÿ",
+       "Ā"
+      ]
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readdir: Buffers sort by their UTF-8 decoding",
+   "script": {
+    "readdir": [
+     {
+      "ok": [
+       {
+        "buf": "62"
+       },
+       {
+        "buf": "61"
+       },
+       {
+        "buf": "f09f98"
+       },
+       {
+        "buf": "ff"
+       },
+       {
+        "buf": "e282"
+       },
+       {
+        "buf": "ffffff"
+       },
+       {
+        "buf": "61f09f62"
+       },
+       {
+        "buf": "f09f9880"
+       },
+       {
+        "buf": "eebfbf"
+       },
+       {
+        "buf": "efbfbd"
+       },
+       {
+        "buf": "c080"
+       },
+       {
+        "buf": ""
+       },
+       {
+        "buf": "eda080"
+       },
+       {
+        "buf": "f4908080"
+       },
+       {
+        "buf": "e08080"
+       },
+       {
+        "buf": "f08080"
+       },
+       {
+        "buf": "7a"
+       },
+       {
+        "buf": "c3a9"
+       },
+       {
+        "buf": "65cc81"
+       },
+       {
+        "buf": "efbdbe"
+       },
+       {
+        "buf": "ee8080"
+       },
+       {
+        "buf": "f0908080"
+       },
+       {
+        "buf": "c2"
+       },
+       {
+        "buf": "e0a0"
+       },
+       {
+        "buf": "f48fbfbf"
+       }
+      ]
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readdir",
+     "args": [
+      "d",
+      "buffer",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readdir: Dirents keep their order",
+   "script": {
+    "readdir": [
+     {
+      "ok": [
+       {
+        "dirent": "b"
+       },
+       {
+        "dirent": "a"
+       },
+       {
+        "dirent": "c"
+       },
+       {
+        "dirent": "😀"
+       },
+       {
+        "dirent": ""
+       },
+       {
+        "dirent": "A"
+       }
+      ]
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "opts": {
+        "withFileTypes": true
+       }
+      },
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readdir: values of every kind",
+   "script": {
+    "readdir": [
+     {
+      "ok": [
+       "b",
+       null,
+       10,
+       9,
+       true,
+       {
+        "undef": true
+       },
+       "a",
+       {
+        "buf": "6e756c6b"
+       },
+       {
+        "dirent": "x"
+       },
+       false,
+       "nulk",
+       1.5,
+       -1,
+       {
+        "undef": true
+       },
+       "undefined"
+      ]
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readdir: an error that comes with names still sorts them",
+   "script": {
+    "readdir": [
+     {
+      "err": "EIO",
+      "ok": [
+       "b",
+       "a"
+      ]
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readdir: EMFILE with names is retried",
+   "script": {
+    "readdir": [
+     {
+      "err": "EMFILE",
+      "ok": [
+       "b",
+       "a"
+      ]
+     },
+     {
+      "ok": [
+       "d",
+       "c"
+      ]
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readdir: an empty directory",
+   "script": {
+    "readdir": [
+     {
+      "ok": []
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readdir: ENOENT",
+   "script": {
+    "readdir": [
+     {
+      "err": "ENOENT"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readdir: ENFILE until the cutoff",
+   "script": {
+    "readdir": [
+     {
+      "err": "ENFILE",
+      "times": 1000000
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chown: errors as nonroot",
+   "env": {
+    "uid": 1000
+   },
+   "script": {
+    "chown": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chownSync: errors as nonroot",
+   "env": {
+    "uid": 1000
+   },
+   "script": {
+    "chownSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 1,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 3,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 4,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 5,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fchown: errors as nonroot",
+   "env": {
+    "uid": 1000
+   },
+   "script": {
+    "fchown": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fchownSync: errors as nonroot",
+   "env": {
+    "uid": 1000
+   },
+   "script": {
+    "fchownSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchown: errors as nonroot",
+   "env": {
+    "uid": 1000
+   },
+   "script": {
+    "lchown": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchownSync: errors as nonroot",
+   "env": {
+    "uid": 1000
+   },
+   "script": {
+    "lchownSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chmod: errors as nonroot",
+   "env": {
+    "uid": 1000
+   },
+   "script": {
+    "chmod": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chmodSync: errors as nonroot",
+   "env": {
+    "uid": 1000
+   },
+   "script": {
+    "chmodSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 1,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 3,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 4,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 5,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fchmod: errors as nonroot",
+   "env": {
+    "uid": 1000
+   },
+   "script": {
+    "fchmod": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fchmodSync: errors as nonroot",
+   "env": {
+    "uid": 1000
+   },
+   "script": {
+    "fchmodSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchmod: errors as nonroot",
+   "env": {
+    "uid": 1000
+   },
+   "script": {
+    "lchmod": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchmodSync: errors as nonroot",
+   "env": {
+    "uid": 1000
+   },
+   "script": {
+    "lchmodSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chown: errors as root",
+   "env": {
+    "uid": 0
+   },
+   "script": {
+    "chown": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chownSync: errors as root",
+   "env": {
+    "uid": 0
+   },
+   "script": {
+    "chownSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 1,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 3,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 4,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 5,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fchown: errors as root",
+   "env": {
+    "uid": 0
+   },
+   "script": {
+    "fchown": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fchownSync: errors as root",
+   "env": {
+    "uid": 0
+   },
+   "script": {
+    "fchownSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchown: errors as root",
+   "env": {
+    "uid": 0
+   },
+   "script": {
+    "lchown": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchownSync: errors as root",
+   "env": {
+    "uid": 0
+   },
+   "script": {
+    "lchownSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chmod: errors as root",
+   "env": {
+    "uid": 0
+   },
+   "script": {
+    "chmod": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chmodSync: errors as root",
+   "env": {
+    "uid": 0
+   },
+   "script": {
+    "chmodSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 1,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 3,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 4,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 5,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fchmod: errors as root",
+   "env": {
+    "uid": 0
+   },
+   "script": {
+    "fchmod": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fchmodSync: errors as root",
+   "env": {
+    "uid": 0
+   },
+   "script": {
+    "fchmodSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchmod: errors as root",
+   "env": {
+    "uid": 0
+   },
+   "script": {
+    "lchmod": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchmodSync: errors as root",
+   "env": {
+    "uid": 0
+   },
+   "script": {
+    "lchmodSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chown: errors as no getuid",
+   "env": {
+    "uid": null
+   },
+   "script": {
+    "chown": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chownSync: errors as no getuid",
+   "env": {
+    "uid": null
+   },
+   "script": {
+    "chownSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 1,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 3,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 4,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 5,
+     "call": "chownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fchown: errors as no getuid",
+   "env": {
+    "uid": null
+   },
+   "script": {
+    "fchown": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fchown",
+     "args": [
+      3,
+      1,
+      2,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fchownSync: errors as no getuid",
+   "env": {
+    "uid": null
+   },
+   "script": {
+    "fchownSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fchownSync",
+     "args": [
+      3,
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchown: errors as no getuid",
+   "env": {
+    "uid": null
+   },
+   "script": {
+    "lchown": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchownSync: errors as no getuid",
+   "env": {
+    "uid": null
+   },
+   "script": {
+    "lchownSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chmod: errors as no getuid",
+   "env": {
+    "uid": null
+   },
+   "script": {
+    "chmod": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chmodSync: errors as no getuid",
+   "env": {
+    "uid": null
+   },
+   "script": {
+    "chmodSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 1,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 3,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 4,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 5,
+     "call": "chmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fchmod: errors as no getuid",
+   "env": {
+    "uid": null
+   },
+   "script": {
+    "fchmod": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fchmodSync: errors as no getuid",
+   "env": {
+    "uid": null
+   },
+   "script": {
+    "fchmodSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fchmodSync",
+     "args": [
+      3,
+      420
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchmod: errors as no getuid",
+   "env": {
+    "uid": null
+   },
+   "script": {
+    "lchmod": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchmodSync: errors as no getuid",
+   "env": {
+    "uid": null
+   },
+   "script": {
+    "lchmodSync": [
+     {
+      "err": "EPERM"
+     },
+     {
+      "err": "EINVAL"
+     },
+     {
+      "err": "ENOSYS"
+     },
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chown: a uid that is neither 0 nor 1000",
+   "env": {
+    "uid": -1
+   },
+   "script": {
+    "chown": [
+     {
+      "err": "EPERM"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chown and chmod: no callback",
+   "script": {
+    "chown": [
+     {
+      "err": "EACCES"
+     }
+    ],
+    "chmod": [
+     {
+      "err": "EPERM"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 0,
+     "call": "chmod",
+     "args": [
+      "p",
+      420
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chown and chmod: completion delays",
+   "script": {
+    "chown": [
+     {
+      "err": "EPERM",
+      "ms": 5
+     }
+    ],
+    "fchmod": [
+     {
+      "ms": 3
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "fchmod",
+     "args": [
+      3,
+      420,
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "chown and chmod: EMFILE is not retried",
+   "script": {
+    "chown": [
+     {
+      "err": "EMFILE"
+     }
+    ],
+    "chmod": [
+     {
+      "err": "ENFILE"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "chown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchmod: a no-op where the module lacks it",
+   "missing": [
+    "lchmod",
+    "lchmodSync"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchmod: missing lchmod also replaces an existing lchmodSync",
+   "missing": [
+    "lchmod"
+   ],
+   "script": {
+    "lchmodSync": [
+     {
+      "err": "EACCES"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchmodSync",
+     "args": [
+      "p",
+      420
+     ]
+    },
+    {
+     "at": 0,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchmod: stays absent without chmod",
+   "missing": [
+    "chmod",
+    "lchmod",
+    "lchmodSync"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchown: a no-op where the module lacks it",
+   "missing": [
+    "lchown",
+    "lchownSync"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchown: missing lchown also replaces an existing lchownSync",
+   "missing": [
+    "lchown"
+   ],
+   "script": {
+    "lchownSync": [
+     {
+      "err": "EACCES"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchownSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lchown: stays absent without chown",
+   "missing": [
+    "chown",
+    "lchown",
+    "lchownSync"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "the no-op callbacks run before a timer or completion",
+   "missing": [
+    "lchmod",
+    "lchown"
+   ],
+   "script": {
+    "open": [
+     {
+      "ok": 3
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "lchown",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: the module's own is used",
+   "script": {
+    "lutimes": [
+     {
+      "err": "ENOENT"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lutimesSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: a no-op where the module lacks it but has futimes",
+   "missing": [
+    "lutimes",
+    "lutimesSync"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "lutimesSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: stays absent without futimes",
+   "missing": [
+    "lutimes",
+    "lutimesSync",
+    "futimes"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: missing lutimes with futimesSync but no futimes",
+   "missing": [
+    "lutimes",
+    "futimes"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimesSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: through open(O_SYMLINK), futimes and close",
+   "env": {
+    "osymlink": 2097152
+   },
+   "missing": [
+    "lutimes",
+    "lutimesSync"
+   ],
+   "script": {
+    "open": [
+     {
+      "ok": 9
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: O_SYMLINK, the open fails",
+   "env": {
+    "osymlink": 2097152
+   },
+   "missing": [
+    "lutimes",
+    "lutimesSync"
+   ],
+   "script": {
+    "open": [
+     {
+      "err": "ELOOP",
+      "times": 2
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: O_SYMLINK, futimes fails and close succeeds",
+   "env": {
+    "osymlink": 2097152
+   },
+   "missing": [
+    "lutimes",
+    "lutimesSync"
+   ],
+   "script": {
+    "open": [
+     {
+      "ok": 9
+     }
+    ],
+    "futimes": [
+     {
+      "err": "EPERM"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: O_SYMLINK, futimes succeeds and close fails",
+   "env": {
+    "osymlink": 2097152
+   },
+   "missing": [
+    "lutimes",
+    "lutimesSync"
+   ],
+   "script": {
+    "open": [
+     {
+      "ok": 9
+     }
+    ],
+    "close": [
+     {
+      "err": "EIO"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: O_SYMLINK, both fail",
+   "env": {
+    "osymlink": 2097152
+   },
+   "missing": [
+    "lutimes",
+    "lutimesSync"
+   ],
+   "script": {
+    "open": [
+     {
+      "ok": 9
+     }
+    ],
+    "futimes": [
+     {
+      "err": "EPERM"
+     }
+    ],
+    "close": [
+     {
+      "err": "EIO"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: O_SYMLINK, without a callback",
+   "env": {
+    "osymlink": 2097152
+   },
+   "missing": [
+    "lutimes",
+    "lutimesSync"
+   ],
+   "script": {
+    "open": [
+     {
+      "ok": 9
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: O_SYMLINK, the open goes through the queue",
+   "env": {
+    "osymlink": 2097152
+   },
+   "missing": [
+    "lutimes",
+    "lutimesSync"
+   ],
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE",
+      "times": 3
+     },
+     {
+      "ok": 9
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: O_SYMLINK, its close resets the queue",
+   "env": {
+    "osymlink": 2097152
+   },
+   "missing": [
+    "lutimes",
+    "lutimesSync"
+   ],
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 7
+     }
+    ],
+    "open:p": [
+     {
+      "ok": 9
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 60,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimesSync: O_SYMLINK",
+   "env": {
+    "osymlink": 2097152
+   },
+   "missing": [
+    "lutimes",
+    "lutimesSync"
+   ],
+   "script": {
+    "openSync": [
+     {
+      "ok": 9
+     },
+     {
+      "err": "ELOOP"
+     },
+     {
+      "ok": 10
+     },
+     {
+      "ok": 11
+     },
+     {
+      "ok": 12
+     }
+    ],
+    "futimesSync": [
+     {},
+     {
+      "err": "EPERM"
+     },
+     {},
+     {
+      "err": "EPERM"
+     }
+    ],
+    "closeSync": [
+     {},
+     {
+      "err": "EIO"
+     },
+     {
+      "err": "EIO"
+     },
+     {}
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimesSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lutimesSync",
+     "args": [
+      "q",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lutimesSync",
+     "args": [
+      "r",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lutimesSync",
+     "args": [
+      "s",
+      1,
+      2
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lutimesSync",
+     "args": [
+      "t",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimesSync: O_SYMLINK, its closeSync resets the queue",
+   "env": {
+    "osymlink": 2097152
+   },
+   "missing": [
+    "lutimes",
+    "lutimesSync"
+   ],
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 7
+     }
+    ],
+    "openSync": [
+     {
+      "ok": 9
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 60,
+     "call": "lutimesSync",
+     "args": [
+      "p",
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lutimes: O_SYMLINK without futimes is a missing lutimes",
+   "env": {
+    "osymlink": 2097152
+   },
+   "missing": [
+    "lutimes",
+    "lutimesSync",
+    "futimes"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "lutimes",
+     "args": [
+      "p",
+      1,
+      2,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "stat: uid and gid corrections",
+   "script": {
+    "stat": [
+     {
+      "ok": {
+       "stats": [
+        -2,
+        -1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        1000,
+        1000
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -4294967296,
+        -4294967297
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -1,
+        5
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        5,
+        -1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        4294967295,
+        4294967296
+       ]
+      }
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "stat",
+     "args": [
+      "p",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "stat",
+     "args": [
+      "p",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "stat",
+     "args": [
+      "p",
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "stat",
+     "args": [
+      "p",
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "stat",
+     "args": [
+      "p",
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "stat",
+     "args": [
+      "p",
+      {
+       "cb": 6
+      }
+     ]
+    },
+    {
+     "at": 6,
+     "call": "stat",
+     "args": [
+      "p",
+      {
+       "cb": 7
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "statSync: uid and gid corrections",
+   "script": {
+    "statSync": [
+     {
+      "ok": {
+       "stats": [
+        -2,
+        -1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        1000,
+        1000
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -4294967296,
+        -4294967297
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -1,
+        5
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        5,
+        -1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        4294967295,
+        4294967296
+       ]
+      }
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "statSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 1,
+     "call": "statSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 2,
+     "call": "statSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 3,
+     "call": "statSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 4,
+     "call": "statSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 5,
+     "call": "statSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 6,
+     "call": "statSync",
+     "args": [
+      "p"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fstat: uid and gid corrections",
+   "script": {
+    "fstat": [
+     {
+      "ok": {
+       "stats": [
+        -2,
+        -1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        1000,
+        1000
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -4294967296,
+        -4294967297
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -1,
+        5
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        5,
+        -1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        4294967295,
+        4294967296
+       ]
+      }
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fstat",
+     "args": [
+      3,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fstat",
+     "args": [
+      3,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fstat",
+     "args": [
+      3,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fstat",
+     "args": [
+      3,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fstat",
+     "args": [
+      3,
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fstat",
+     "args": [
+      3,
+      {
+       "cb": 6
+      }
+     ]
+    },
+    {
+     "at": 6,
+     "call": "fstat",
+     "args": [
+      3,
+      {
+       "cb": 7
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "fstatSync: uid and gid corrections",
+   "script": {
+    "fstatSync": [
+     {
+      "ok": {
+       "stats": [
+        -2,
+        -1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        1000,
+        1000
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -4294967296,
+        -4294967297
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -1,
+        5
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        5,
+        -1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        4294967295,
+        4294967296
+       ]
+      }
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "fstatSync",
+     "args": [
+      3
+     ]
+    },
+    {
+     "at": 1,
+     "call": "fstatSync",
+     "args": [
+      3
+     ]
+    },
+    {
+     "at": 2,
+     "call": "fstatSync",
+     "args": [
+      3
+     ]
+    },
+    {
+     "at": 3,
+     "call": "fstatSync",
+     "args": [
+      3
+     ]
+    },
+    {
+     "at": 4,
+     "call": "fstatSync",
+     "args": [
+      3
+     ]
+    },
+    {
+     "at": 5,
+     "call": "fstatSync",
+     "args": [
+      3
+     ]
+    },
+    {
+     "at": 6,
+     "call": "fstatSync",
+     "args": [
+      3
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lstat: uid and gid corrections",
+   "script": {
+    "lstat": [
+     {
+      "ok": {
+       "stats": [
+        -2,
+        -1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        1000,
+        1000
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -4294967296,
+        -4294967297
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -1,
+        5
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        5,
+        -1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        4294967295,
+        4294967296
+       ]
+      }
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lstat",
+     "args": [
+      "p",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lstat",
+     "args": [
+      "p",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lstat",
+     "args": [
+      "p",
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lstat",
+     "args": [
+      "p",
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lstat",
+     "args": [
+      "p",
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lstat",
+     "args": [
+      "p",
+      {
+       "cb": 6
+      }
+     ]
+    },
+    {
+     "at": 6,
+     "call": "lstat",
+     "args": [
+      "p",
+      {
+       "cb": 7
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lstatSync: uid and gid corrections",
+   "script": {
+    "lstatSync": [
+     {
+      "ok": {
+       "stats": [
+        -2,
+        -1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        1000,
+        1000
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -4294967296,
+        -4294967297
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -1,
+        5
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        5,
+        -1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        4294967295,
+        4294967296
+       ]
+      }
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lstatSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 1,
+     "call": "lstatSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 2,
+     "call": "lstatSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 3,
+     "call": "lstatSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 4,
+     "call": "lstatSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 5,
+     "call": "lstatSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 6,
+     "call": "lstatSync",
+     "args": [
+      "p"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "stat: options decide how many arguments the module gets",
+   "script": {
+    "stat": [
+     {
+      "ok": {
+       "stats": [
+        -1,
+        1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -2,
+        2
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -3,
+        3
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -4,
+        4
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -5,
+        5
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -6,
+        6
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -7,
+        7
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -8,
+        8
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -9,
+        9
+       ]
+      }
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "stat",
+     "args": [
+      "p",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "stat",
+     "args": [
+      "p",
+      {
+       "opts": {
+        "bigint": false
+       }
+      },
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "stat",
+     "args": [
+      "p",
+      null,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 3,
+     "call": "stat",
+     "args": [
+      "p",
+      0,
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 4,
+     "call": "stat",
+     "args": [
+      "p",
+      "",
+      {
+       "cb": 5
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "stat",
+     "args": [
+      "p",
+      {
+       "undef": true
+      },
+      {
+       "cb": 6
+      }
+     ]
+    },
+    {
+     "at": 6,
+     "call": "stat",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 7,
+     "call": "stat",
+     "args": [
+      "p",
+      "x",
+      {
+       "cb": 8
+      }
+     ]
+    },
+    {
+     "at": 8,
+     "call": "stat",
+     "args": [
+      "p",
+      1,
+      {
+       "cb": 9
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "statSync: options decide how many arguments the module gets",
+   "script": {
+    "statSync": [
+     {
+      "ok": {
+       "stats": [
+        -1,
+        1
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -2,
+        2
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -3,
+        3
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -4,
+        4
+       ]
+      }
+     },
+     {
+      "ok": {
+       "stats": [
+        -5,
+        5
+       ]
+      }
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "statSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 1,
+     "call": "statSync",
+     "args": [
+      "p",
+      {
+       "opts": {
+        "throwIfNoEntry": false
+       }
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "statSync",
+     "args": [
+      "p",
+      null
+     ]
+    },
+    {
+     "at": 3,
+     "call": "statSync",
+     "args": [
+      "p",
+      0
+     ]
+    },
+    {
+     "at": 4,
+     "call": "statSync",
+     "args": [
+      "p",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "stat: errors are not corrected",
+   "script": {
+    "stat": [
+     {
+      "err": "ENOENT"
+     }
+    ],
+    "lstat": [
+     {
+      "err": "EMFILE"
+     }
+    ],
+    "statSync": [
+     {
+      "err": "ENOENT"
+     },
+     {
+      "ok": {
+       "undef": true
+      }
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "stat",
+     "args": [
+      "p",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "lstat",
+     "args": [
+      "p",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "statSync",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 0,
+     "call": "statSync",
+     "args": [
+      "p",
+      {
+       "opts": {
+        "throwIfNoEntry": false
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "stat: absent from the module stays absent",
+   "missing": [
+    "stat",
+    "statSync",
+    "fstat"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "stat",
+     "args": [
+      "p",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "statSync",
+     "args": [
+      "p"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: not patched on linux",
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, success",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, EPERM while the destination is missing is retried",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM"
+     },
+     {}
+    ],
+    "stat": [
+     {
+      "err": "ENOENT"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, EACCES and EBUSY are retried too",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EACCES"
+     },
+     {
+      "err": "EBUSY"
+     },
+     {
+      "err": "EACCES"
+     },
+     {}
+    ],
+    "stat": [
+     {
+      "err": "ENOENT",
+      "times": 3
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, the destination exists: the rename error",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EACCES"
+     }
+    ],
+    "stat": [
+     {
+      "ok": {
+       "stats": [
+        0,
+        0
+       ]
+      }
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, stat fails otherwise: the rename error",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EBUSY"
+     },
+     {
+      "err": "EPERM"
+     }
+    ],
+    "stat": [
+     {
+      "err": "ENOENT"
+     },
+     {
+      "err": "EACCES"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, backoff 0, 10, … 100, 100",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM",
+      "times": 14
+     },
+     {}
+    ],
+    "stat": [
+     {
+      "err": "ENOENT",
+      "times": 14
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, slow stat and rename",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM",
+      "ms": 7,
+      "times": 3
+     },
+     {
+      "ms": 4
+     }
+    ],
+    "stat": [
+     {
+      "err": "ENOENT",
+      "ms": 5,
+      "times": 3
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, EPERM until the 60 s window closes",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM",
+      "times": 1000000
+     }
+    ],
+    "stat": [
+     {
+      "err": "ENOENT",
+      "times": 1000000
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, an error at 59999 ms is retried, at 60000 it is final",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM",
+      "ms": 59999
+     },
+     {
+      "err": "EPERM"
+     },
+     {}
+    ],
+    "stat": [
+     {
+      "err": "ENOENT",
+      "times": 2
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, an error at 60000 ms is final",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM",
+      "ms": 60000
+     },
+     {}
+    ],
+    "stat": [
+     {
+      "err": "ENOENT"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, ENOENT and EXDEV are not retried",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename:a": [
+     {
+      "err": "ENOENT"
+     }
+    ],
+    "rename:c": [
+     {
+      "err": "EXDEV"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "c",
+      "d",
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, the stat is the corrected stat with a callback only",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM"
+     },
+     {}
+    ],
+    "stat": [
+     {
+      "err": "ENOENT"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, no callback, success",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, no callback, the destination exists",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM"
+     }
+    ],
+    "stat": [
+     {
+      "ok": {
+       "stats": [
+        0,
+        0
+       ]
+      }
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, no callback, the retry succeeds",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM"
+     },
+     {}
+    ],
+    "stat": [
+     {
+      "err": "ENOENT"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, two renames at once",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename:a": [
+     {
+      "err": "EPERM",
+      "times": 3
+     },
+     {}
+    ],
+    "rename:c": [
+     {
+      "err": "EBUSY"
+     },
+     {}
+    ],
+    "stat": [
+     {
+      "err": "ENOENT",
+      "times": 4
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 5,
+     "call": "rename",
+     "args": [
+      "c",
+      "d",
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: GRACEFUL_FS_PLATFORM=win32 on linux",
+   "env": {
+    "platform": "linux",
+    "gfsPlatform": "win32"
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM"
+     },
+     {}
+    ],
+    "stat": [
+     {
+      "err": "ENOENT"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: GRACEFUL_FS_PLATFORM=linux on win32",
+   "env": {
+    "platform": "win32",
+    "gfsPlatform": "linux",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: an empty GRACEFUL_FS_PLATFORM falls back to process.platform",
+   "env": {
+    "platform": "win32",
+    "gfsPlatform": "",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM"
+     },
+     {}
+    ],
+    "stat": [
+     {
+      "err": "ENOENT"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32, absent from the module stays absent",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "missing": [
+    "rename"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "rename: win32 without stat throws when it retries",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "missing": [
+    "stat"
+   ],
+   "script": {
+    "rename": [
+     {
+      "err": "EPERM"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "read: EAGAIN 10 times, then success",
+   "script": {
+    "read": [
+     {
+      "err": "EAGAIN",
+      "times": 10
+     },
+     {
+      "ok": 5
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "read",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      null,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "read: EAGAIN 11 times",
+   "script": {
+    "read": [
+     {
+      "err": "EAGAIN",
+      "times": 11
+     },
+     {
+      "ok": 5
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "read",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      null,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "read: EAGAIN with completion delays",
+   "script": {
+    "read": [
+     {
+      "err": "EAGAIN",
+      "ms": 3,
+      "times": 4
+     },
+     {
+      "ok": 2,
+      "ms": 1
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "read",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      1,
+      2,
+      10,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "read: other errors are not retried",
+   "script": {
+    "read": [
+     {
+      "err": "EBADF"
+     },
+     {
+      "err": "EMFILE"
+     },
+     {
+      "ok": 0
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "read",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      null,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "read",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      null,
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "read",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      -1,
+      {
+       "cb": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "read: each call counts its own retries",
+   "script": {
+    "read": [
+     {
+      "err": "EAGAIN",
+      "times": 6
+     },
+     {
+      "ok": 1
+     },
+     {
+      "err": "EAGAIN",
+      "times": 10
+     },
+     {
+      "ok": 2
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "read",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      null,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "read",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      null,
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "read: without a callback the module gets none",
+   "script": {
+    "read": [
+     {
+      "ok": 1
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "read",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "read: the short form read(fd, cb) is not retried",
+   "script": {
+    "read": [
+     {
+      "ok": 1
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "read",
+     "args": [
+      3,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readSync: EAGAIN 10 times, then success",
+   "script": {
+    "readSync": [
+     {
+      "err": "EAGAIN",
+      "times": 10
+     },
+     {
+      "ok": 5
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readSync",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readSync: EAGAIN 11 times",
+   "script": {
+    "readSync": [
+     {
+      "err": "EAGAIN",
+      "times": 11
+     },
+     {
+      "ok": 5
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readSync",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "readSync: other errors",
+   "script": {
+    "readSync": [
+     {
+      "err": "EAGAIN",
+      "times": 2
+     },
+     {
+      "err": "EBADF"
+     },
+     {
+      "ok": 0
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "readSync",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      null
+     ]
+    },
+    {
+     "at": 1,
+     "call": "readSync",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      0
+     ]
+    }
+   ]
+  },
+  {
+   "name": "read and readSync: absent from the module stay absent",
+   "missing": [
+    "read",
+    "readSync"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "read",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      null,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "readSync",
+     "args": [
+      3,
+      {
+       "buf": "00000000000000"
+      },
+      0,
+      7,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "createReadStream: the open goes through the queue",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE",
+      "times": 2
+     },
+     {
+      "ok": 7
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "createReadStream",
+     "args": [
+      "p"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "createReadStream: options",
+   "script": {
+    "open": [
+     {
+      "ok": 7
+     },
+     {
+      "ok": 8
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "createReadStream",
+     "args": [
+      "p",
+      {
+       "opts": {
+        "flags": "r+",
+        "mode": 384
+       }
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "createReadStream",
+     "args": [
+      "q",
+      "utf8"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "createReadStream: an error destroys the stream (autoClose)",
+   "script": {
+    "open": [
+     {
+      "err": "ENOENT"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "createReadStream",
+     "args": [
+      "p"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "createReadStream: an error with autoClose false",
+   "script": {
+    "open": [
+     {
+      "err": "EACCES"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "createReadStream",
+     "args": [
+      "p",
+      {
+       "opts": {
+        "autoClose": false
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "createReadStream: an fd skips the open",
+   "steps": [
+    {
+     "at": 0,
+     "call": "createReadStream",
+     "args": [
+      "p",
+      {
+       "opts": {
+        "fd": 5
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "createReadStream: ENFILE until the cutoff",
+   "script": {
+    "open": [
+     {
+      "err": "ENFILE",
+      "times": 1000000
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "createReadStream",
+     "args": [
+      "p"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "createWriteStream: the open goes through the queue",
+   "script": {
+    "open": [
+     {
+      "err": "ENFILE",
+      "times": 3
+     },
+     {
+      "ok": 8
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "createWriteStream",
+     "args": [
+      "p"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "createWriteStream: an error always destroys",
+   "script": {
+    "open": [
+     {
+      "err": "EROFS"
+     },
+     {
+      "err": "EISDIR"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "createWriteStream",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 1,
+     "call": "createWriteStream",
+     "args": [
+      "q",
+      {
+       "opts": {
+        "autoClose": false,
+        "flags": "a"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "createReadStream: the module has no ReadStream",
+   "missing": [
+    "ReadStream",
+    "WriteStream"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "createReadStream",
+     "args": [
+      "p"
+     ]
+    },
+    {
+     "at": 0,
+     "call": "createWriteStream",
+     "args": [
+      "p"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "streams: a close resets the queue their opens wait on",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 7
+     }
+    ],
+    "open:b": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 8
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "createReadStream",
+     "args": [
+      "a"
+     ]
+    },
+    {
+     "at": 1,
+     "call": "createWriteStream",
+     "args": [
+      "b"
+     ]
+    },
+    {
+     "at": 70,
+     "call": "close",
+     "args": [
+      4,
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "two copies over one module share the queue, each with its own timer",
+   "load": [
+    0,
+    0
+   ],
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 6
+     },
+     {
+      "ok": 10
+     }
+    ],
+    "open:b": [
+     {
+      "err": "EMFILE",
+      "times": 6
+     },
+     {
+      "ok": 11
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "on": "g1",
+     "call": "open",
+     "args": [
+      "b",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "two copies over one module: only the first patches close",
+   "load": [
+    0,
+    0
+   ],
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 10
+     }
+    ],
+    "open:b": [
+     {
+      "err": "EMFILE",
+      "times": 8
+     },
+     {
+      "ok": 11
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "on": "g1",
+     "call": "open",
+     "args": [
+      "b",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 60,
+     "on": "g1",
+     "call": "close",
+     "args": [
+      5,
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 200,
+     "on": "b0",
+     "call": "closeSync",
+     "args": [
+      6
+     ]
+    }
+   ]
+  },
+  {
+   "name": "two copies over two modules share the queue",
+   "load": [
+    0,
+    1
+   ],
+   "bases": [
+    {
+     "script": {
+      "open": [
+       {
+        "err": "EMFILE",
+        "times": 8
+       },
+       {
+        "ok": 10
+       }
+      ]
+     }
+    },
+    {
+     "script": {
+      "open": [
+       {
+        "err": "ENFILE",
+        "times": 8
+       },
+       {
+        "ok": 11
+       }
+      ]
+     }
+    }
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "on": "g1",
+     "call": "open",
+     "args": [
+      "b",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 60,
+     "on": "b1",
+     "call": "close",
+     "args": [
+      5,
+      {
+       "cb": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "two copies over two modules: the second module's closeSync",
+   "load": [
+    0,
+    1
+   ],
+   "bases": [
+    {
+     "script": {
+      "open": [
+       {
+        "err": "EMFILE",
+        "times": 8
+       },
+       {
+        "ok": 10
+       }
+      ]
+     }
+    },
+    {
+     "missing": [
+      "appendFile"
+     ]
+    }
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 60,
+     "on": "g1",
+     "call": "closeSync",
+     "args": [
+      5
+     ]
+    },
+    {
+     "at": 61,
+     "on": "g1",
+     "call": "appendFile",
+     "args": [
+      "x",
+      "y",
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "two copies: a timeout callback in one runs the other's closeSync",
+   "load": [
+    0,
+    0
+   ],
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "EMFILE",
+      "ms": 59990
+     }
+    ],
+    "open:b": [
+     {
+      "err": "EMFILE",
+      "times": 1000000
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1,
+       "then": [
+        {
+         "on": "g1",
+         "call": "closeSync",
+         "args": [
+          5
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "at": 20,
+     "call": "open",
+     "args": [
+      "b",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a timeout callback that calls closeSync",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "EMFILE",
+      "ms": 59990
+     }
+    ],
+    "open:b": [
+     {
+      "err": "EMFILE",
+      "times": 1000000
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1,
+       "then": [
+        {
+         "call": "closeSync",
+         "args": [
+          5
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "at": 20,
+     "call": "open",
+     "args": [
+      "b",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a callback that opens again",
+   "script": {
+    "open": [
+     {
+      "err": "EMFILE",
+      "times": 2
+     },
+     {
+      "ok": 3
+     },
+     {
+      "err": "EMFILE",
+      "times": 2
+     },
+     {
+      "ok": 4
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1,
+       "then": [
+        {
+         "call": "open",
+         "args": [
+          "b",
+          "r",
+          {
+           "cb": 2
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a callback that closes synchronously while others wait",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE",
+      "times": 2
+     },
+     {
+      "ok": 3
+     }
+    ],
+    "open:b": [
+     {
+      "err": "EMFILE",
+      "times": 9
+     },
+     {
+      "ok": 4
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "b",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1,
+       "then": [
+        {
+         "call": "closeSync",
+         "args": [
+          3
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a retried call that throws stops the retry timer",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "throw": "ERR_BOOM"
+     }
+    ],
+    "open:b": [
+     {
+      "err": "EMFILE",
+      "times": 3
+     },
+     {
+      "ok": 4
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "b",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 500,
+     "call": "closeSync",
+     "args": [
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a first call that throws reaches the caller",
+   "script": {
+    "open": [
+     {
+      "throw": "ERR_INVALID_ARG_VALUE"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "bad",
+      {
+       "cb": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a step in a callback that throws is caught there",
+   "script": {
+    "open": [
+     {
+      "ok": 3
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1,
+       "then": [
+        {
+         "call": "appendFile",
+         "args": [
+          "x",
+          "y",
+          {
+           "cb": 2
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "missing": [
+    "appendFile"
+   ]
+  },
+  {
+   "name": "a callback that throws: uncaught, from the completion",
+   "script": {
+    "open": [
+     {
+      "ok": 3
+     }
+    ],
+    "readdir": [
+     {
+      "ok": [
+       "b",
+       "a"
+      ]
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1,
+       "throws": "ERR_CB"
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "cb": 2,
+       "throws": "ERR_CB"
+      }
+     ]
+    },
+    {
+     "at": 2,
+     "call": "chmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 3,
+       "throws": "ERR_CB"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a timeout callback that throws stops the retry timer",
+   "script": {
+    "open:a": [
+     {
+      "err": "EMFILE"
+     },
+     {
+      "err": "EMFILE",
+      "ms": 59990
+     }
+    ],
+    "open:b": [
+     {
+      "err": "EMFILE",
+      "times": 605
+     },
+     {
+      "ok": 4
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 1,
+       "throws": "ERR_CB"
+      }
+     ]
+    },
+    {
+     "at": 20,
+     "call": "open",
+     "args": [
+      "b",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 61000,
+     "call": "closeSync",
+     "args": [
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a no-op lchmod callback that throws",
+   "missing": [
+    "lchmod"
+   ],
+   "script": {
+    "open": [
+     {
+      "ok": 3
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "lchmod",
+     "args": [
+      "p",
+      420,
+      {
+       "cb": 1,
+       "throws": "ERR_CB"
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a read callback that throws after EAGAIN retries",
+   "script": {
+    "read": [
+     {
+      "err": "EAGAIN",
+      "times": 3
+     },
+     {
+      "ok": 1
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "read",
+     "args": [
+      3,
+      {
+       "buf": "00"
+      },
+      0,
+      1,
+      null,
+      {
+       "cb": 1,
+       "throws": "ERR_CB"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a rename callback that throws after a retry",
+   "env": {
+    "platform": "win32",
+    "uid": null
+   },
+   "script": {
+    "rename": [
+     {
+      "err": "EBUSY"
+     },
+     {}
+    ],
+    "stat": [
+     {
+      "err": "ENOENT"
+     }
+    ]
+   },
+   "steps": [
+    {
+     "at": 0,
+     "call": "rename",
+     "args": [
+      "a",
+      "b",
+      {
+       "cb": 1,
+       "throws": "ERR_CB"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a module with only close and closeSync",
+   "missing": [
+    "open",
+    "openSync",
+    "readFile",
+    "writeFile",
+    "appendFile",
+    "copyFile",
+    "readdir",
+    "read",
+    "readSync",
+    "rename",
+    "chown",
+    "fchown",
+    "lchown",
+    "chownSync",
+    "fchownSync",
+    "lchownSync",
+    "chmod",
+    "fchmod",
+    "lchmod",
+    "chmodSync",
+    "fchmodSync",
+    "lchmodSync",
+    "stat",
+    "fstat",
+    "lstat",
+    "statSync",
+    "fstatSync",
+    "lstatSync",
+    "futimes",
+    "futimesSync",
+    "lutimes",
+    "lutimesSync",
+    "ReadStream",
+    "WriteStream"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "readFile",
+     "args": [
+      "f",
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "open",
+     "args": [
+      "a",
+      "r",
+      {
+       "cb": 2
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "readdir",
+     "args": [
+      "d",
+      {
+       "cb": 3
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "writeFile",
+     "args": [
+      "f",
+      "x",
+      {
+       "cb": 4
+      }
+     ]
+    },
+    {
+     "at": 1,
+     "call": "close",
+     "args": [
+      3,
+      {
+       "cb": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a module without close",
+   "missing": [
+    "close",
+    "closeSync"
+   ],
+   "steps": [
+    {
+     "at": 0,
+     "call": "close",
+     "args": [
+      3,
+      {
+       "cb": 1
+      }
+     ]
+    },
+    {
+     "at": 0,
+     "call": "closeSync",
+     "args": [
+      3
+     ]
+    }
+   ]
+  },
+  {
+   "name": "the full module on win32 with O_SYMLINK",
+   "env": {
+    "platform": "win32",
+    "uid": null,
+    "osymlink": 2097152
+   },
+   "steps": []
+  },
+  {
+   "name": "the full module on darwin, root",
+   "env": {
+    "platform": "darwin",
+    "uid": 0,
+    "osymlink": 2097152
+   },
+   "missing": [
+    "lutimes",
+    "lutimesSync",
+    "lchmod"
+   ],
+   "steps": []
+  }
+ ]
+}
