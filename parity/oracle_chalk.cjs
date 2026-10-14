@@ -22,6 +22,38 @@
 'use strict';
 const path = require('path');
 
+// Environment rows default to a Linux TTY with no environment variables.
+const envDefaults = { platform: 'linux', release: '5.15.0', argv: ['node', '/app/index.js'], env: {}, stdoutTTY: true, stderrTTY: true };
+
+// Child mode (`node oracle_chalk.cjs --env-row <root>`, the row on stdin): pin the process state,
+// then load supports-color and chalk and report what they computed at load time.
+if (process.argv[2] === '--env-row') {
+  const root = process.argv[3];
+  const row = Object.assign({}, envDefaults, JSON.parse(require('fs').readFileSync(0, 'utf8')));
+  process.argv = row.argv.slice();
+  process.env = Object.assign({}, row.env);
+  Object.defineProperty(process, 'platform', { value: row.platform });
+  require('os').release = () => row.release;
+  require('tty').isatty = fd => (fd === 1 ? row.stdoutTTY : fd === 2 ? row.stderrTTY : false);
+  const res = {};
+  const sc = require(path.join(root, 'node_modules', 'supports-color'));
+  res.stdout = sc.stdout;
+  res.stderr = sc.stderr;
+  res.streams = [undefined, { isTTY: true }, { isTTY: false }, {}].map(s => sc.supportsColor(s));
+  try {
+    const chalk = require(path.join(root, 'node_modules', 'chalk'));
+    res.chalk = {
+      level: chalk.level, supportsColor: chalk.supportsColor,
+      stderrLevel: chalk.stderr.level, stderrSupportsColor: chalk.stderr.supportsColor,
+      instanceLevel: new chalk.Instance().level,
+    };
+  } catch (e) {
+    res.chalk = 'throws ' + e.name + ': ' + e.message;
+  }
+  process.stdout.write(JSON.stringify(res));
+  return;
+}
+
 // enc renders a value: numbers as String(x) except -0 ("-0"), strings JSON-quoted, arrays as
 // [a,b,c], undefined and null by name.
 function enc(v) {
@@ -121,6 +153,22 @@ const out = { node: process.version };
     }
   }
   out.ansiStyles = as;
+}
+
+// --- has-flag: hasFlag(flag, argv) for each case.
+{
+  const hasFlag = require(mod('has-flag'));
+  out.hasFlag = cases.hasFlag.map(([flag, argv]) => hasFlag(flag, argv));
+}
+
+// --- supports-color and chalk's load-time detection: one fresh child process per environment row.
+{
+  const { spawnSync } = require('child_process');
+  out.envs = cases.envs.map(row => {
+    const r = spawnSync(process.execPath, [__filename, '--env-row', root], { input: JSON.stringify(row), encoding: 'utf8' });
+    if (r.status !== 0) throw new Error('env row ' + row.name + ' failed: ' + r.stderr);
+    return JSON.parse(r.stdout);
+  });
 }
 
 console.log(JSON.stringify(out, null, 1));

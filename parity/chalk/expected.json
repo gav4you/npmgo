@@ -23523,5 +23523,4925 @@
     ]
    }
   }
- }
+ },
+ "hasFlag": [
+  true,
+  false,
+  true,
+  true,
+  true,
+  false,
+  true,
+  false,
+  false,
+  true,
+  true,
+  false,
+  false,
+  false,
+  false,
+  true,
+  true,
+  false,
+  true,
+  false,
+  true,
+  false,
+  false,
+  false,
+  true
+ ],
+ "envs": [
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    }
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    }
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    }
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    }
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": -1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": -1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": -1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": -1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": -1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": -1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    }
+   ],
+   "chalk": "throws Error: The `level` option should be an integer from 0 to 3"
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    }
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    }
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    }
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    }
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    }
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": false,
+   "streams": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 0,
+    "stderrSupportsColor": false,
+    "instanceLevel": 0
+   }
+  },
+  {
+   "stdout": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "stderr": {
+    "level": 3,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": true
+   },
+   "streams": [
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 3,
+    "supportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "stderrLevel": 3,
+    "stderrSupportsColor": {
+     "level": 3,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": true
+    },
+    "instanceLevel": 3
+   }
+  },
+  {
+   "stdout": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 1,
+    "supportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 1
+   }
+  },
+  {
+   "stdout": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "stderr": {
+    "level": 2,
+    "hasBasic": true,
+    "has256": true,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 2,
+    "supportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "stderrLevel": 2,
+    "stderrSupportsColor": {
+     "level": 2,
+     "hasBasic": true,
+     "has256": true,
+     "has16m": false
+    },
+    "instanceLevel": 2
+   }
+  },
+  {
+   "stdout": false,
+   "stderr": {
+    "level": 1,
+    "hasBasic": true,
+    "has256": false,
+    "has16m": false
+   },
+   "streams": [
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    false,
+    false
+   ],
+   "chalk": {
+    "level": 0,
+    "supportsColor": false,
+    "stderrLevel": 1,
+    "stderrSupportsColor": {
+     "level": 1,
+     "hasBasic": true,
+     "has256": false,
+     "has16m": false
+    },
+    "instanceLevel": 0
+   }
+  }
+ ]
 }
