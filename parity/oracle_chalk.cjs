@@ -90,4 +90,37 @@ const out = { node: process.version };
   out.colorConvert = cc;
 }
 
+// --- ansi-styles: the style names, every style's codes, the groups' keys, color.close /
+// bgColor.close, the codes Map, and the six dynamic tables (color.ansi, .ansi256, .ansi16m and the
+// bgColor ones) for every key, called with the color-convert case inputs that fit the key's model
+// (a channel model with exactly its number of channels, a hex / keyword string, an ansi number).
+{
+  const styles = require(mod('ansi-styles'));
+  const convert = require(mod('color-convert'));
+  const as = { names: Object.keys(styles), styles: {}, groups: {}, close: {}, codes: [...styles.codes], inputs: {}, dynamic: {} };
+  for (const n of as.names) as.styles[n] = [styles[n].open, styles[n].close];
+  for (const g of ['modifier', 'color', 'bgColor']) {
+    as.groups[g] = Object.keys(styles[g]);
+    for (const n of Object.keys(styles[g])) if (styles[n] !== undefined && styles[g][n] !== styles[n]) throw new Error('group style differs: ' + n);
+  }
+  for (const g of ['color', 'bgColor']) as.close[g] = styles[g].close;
+  const fits = (model, x) => ['hex', 'keyword'].includes(model) ? typeof x === 'string'
+    : ['ansi16', 'ansi256'].includes(model) ? !Array.isArray(x)
+      : Array.isArray(x) && x.length === convert[model].channels;
+  for (const model of Object.keys(convert)) {
+    as.inputs[model === 'ansi16' ? 'ansi' : model] = (cases.convert[model] || []).filter(x => fits(model, x));
+  }
+  for (const g of ['color', 'bgColor']) {
+    for (const t of ['ansi', 'ansi256', 'ansi16m']) {
+      const table = styles[g][t], results = { keys: Object.keys(table) };
+      for (const key of results.keys) {
+        results[key] = as.inputs[key].map(x => attempt(() => typeof x === 'string' && ['hex', 'keyword'].includes(key) ? table[key](x)
+          : Array.isArray(x) ? table[key](...num(x)) : table[key](num(x))));
+      }
+      as.dynamic[g + '.' + t] = results;
+    }
+  }
+  out.ansiStyles = as;
+}
+
 console.log(JSON.stringify(out, null, 1));
