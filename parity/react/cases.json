@@ -17891,6 +17891,640 @@
    }
   },
   {
+   "name": "form: useActionState postback key (murmurhash / md5)",
+   "tree": {
+    "$": "el",
+    "t": "section",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": "div",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "key",
+         "k"
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": {
+         "$": "comp",
+         "n": "ActForm"
+        },
+        "p": null,
+        "c": []
+       }
+      ]
+     },
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "ActForm"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
+   },
+   "comps": {
+    "ActForm": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": [
+        "s",
+        "a"
+       ],
+       "v": {
+        "$": "hook",
+        "h": "useActionState",
+        "a": [
+         {
+          "$": "action",
+          "fn": {
+           "$": "fn",
+           "ps": [
+            "p"
+           ],
+           "ret": 1
+          },
+          "bindable": true,
+          "formAction": {
+           "$": "fn",
+           "ps": [
+            "p"
+           ],
+           "ret": {
+            "$": "obj",
+            "p": [
+             [
+              "name",
+              {
+               "$": "cat",
+               "a": [
+                "n_",
+                {
+                 "$": "var",
+                 "n": "p"
+                }
+               ]
+              }
+             ],
+             [
+              "data",
+              [
+               [
+                "field",
+                "v"
+               ]
+              ]
+             ]
+            ]
+           }
+          }
+         },
+         "init"
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "el",
+      "t": "form",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "action",
+         {
+          "$": "var",
+          "n": "a"
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "var",
+        "n": "s"
+       }
+      ]
+     },
+     "name": "ActForm"
+    }
+   }
+  },
+  {
+   "name": "form: useActionState postback key with permalink",
+   "tree": {
+    "$": "el",
+    "t": {
+     "$": "comp",
+     "n": "PF"
+    },
+    "p": null,
+    "c": []
+   },
+   "comps": {
+    "PF": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": [
+        "s",
+        "a"
+       ],
+       "v": {
+        "$": "hook",
+        "h": "useActionState",
+        "a": [
+         {
+          "$": "action",
+          "fn": {
+           "$": "fn",
+           "ps": [
+            "p"
+           ],
+           "ret": 1
+          },
+          "bindable": true,
+          "formAction": {
+           "$": "fn",
+           "ps": [
+            "p"
+           ],
+           "ret": {
+            "$": "obj",
+            "p": [
+             [
+              "name",
+              {
+               "$": "cat",
+               "a": [
+                "n_",
+                {
+                 "$": "var",
+                 "n": "p"
+                }
+               ]
+              }
+             ],
+             [
+              "data",
+              [
+               [
+                "field",
+                "v"
+               ]
+              ]
+             ]
+            ]
+           }
+          }
+         },
+         "init",
+         "/perma"
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "el",
+      "t": "form",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "action",
+         {
+          "$": "var",
+          "n": "a"
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "var",
+        "n": "s"
+       }
+      ]
+     },
+     "name": "PF"
+    }
+   }
+  },
+  {
+   "name": "form: useActionState with formState signature match",
+   "tree": {
+    "$": "el",
+    "t": {
+     "$": "comp",
+     "n": "ActForm"
+    },
+    "p": null,
+    "c": []
+   },
+   "modes": [
+    "stream"
+   ],
+   "comps": {
+    "ActForm": {
+     "kind": "fn",
+     "body": [
+      {
+       "let": [
+        "s",
+        "a"
+       ],
+       "v": {
+        "$": "hook",
+        "h": "useActionState",
+        "a": [
+         {
+          "$": "action",
+          "fn": {
+           "$": "fn",
+           "ps": [
+            "p"
+           ],
+           "ret": 1
+          },
+          "bindable": true,
+          "formAction": {
+           "$": "fn",
+           "ps": [
+            "p"
+           ],
+           "ret": {
+            "$": "obj",
+            "p": [
+             [
+              "name",
+              {
+               "$": "cat",
+               "a": [
+                "n_",
+                {
+                 "$": "var",
+                 "n": "p"
+                }
+               ]
+              }
+             ],
+             [
+              "data",
+              [
+               [
+                "field",
+                "v"
+               ]
+              ]
+             ]
+            ]
+           }
+          },
+          "sigEqual": {
+           "$": "fn",
+           "ps": [
+            "x",
+            "y"
+           ],
+           "ret": true
+          }
+         },
+         "init"
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "el",
+      "t": "form",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "action",
+         {
+          "$": "var",
+          "n": "a"
+         }
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "var",
+        "n": "s"
+       }
+      ]
+     },
+     "name": "ActForm"
+    }
+   },
+   "stream": {
+    "opts": {
+     "formState": [
+      "restored",
+      "k-unmatched",
+      "ref",
+      0
+     ]
+    }
+   }
+  },
+  {
+   "name": "resources: Link header when piped in onShellReady",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "R"
+      },
+      "p": null,
+      "c": []
+     },
+     {
+      "$": "el",
+      "t": "img",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "src",
+         "hdr2.png"
+        ]
+       ]
+      },
+      "c": []
+     }
+    ]
+   },
+   "modes": [
+    "stream"
+   ],
+   "comps": {
+    "R": {
+     "kind": "fn",
+     "body": [
+      {
+       "do": {
+        "$": "api",
+        "f": "preconnect",
+        "a": [
+         "https://h2.example",
+         {
+          "$": "obj",
+          "p": [
+           [
+            "crossOrigin",
+            "use-credentials"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "do": {
+        "$": "api",
+        "f": "preload",
+        "a": [
+         "f2.woff",
+         {
+          "$": "obj",
+          "p": [
+           [
+            "as",
+            "font"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "do": {
+        "$": "api",
+        "f": "preload",
+        "a": [
+         "big.png",
+         {
+          "$": "obj",
+          "p": [
+           [
+            "as",
+            "image"
+           ],
+           [
+            "fetchPriority",
+            "high"
+           ]
+          ]
+         }
+        ]
+       }
+      }
+     ],
+     "ret": "r"
+    }
+   },
+   "stream": {
+    "pipe": "shell",
+    "opts": {
+     "onHeaders": true
+    }
+   }
+  },
+  {
+   "name": "resources: Link header includes stylesheets when shell pending",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": "link",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "rel",
+         "stylesheet"
+        ],
+        [
+         "href",
+         "early.css"
+        ],
+        [
+         "precedence",
+         "p"
+        ],
+        [
+         "crossOrigin",
+         "anonymous"
+        ]
+       ]
+      },
+      "c": []
+     },
+     {
+      "$": "el",
+      "t": {
+       "$": "comp",
+       "n": "Use_p"
+      },
+      "p": null,
+      "c": []
+     }
+    ]
+   },
+   "modes": [
+    "stream"
+   ],
+   "comps": {
+    "Use_p": {
+     "kind": "fn",
+     "name": "Use_p",
+     "body": [
+      {
+       "let": "x",
+       "v": {
+        "$": "hook",
+        "h": "use",
+        "a": [
+         {
+          "$": "promise",
+          "n": "p"
+         }
+        ]
+       }
+      }
+     ],
+     "ret": {
+      "$": "var",
+      "n": "x"
+     }
+    }
+   },
+   "promises": [
+    {
+     "n": "p",
+     "kind": "pending",
+     "value": "late",
+     "step": 1
+    }
+   ],
+   "stream": {
+    "pipe": "shell",
+    "opts": {
+     "onHeaders": true
+    }
+   }
+  },
+  {
+   "name": "form: textarea and select edge values",
+   "tree": {
+    "$": "el",
+    "t": "div",
+    "p": null,
+    "c": [
+     {
+      "$": "el",
+      "t": "textarea",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "value",
+         0
+        ]
+       ]
+      },
+      "c": []
+     },
+     {
+      "$": "el",
+      "t": "textarea",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "value",
+         null
+        ],
+        [
+         "defaultValue",
+         "dv"
+        ]
+       ]
+      },
+      "c": []
+     },
+     {
+      "$": "el",
+      "t": "select",
+      "p": {
+       "$": "obj",
+       "p": [
+        [
+         "value",
+         null
+        ],
+        [
+         "defaultValue",
+         "b"
+        ]
+       ]
+      },
+      "c": [
+       {
+        "$": "el",
+        "t": "option",
+        "p": {
+         "$": "obj",
+         "p": [
+          [
+           "value",
+           "a"
+          ]
+         ]
+        },
+        "c": []
+       },
+       {
+        "$": "el",
+        "t": "option",
+        "p": {
+         "$": "obj",
+         "p": [
+          [
+           "value",
+           "b"
+          ]
+         ]
+        },
+        "c": []
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
    "name": "stream: progressive chunk boundaries flush",
    "tree": {
     "$": "el",

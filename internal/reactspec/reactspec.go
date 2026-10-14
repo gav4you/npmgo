@@ -62,12 +62,12 @@ import (
 
 // Case is one parity case.
 type Case struct {
-	Name     string                     `json:"name"`
-	Modes    []string                   `json:"modes"`
+	Name     string                    `json:"name"`
+	Modes    []string                  `json:"modes"`
 	Ctxs     map[string]map[string]any `json:"ctxs"`
 	Comps    map[string]map[string]any `json:"comps"`
-	Promises []map[string]any           `json:"promises"`
-	Tree     any                        `json:"tree"`
+	Promises []map[string]any          `json:"promises"`
+	Tree     any                       `json:"tree"`
 	Opts     *struct {
 		IdentifierPrefix string `json:"identifierPrefix"`
 	} `json:"opts"`
@@ -768,6 +768,9 @@ func (env *Env) evalObj(m map[string]any, s scope) any {
 		if _, ok := m["sigEqual"]; ok {
 			se := E("sigEqual")
 			a.IsSignatureEqual = func(x, y any) bool { return jsvalue.Truthy(call(se, x, y)) }
+		}
+		if m["bindable"] == true {
+			a.Bind = func(...any) any { return a }
 		}
 		return a
 	}

@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"reflect"
 	"strconv"
-	"unicode/utf16"
 
 	"github.com/gav4you/npmgo/internal/jsloop"
 	"github.com/gav4you/npmgo/internal/jsvalue"
@@ -489,48 +488,6 @@ func (d *dispatcher) PreinitStyle(href string, precedence any, opts *react.Objec
 }
 func (d *dispatcher) PreinitModuleScript(src string, opts *react.Object) {
 	d.request().preinitModuleScript(src, opts)
-}
-
-// murmurhash3_32_gc over the string's UTF-16 code units (charCodeAt & 255).
-func murmurhash3(key string, seed uint32) uint32 {
-	units := utf16.Encode([]rune(key))
-	n := len(units)
-	remainder := n & 3
-	nbytes := n - remainder
-	h1 := seed
-	i := 0
-	for i < nbytes {
-		k1 := uint32(units[i]&255) | uint32(units[i+1]&255)<<8 | uint32(units[i+2]&255)<<16 | uint32(units[i+3]&255)<<24
-		i += 4
-		k1 *= 3432918353
-		k1 = k1<<15 | k1>>17
-		k1 *= 461845907
-		h1 ^= k1
-		h1 = h1<<13 | h1>>19
-		h1 = h1*5 + 3864292196
-	}
-	var k1 uint32
-	switch remainder {
-	case 3:
-		k1 ^= uint32(units[i+2]&255) << 16
-		fallthrough
-	case 2:
-		k1 ^= uint32(units[i+1]&255) << 8
-		fallthrough
-	case 1:
-		k1 ^= uint32(units[i] & 255)
-		k1 *= 3432918353
-		k1 = k1<<15 | k1>>17
-		k1 *= 461845907
-		h1 ^= k1
-	}
-	h1 ^= uint32(n)
-	h1 ^= h1 >> 16
-	h1 *= 2246822507
-	h1 ^= h1 >> 13
-	h1 *= 3266489909
-	h1 ^= h1 >> 16
-	return h1
 }
 
 func (r *request) createPostbackActionStateKey(permalink []string, kp *keyPath, hookIndex int) string {

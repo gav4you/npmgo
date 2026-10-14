@@ -91,11 +91,14 @@ type recordingDestination struct {
 	events *[]string
 }
 
-func (d *recordingDestination) write(chunk string) bool { d.chunks = append(d.chunks, chunk); return true }
-func (d *recordingDestination) beginWriting()           {}
-func (d *recordingDestination) completeWriting()        {}
-func (d *recordingDestination) flushBuffered()          {}
-func (d *recordingDestination) end()                    { *d.events = append(*d.events, "end") }
+func (d *recordingDestination) write(chunk string) bool {
+	d.chunks = append(d.chunks, chunk)
+	return true
+}
+func (d *recordingDestination) beginWriting()    {}
+func (d *recordingDestination) completeWriting() {}
+func (d *recordingDestination) flushBuffered()   {}
+func (d *recordingDestination) end()             { *d.events = append(*d.events, "end") }
 func (d *recordingDestination) destroy(err any) {
 	*d.events = append(*d.events, "destroy:"+errMessage(err))
 }

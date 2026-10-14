@@ -245,6 +245,8 @@ function evalExpr(e, scope, env) {
         };
       }
       if (e.sigEqual !== undefined) { const se = E(e.sigEqual); a.$$IS_SIGNATURE_EQUAL = function (x, y) { return se(x, y); }; }
+      // A server reference's bind keeps $$FORM_ACTION; model it as returning the action itself.
+      if (e.bindable) a.bind = function () { return a; };
       return a;
     }
   }

@@ -413,8 +413,8 @@ func (r *request) flushSegmentContainer(d destination, seg *segment, h *hoistabl
 
 func (r *request) flushCompletedBoundary(d destination, b *boundary) bool {
 	r.flushedByteSize = b.byteSize
-	for _, seg := range b.completedSegments {
-		r.flushPartiallyCompletedSegment(d, b, seg)
+	for i := 0; i < len(b.completedSegments); i++ {
+		r.flushPartiallyCompletedSegment(d, b, b.completedSegments[i])
 	}
 	b.completedSegments = b.completedSegments[:0]
 	if row := b.row; row != nil && r.isEligibleForOutlining(b) {
@@ -686,7 +686,6 @@ func (r *request) flushCompletedQueues(d destination) {
 	d.completeWriting()
 	d.beginWriting()
 	r.flushingPartialBoundaries = true
-	r.destinationHasCapacity = true
 	for i = 0; i < len(r.partialBoundaries); i++ {
 		b := r.partialBoundaries[i]
 		ok := func() bool {
