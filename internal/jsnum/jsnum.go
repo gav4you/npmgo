@@ -165,15 +165,20 @@ func ToInt32(x float64) int32 {
 // where ECMAScript differs from IEEE 754: a NaN exponent always gives NaN
 // (1 ** NaN) and so does (+-1) ** +-Infinity.
 //
-// V8 computes ** with the C library's pow, so Node's own results differ in
-// the last bit between platforms (and, with glibc, between CPUs with and
-// without FMA); math.Pow agrees with Node on the value but not always on
-// that bit.
+// V8 (with its default --use-std-math-pow) evaluates x ** 2 as x * x and
+// x ** 0.5 as a square root, and computes everything else with the C
+// library's pow, so Node's own results differ in the last bit between
+// platforms (and, with glibc, between CPUs with and without FMA); math.Pow
+// agrees with Node on the value but not always on that bit. (V8's own fdlibm
+// pow, base::ieee754::legacy::pow, is used only with --no-use-std-math-pow.)
 func Pow(x, y float64) float64 {
 	if math.IsNaN(y) || (math.IsInf(y, 0) && (x == 1 || x == -1)) {
 		return math.NaN()
 	}
-	return math.Pow(x, y)
+	if y == 2 {
+		return x * x
+	}
+	return math.Pow(x, y) // y == 0.5 is math.Sqrt here too, with the same special cases
 }
 
 // ISOString matches Date.prototype.toISOString for a finite millisecond time.

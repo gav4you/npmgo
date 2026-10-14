@@ -125,6 +125,7 @@ func TestPow(t *testing.T) {
 		{1, nan, nan}, {-1, inf, nan}, {1, -inf, nan}, {nan, 0, 1}, {2, 0.5, 1.4142135623730951},
 		{-8, 1.0 / 3, nan}, {0, -1, inf}, {negZero, -1, -inf}, {negZero, 3, negZero}, {4, 0.5, 2},
 		{2, 3, 8}, {10, -2, 0.01}, {1.5, inf, inf}, {0.5, -inf, inf}, {-2, 3, -8}, {-2, 2, 4},
+		{1.1, 2, 1.2100000000000002}, {0.1, 2, 0.010000000000000002}, {-inf, 0.5, inf}, {negZero, 0.5, 0},
 	} {
 		if got := Pow(c.x, c.y); !same(got, c.want) {
 			t.Errorf("Pow(%v, %v) = %v, want %v", c.x, c.y, got, c.want)

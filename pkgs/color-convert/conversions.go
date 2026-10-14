@@ -205,9 +205,9 @@ func rgbToCMYK(v Value) Value {
 }
 
 // comparativeDistance is the squared Euclidean distance. JavaScript squares
-// with ** 2, which V8 hands to the C library's pow; d*d is that value
-// whenever it is exact (integer channels) and the correctly rounded one
-// otherwise.
+// with ** 2, which V8 evaluates as x * x (its std-pow path special-cases the
+// exponent 2 before calling the C library's pow), so d*d is the same
+// operation.
 func comparativeDistance(x []float64, y [3]uint8) float64 {
 	d0 := at(x, 0) - float64(y[0])
 	d1 := at(x, 1) - float64(y[1])
