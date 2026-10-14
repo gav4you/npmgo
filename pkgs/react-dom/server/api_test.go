@@ -139,6 +139,39 @@ func TestAbortFromAnotherGoroutine(t *testing.T) {
 	}
 }
 
+// A promise that settles after the stream has ended (an aborted render whose
+// data arrives late) must not block the goroutine settling it, and Abort or
+// a second Pipe after the end are harmless.
+func TestSettleAfterStreamEnd(t *testing.T) {
+	p, resolve, _ := react.NewPromise()
+	late := func(hk react.Hooks, _ *react.Props) react.Node { return hk.Use(p) }
+	s := server.RenderToPipeableStream(h("div", nil, h(react.Suspense, react.Obj("fallback", "fb"), h(late, nil))), &server.StreamOptions{
+		OnError: func(error, server.ErrorInfo) string { return "" },
+	})
+	s.Abort(errors.New("timed out"))
+	var buf bytes.Buffer
+	if err := s.Pipe(&buf); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.HasSuffix(buf.String(), `$RX("B:0")</script>`) {
+		t.Fatalf("stream %q", buf.String())
+	}
+	settled := make(chan struct{})
+	go func() {
+		resolve("too late")
+		s.Abort(nil)
+		close(settled)
+	}()
+	select {
+	case <-settled:
+	case <-time.After(2 * time.Second):
+		t.Fatal("settling the promise after the stream ended blocked")
+	}
+	if err := s.Pipe(&buf); err == nil || err.Error() != "React currently only supports piping to one writable stream." {
+		t.Fatalf("second pipe: %v", err)
+	}
+}
+
 func TestShellErrorEndsPipe(t *testing.T) {
 	failing := func() react.Node { panic(errBoom) }
 	var shellErr error

@@ -4,8 +4,9 @@
 //
 // Any goroutine may queue work (that is how promises settled elsewhere wake a
 // render); only the goroutine driving the loop runs it. After Close, queued
-// work runs synchronously on the queuing goroutine, serialized, which models
-// microtasks running after a synchronous render has returned.
+// work runs on the queuing goroutine (or on the goroutine already running
+// such work), one task at a time, which models microtasks running after a
+// synchronous render has returned.
 package jsloop
 
 import "sync"
@@ -22,7 +23,10 @@ type Loop struct {
 	macro  []func()
 	wake   chan struct{}
 	closed bool
-	runMu  sync.Mutex // serializes work run after Close
+	// late is work queued after Close; draining is set while a goroutine
+	// runs it (see drainLateLocked).
+	late     []func()
+	draining bool
 }
 
 // New returns an empty loop.
@@ -39,10 +43,8 @@ func (l *Loop) signal() {
 func (l *Loop) QueueMicrotask(task func()) {
 	l.mu.Lock()
 	if l.closed {
-		l.mu.Unlock()
-		l.runMu.Lock()
-		defer l.runMu.Unlock()
-		task()
+		l.late = append(l.late, task)
+		l.drainLateLocked()
 		return
 	}
 	l.micro = append(l.micro, task)
@@ -54,15 +56,37 @@ func (l *Loop) QueueMicrotask(task func()) {
 func (l *Loop) SetImmediate(task func()) {
 	l.mu.Lock()
 	if l.closed {
-		l.mu.Unlock()
-		l.runMu.Lock()
-		defer l.runMu.Unlock()
-		task()
+		l.late = append(l.late, task)
+		l.drainLateLocked()
 		return
 	}
 	l.macro = append(l.macro, task)
 	l.mu.Unlock()
 	l.signal()
+}
+
+// drainLateLocked runs the work queued after Close, unless another call is
+// already doing so: then that call runs what was just queued, after its
+// current task. Called with mu held; returns with mu released. One goroutine
+// at a time runs late work, so it stays serialized, and a task that queues
+// more work (a promise reaction pinging a task, which schedules performWork)
+// never waits on itself.
+func (l *Loop) drainLateLocked() {
+	if l.draining {
+		l.mu.Unlock()
+		return
+	}
+	l.draining = true
+	for len(l.late) > 0 {
+		t := l.late[0]
+		l.late[0] = nil
+		l.late = l.late[1:]
+		l.mu.Unlock()
+		t()
+		l.mu.Lock()
+	}
+	l.draining = false
+	l.mu.Unlock()
 }
 
 func (l *Loop) popMicro() func() {
@@ -136,20 +160,14 @@ func (l *Loop) Run(done func() bool) {
 }
 
 // Close drains queued microtasks one last time and switches the loop to
-// running later work synchronously on whichever goroutine queues it.
+// running later work on whichever goroutine queues it.
 func (l *Loop) Close() {
 	l.Drain()
 	l.mu.Lock()
 	l.closed = true
-	micro, macro := l.micro, l.macro
-	l.micro, l.macro = nil, nil
-	l.mu.Unlock()
-	l.runMu.Lock()
-	defer l.runMu.Unlock()
-	for _, t := range micro {
-		t()
-	}
-	_ = macro // macrotasks of a finished render have nothing left to do
+	l.late = append(l.late, l.micro...) // queued since Drain emptied the queue
+	l.micro, l.macro = nil, nil         // macrotasks of a finished render have nothing left to do
+	l.drainLateLocked()
 }
 
 // thenOnner is implemented by promises that deliver reactions as microtasks
