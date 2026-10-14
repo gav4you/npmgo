@@ -51,10 +51,24 @@ func pathToFileURLHref(p string) string {
 	return u.String()
 }
 
+// asError ports isError: a native error, or any object whose prototype chain
+// reaches Error.prototype (adapted through errorView).
+func asError(v any) (*Error, bool) {
+	switch x := v.(type) {
+	case *Error:
+		return x, true
+	case *Object:
+		if usesChain(x) && inChain(x, ErrorPrototype) {
+			return errorView(x), true
+		}
+	}
+	return nil, false
+}
+
 func getStackFrames(c *ctx, e *Error, stack string) []string {
 	frames := strings.Split(stack, "\n")
 
-	if cause, ok := e.Cause.(*Error); ok && e.HasCause {
+	if cause, ok := asError(e.Cause); ok && e.HasCause {
 		causeStack := getStackString(c, cause)
 		if start := strings.Index(causeStack, "\n    at"); start != -1 {
 			causeFrames := strings.Split(causeStack[start+1:], "\n")
@@ -83,22 +97,25 @@ func getStackFrames(c *ctx, e *Error, stack string) []string {
 	return frames
 }
 
+// getStackString ports getStackString: a truthy string stack is used as is; any
+// other truthy value is formatted under the error's toString, with Node's
+// missing recurseTimes (NaN) semantics; a falsy stack means no stack.
 func getStackString(c *ctx, e *Error) string {
-	switch s := e.Stack.(type) {
-	case string:
-		if s != "" {
-			return s
-		}
-	case nil:
-	default:
-		c.seen = append(c.seen, e)
-		c.indentationLvl += 4
-		r := formatValue(c, s, 0, false)
-		c.indentationLvl -= 4
-		c.seen = c.seen[:len(c.seen)-1]
-		return errorToString(e) + "\n    " + r
+	if !jsTruthy(e.Stack) {
+		return errorToString(e)
 	}
-	return errorToString(e)
+	if s, ok := e.Stack.(string); ok {
+		return s
+	}
+	c.seen = append(c.seen, identity(e))
+	c.indentationLvl += 4
+	saved := c.nanDepth
+	c.nanDepth = true
+	r := formatValue(c, e.Stack, 0, false)
+	c.nanDepth = saved
+	c.indentationLvl -= 4
+	c.seen = c.seen[:len(c.seen)-1]
+	return errorToString(e) + "\n    " + r
 }
 
 func splice(s []string, start, del int, insert string) []string {

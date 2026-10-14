@@ -186,7 +186,11 @@ func build(raw json.RawMessage, refs map[string]any) any {
 		d.Props = props()
 		return d
 	case "re":
-		return &RegExp{Source: str("src"), Flags: str("flags"), Props: props()}
+		r := &RegExp{Source: str("src"), Flags: str("flags"), Props: props()}
+		if raw, ok := s["lastIndex"]; ok {
+			json.Unmarshal(raw, &r.LastIndex)
+		}
+		return r
 	case "u8":
 		var f []float64
 		json.Unmarshal(s["items"], &f)
@@ -207,24 +211,46 @@ func build(raw json.RawMessage, refs map[string]any) any {
 		case flag("gen"):
 			src = "function* () {}"
 		}
-		return &Function{Name: str("name"), Async: flag("async"), Generator: flag("gen"), Source: src,
-			Class: flag("class"), Extends: str("extends"), Props: props()}
+		f := &Function{Name: str("name"), Async: flag("async"), Generator: flag("gen"), Source: src,
+			Class: flag("class"), Extends: str("extends")}
+		if id := str("id"); id != "" {
+			refs[id] = f
+		}
+		f.Props = props()
+		return f
 	case "err":
 		ctor := str("ctor")
 		if ctor == "" {
 			ctor = "Error"
 		}
-		e := &Error{Proto: Proto{Constructor: ctor}, Name: ctor, Message: str("msg")}
+		// A subclass made by build.cjs (`class Foo extends Error {}`) inherits
+		// the name "Error"; only the native error classes name themselves.
+		e := &Error{Proto: Proto{Constructor: ctor}, Name: "Error", Message: str("msg")}
+		if nativeErrorNames[ctor] {
+			e.Name = ctor
+		}
+		if id := str("id"); id != "" {
+			refs[id] = e
+		}
 		if _, ok := s["name"]; ok {
 			e.Name = str("name")
 		}
-		if _, ok := s["stack"]; ok {
-			e.Stack = str("stack")
+		if raw, ok := s["stack"]; ok {
+			// A string is the stack text; any other spec is built (an object,
+			// false, 0 or null stack), as in build.cjs.
+			if bytes.HasPrefix(bytes.TrimSpace(raw), []byte(`"`)) {
+				e.Stack = str("stack")
+			} else {
+				e.Stack = build(raw, refs)
+			}
 		}
 		if c, ok := s["cause"]; ok {
 			e.HasCause, e.Cause = true, build(c, refs)
 		}
 		e.Props = props()
+		if flag("nullProto") {
+			e.Proto = Proto{Null: true}
+		}
 		return e
 	case "proxy":
 		return &Proxy{Target: build(s["target"], refs), Handler: build(s["handler"], refs), Revoked: flag("revoked")}
@@ -255,11 +281,11 @@ func build(raw json.RawMessage, refs map[string]any) any {
 		}
 		switch str("kind") {
 		case "keys":
-			return &MapIterator{Items: keys}
+			return &MapIterator{Items: keys, Props: props()}
 		case "values":
-			return &MapIterator{Items: vals}
+			return &MapIterator{Items: vals, Props: props()}
 		}
-		return &MapIterator{Items: flat, Entries: true}
+		return &MapIterator{Items: flat, Entries: true, Props: props()}
 	case "setiter":
 		it := items("items")
 		if str("kind") == "entries" {
@@ -267,9 +293,9 @@ func build(raw json.RawMessage, refs map[string]any) any {
 			for _, v := range it {
 				flat = append(flat, v, v)
 			}
-			return &SetIterator{Items: flat, Entries: true}
+			return &SetIterator{Items: flat, Entries: true, Props: props()}
 		}
-		return &SetIterator{Items: it}
+		return &SetIterator{Items: it, Props: props()}
 	case "wk":
 		return wellKnown[str("name")]
 	case "chain":
@@ -407,6 +433,10 @@ func build(raw json.RawMessage, refs map[string]any) any {
 	}
 	panic("bad spec " + string(raw))
 }
+
+// nativeErrorNames are the globalThis error classes build.cjs uses directly.
+var nativeErrorNames = map[string]bool{"Error": true, "TypeError": true, "RangeError": true, "SyntaxError": true,
+	"ReferenceError": true, "EvalError": true, "URIError": true, "AggregateError": true, "SuppressedError": true}
 
 // customSpec mirrors the [util.inspect.custom] objects made by build.cjs.
 type customSpec struct {

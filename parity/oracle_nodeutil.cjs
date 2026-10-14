@@ -7,7 +7,8 @@ const { build } = require('./build.cjs');
 const c = require(require('path').resolve(process.argv[2]));
 // Neutral working directory so recorded outputs don't contain the local machine path.
 process.cwd = () => '/work/npmgo';
-const opt = o => { if (!o) return undefined; const r = { ...o }; for (const k of ['depth', 'breakLength', 'maxArrayLength', 'maxStringLength']) if (r[k] === 'Infinity') r[k] = Infinity; if (r.sorted === 'reverse') r.sorted = (a, b) => (a < b ? 1 : a > b ? -1 : 0); return r; };
+// Numeric options may be given as the strings 'Infinity' or 'NaN' (JSON has neither).
+const opt = o => { if (!o) return undefined; const r = { ...o }; for (const k of ['depth', 'breakLength', 'maxArrayLength', 'maxStringLength']) { if (r[k] === 'Infinity') r[k] = Infinity; else if (r[k] === 'NaN') r[k] = NaN; } if (r.sorted === 'reverse') r.sorted = (a, b) => (a < b ? 1 : a > b ? -1 : 0); return r; };
 (async () => {
   build.namespaces = {};
   for (const [name, def] of Object.entries(c.namespaces || {})) {

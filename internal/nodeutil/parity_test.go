@@ -18,14 +18,20 @@ func optsFrom(raw json.RawMessage) (Options, bool) {
 	}
 	var m map[string]any
 	json.Unmarshal(raw, &m)
+	// Numeric options may be the strings "Infinity" or "NaN", as in the oracle.
+	num := func(v any) float64 {
+		switch v {
+		case "Infinity":
+			return math.Inf(1)
+		case "NaN":
+			return math.NaN()
+		}
+		return v.(float64)
+	}
 	for k, v := range m {
 		switch k {
 		case "depth":
-			if v == "Infinity" {
-				o.Depth = math.Inf(1)
-			} else {
-				o.Depth = v.(float64)
-			}
+			o.Depth = num(v)
 		case "compact":
 			switch x := v.(type) {
 			case bool:
@@ -34,11 +40,11 @@ func optsFrom(raw json.RawMessage) (Options, bool) {
 				o.Compact = int(x)
 			}
 		case "breakLength":
-			o.BreakLength = v.(float64)
+			o.BreakLength = num(v)
 		case "maxArrayLength":
-			o.MaxArrayLength = v.(float64)
+			o.MaxArrayLength = num(v)
 		case "maxStringLength":
-			o.MaxStringLength = v.(float64)
+			o.MaxStringLength = num(v)
 		case "sorted":
 			if v == "reverse" {
 				o.Sorted = true

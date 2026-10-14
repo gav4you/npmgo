@@ -95,12 +95,14 @@ type Date struct {
 	Props []Prop
 }
 
-// RegExp is a JS regular expression literal.
+// RegExp is a JS regular expression literal. LastIndex is the own
+// non-enumerable lastIndex property (shown with showHidden).
 type RegExp struct {
 	Proto
-	Source string
-	Flags  string
-	Props  []Prop
+	Source    string
+	Flags     string
+	LastIndex float64
+	Props     []Prop
 }
 
 // Error is a JS Error. Stack nil means the stack property is absent.

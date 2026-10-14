@@ -43,27 +43,21 @@ var (
 	WeakSetPrototype        = wellKnownProto("WeakSet", ObjectPrototype)
 )
 
-// builtInObjects is the set of capitalised globalThis names in Node v25.9.0.
+// builtInObjects is inspect.js's `builtInObjects`: the capitalised own
+// property names of globalThis *when inspect.js is loaded*, which is during
+// bootstrap, before Node installs Buffer, the web platform globals (URL,
+// AbortController, TextEncoder, ...), SharedArrayBuffer, Float16Array,
+// WebAssembly or the DisposableStack family. Measured in Node v25.9.0 with
+// tools/builtin_objects.cjs.
 var builtInObjects = func() map[string]bool {
 	m := map[string]bool{}
-	for _, n := range []string{"AbortController", "AbortSignal", "AggregateError", "Array", "ArrayBuffer",
-		"AsyncDisposableStack", "Atomics", "BigInt", "BigInt64Array", "BigUint64Array", "Blob", "Boolean",
-		"BroadcastChannel", "Buffer", "ByteLengthQueuingStrategy", "CloseEvent", "CompressionStream",
-		"CountQueuingStrategy", "Crypto", "CryptoKey", "CustomEvent", "DOMException", "DataView", "Date",
-		"DecompressionStream", "DisposableStack", "Error", "ErrorEvent", "EvalError", "Event", "EventTarget",
-		"File", "FinalizationRegistry", "Float16Array", "Float32Array", "Float64Array", "FormData", "Function",
-		"Headers", "Infinity", "Int16Array", "Int32Array", "Int8Array", "Intl", "Iterator", "JSON", "Map",
-		"Math", "MessageChannel", "MessageEvent", "MessagePort", "NaN", "Navigator", "Number", "Object",
-		"Performance", "PerformanceEntry", "PerformanceMark", "PerformanceMeasure", "PerformanceObserver",
-		"PerformanceObserverEntryList", "PerformanceResourceTiming", "Promise", "Proxy", "RangeError",
-		"ReadableByteStreamController", "ReadableStream", "ReadableStreamBYOBReader", "ReadableStreamBYOBRequest",
-		"ReadableStreamDefaultController", "ReadableStreamDefaultReader", "ReferenceError", "Reflect", "RegExp",
-		"Request", "Response", "Set", "SharedArrayBuffer", "Storage", "String", "SubtleCrypto", "SuppressedError",
-		"Symbol", "SyntaxError", "TextDecoder", "TextDecoderStream", "TextEncoder", "TextEncoderStream",
-		"TransformStream", "TransformStreamDefaultController", "TypeError", "URIError", "URL", "URLPattern",
-		"URLSearchParams", "Uint16Array", "Uint32Array", "Uint8Array", "Uint8ClampedArray", "WeakMap", "WeakRef",
-		"WeakSet", "WebAssembly", "WebSocket", "WritableStream", "WritableStreamDefaultController",
-		"WritableStreamDefaultWriter"} {
+	for _, n := range []string{"AggregateError", "Array", "ArrayBuffer", "Atomics", "BigInt", "BigInt64Array",
+		"BigUint64Array", "Boolean", "DataView", "Date", "Error", "EvalError", "FinalizationRegistry",
+		"Float32Array", "Float64Array", "Function", "Infinity", "Int16Array", "Int32Array", "Int8Array", "Intl",
+		"Iterator", "JSON", "Map", "Math", "NaN", "Number", "Object", "Promise", "Proxy", "RangeError",
+		"ReferenceError", "Reflect", "RegExp", "Set", "String", "Symbol", "SyntaxError", "TypeError",
+		"URIError", "Uint16Array", "Uint32Array", "Uint8Array", "Uint8ClampedArray", "WeakMap", "WeakRef",
+		"WeakSet"} {
 		m[n] = true
 	}
 	return m
@@ -348,7 +342,7 @@ func getConstructorName(c *ctx, obj any, recurseTimes int, protoProps *[]string)
 		return nil
 	}
 	res := internalClassName(tmp)
-	if float64(recurseTimes) > c.Depth {
+	if !c.nanDepth && float64(recurseTimes) > c.Depth {
 		s := res + " <Complex prototype>"
 		return &s
 	}
@@ -364,8 +358,8 @@ func getConstructorName(c *ctx, obj any, recurseTimes int, protoProps *[]string)
 	return &s
 }
 
-// ownKeysOrdered ports Reflect.ownKeys order: integer-like keys ascending,
-// then string keys in insertion order, then symbols.
+// ownKeysOrdered ports [[OwnPropertyKeys]] order (Reflect.ownKeys): array
+// index keys ascending, then string keys in insertion order, then symbols.
 func ownKeysOrdered(props []Prop) []Prop {
 	var ints, strs, syms []Prop
 	for _, p := range props {
@@ -373,7 +367,7 @@ func ownKeysOrdered(props []Prop) []Prop {
 		case Symbol:
 			syms = append(syms, p)
 		case string:
-			if numberKeyRe.MatchString(k) && len(k) < 10 {
+			if isArrayIndex(k) {
 				ints = append(ints, p)
 			} else {
 				strs = append(strs, p)
@@ -382,6 +376,15 @@ func ownKeysOrdered(props []Prop) []Prop {
 	}
 	sortIntKeys(ints)
 	return append(append(ints, strs...), syms...)
+}
+
+// isArrayIndex reports whether key is a canonical integer in [0, 2^32 - 2].
+func isArrayIndex(key string) bool {
+	if !numberKeyRe.MatchString(key) || len(key) > 10 {
+		return false
+	}
+	n, err := strconv.ParseUint(key, 10, 64)
+	return err == nil && n <= 4294967294
 }
 
 func keyEqual(a, b any) bool {

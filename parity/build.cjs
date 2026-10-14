@@ -52,7 +52,7 @@ function build(spec, refs = {}) {
     case 'map': { const m = new Map(); if (spec.id) refs[spec.id] = m; for (const [k, v] of spec.entries) m.set(B(k), B(v)); addProps(m, spec.props); return m; }
     case 'set': { const s = new Set(); if (spec.id) refs[spec.id] = s; for (const v of spec.items) s.add(B(v)); addProps(s, spec.props); return s; }
     case 'date': { const d = new Date(spec.ms === null ? NaN : spec.ms); addProps(d, spec.props); return d; }
-    case 're': { const r = new RegExp(spec.src, spec.flags); addProps(r, spec.props); return r; }
+    case 're': { const r = new RegExp(spec.src, spec.flags); if (spec.lastIndex !== undefined) r.lastIndex = spec.lastIndex; addProps(r, spec.props); return r; }
     case 'u8': return new Uint8Array(spec.items);
     case 'boxed': return Object(B(spec.v));
     case 'fn': {
@@ -63,15 +63,20 @@ function build(spec, refs = {}) {
       else if (spec.gen) f = function* () {};
       else f = function () {};
       if (!spec.class) Object.defineProperty(f, 'name', { value: spec.name || '' });
+      if (spec.id) refs[spec.id] = f;
       addProps(f, spec.props);
       return f;
     }
     case 'err': {
       const Ctor = spec.ctor && spec.ctor !== 'Error' ? (globalThis[spec.ctor] || named(spec.ctor, Error)) : Error;
       const e = spec.ctor === 'AggregateError' ? new Ctor([], spec.msg) : spec.cause !== undefined ? new Ctor(spec.msg, { cause: B(spec.cause) }) : new Ctor(spec.msg);
+      if (spec.id) refs[spec.id] = e;
       if (spec.name !== undefined) e.name = spec.name;
-      if (spec.stack === undefined) delete e.stack; else e.stack = spec.stack;
+      // stack: absent = delete the own property; a string is assigned as is;
+      // any other spec (object, false, 0, null) is built and assigned.
+      if (spec.stack === undefined) delete e.stack; else e.stack = typeof spec.stack === 'string' ? spec.stack : B(spec.stack);
       addProps(e, spec.props);
+      if (spec.nullProto) Object.setPrototypeOf(e, null);
       return e;
     }
   }
@@ -80,8 +85,8 @@ function build(spec, refs = {}) {
     case "promise": { if (spec.state === "pending") return new Promise(() => {}); if (spec.state === "rejected") { const p = Promise.reject(B(spec.v)); p.catch(() => {}); return p; } return Promise.resolve(B(spec.v)); }
     case "weakset": return new WeakSet(spec.items.map(B));
     case "weakmap": return new WeakMap(spec.entries.map(([k, v]) => [B(k), B(v)]));
-    case "mapiter": { const m = new Map(spec.entries.map(([k, v]) => [B(k), B(v)])); return m[spec.kind](); }
-    case "setiter": { const s = new Set(spec.items.map(B)); return s[spec.kind](); }
+    case "mapiter": { const m = new Map(spec.entries.map(([k, v]) => [B(k), B(v)])); const it = m[spec.kind](); addProps(it, spec.props); return it; }
+    case "setiter": { const s = new Set(spec.items.map(B)); const it = s[spec.kind](); addProps(it, spec.props); return it; }
     case "wk": return globalThis[spec.name].prototype;
     case "chain": {
       // Object with an explicit prototype: proto is a spec (obj/chain/wk) or null.

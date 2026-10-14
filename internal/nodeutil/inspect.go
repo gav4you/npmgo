@@ -1,17 +1,19 @@
 // Package nodeutil is a Go translation of Node.js util.inspect / util.format
-// (lib/internal/util/inspect.js, Node v25.9.0). The Node.js license is kept
-// in LICENSE.
+// (lib/internal/util/inspect.js, Node v25.9.0), the [util.inspect.custom]
+// hooks of URL and URLSearchParams (lib/internal/url.js) and the ICU string
+// width (src/node_i18n.cc). The Node.js license is kept in LICENSE.
 //
-// JavaScript values are modelled by the types in values.go. Not translated:
-// proxies, custom [util.inspect.custom] hooks, WeakMap/WeakSet/Promise/iterator
-// internals (V8-only state), stack-frame colouring, and the RegExp syntax
-// highlighter (regexps are coloured as a whole in red, as Node did before v24).
+// JavaScript values are modelled by the types in values.go; the state Node
+// reads out of V8 (proxies, promises, weak collections, iterators, module
+// namespaces, externals) by the adapter types in adapters.go. See PROGRESS.md
+// for what is not modelled.
 package nodeutil
 
 import (
 	"fmt"
 	"math"
 	"math/big"
+	"reflect"
 	"regexp"
 	"sort"
 	"strconv"
@@ -98,6 +100,42 @@ type ctx struct {
 	currentDepth   int
 	circular       map[any]int
 	circularOrder  int
+	// nanDepth is set while formatting an error's non-string `stack` value:
+	// Node calls formatValue(ctx, stack) without recurseTimes, so every
+	// comparison with it (depth exceeded, compact line-up, custom depth) is
+	// made against NaN and is false.
+	nanDepth bool
+}
+
+// sameRef reports whether a and b are the same modelled JS object. Values of
+// uncomparable Go types (slices, maps, funcs) are never the same object; this
+// avoids the panic `==` raises for them.
+func sameRef(a, b any) bool {
+	if a == nil || b == nil {
+		return a == nil && b == nil
+	}
+	ta, tb := reflect.TypeOf(a), reflect.TypeOf(b)
+	if ta != tb || !ta.Comparable() {
+		return false
+	}
+	return a == b
+}
+
+// jsTruthy ports ToBoolean for the modelled values.
+func jsTruthy(v any) bool {
+	switch x := normalize(v).(type) {
+	case nil, Undefined:
+		return false
+	case bool:
+		return x
+	case float64:
+		return x != 0 && !math.IsNaN(x)
+	case string:
+		return x != ""
+	case *big.Int:
+		return x.Sign() != 0
+	}
+	return true
 }
 
 func (c *ctx) compactNum() (int, bool) {
@@ -189,10 +227,13 @@ func formatValue(c *ctx, value any, recurseTimes int, typedArray bool) string {
 	if c.CustomInspect {
 		if ci, ok := value.(CustomInspector); ok {
 			depth := c.Depth - float64(recurseTimes)
+			if c.nanDepth {
+				depth = math.NaN()
+			}
 			opts := CustomOptions{Options: c.Options, Stylize: c.stylize}
 			_ = isProxy
 			ret := ci.InspectCustom(depth, opts, func(v any, o Options) string { return Inspect(v, o) })
-			if ret != context && ret != value {
+			if !sameRef(ret, context) && !sameRef(ret, value) {
 				if s, ok := ret.(string); ok {
 					return strings.ReplaceAll(s, "\n", "\n"+strings.Repeat(" ", c.indentationLvl))
 				}
@@ -204,7 +245,7 @@ func formatValue(c *ctx, value any, recurseTimes int, typedArray bool) string {
 		value = m.JSModel()
 	}
 	for _, s := range c.seen {
-		if s == identity(value) {
+		if sameRef(s, identity(value)) {
 			idx := 1
 			if c.circular == nil {
 				c.circular = map[any]int{identity(value): 1}
@@ -245,20 +286,49 @@ func getPrefix(constructor *string, tag, fallback, size string) string {
 	return result
 }
 
+// visibleKeys ports getKeys: the own keys to print (all with showHidden, else
+// the enumerable ones) in [[OwnPropertyKeys]] order: array indices ascending,
+// then strings in insertion order, then symbols.
 func visibleKeys(props []Prop, showHidden bool) []Prop {
 	var out []Prop
-	var syms []Prop
 	for _, p := range props {
 		if p.Hidden && !showHidden {
 			continue
 		}
-		if _, ok := p.Key.(Symbol); ok {
-			syms = append(syms, p)
-		} else {
-			out = append(out, p)
+		out = append(out, p)
+	}
+	return ownKeysOrdered(out)
+}
+
+// errorOwnKeys returns the own properties V8 gives an Error instance before any
+// user property: the `stack` accessor, `message` and `cause` (all
+// non-enumerable), followed by the modelled Props.
+func errorOwnKeys(e *Error) []Prop {
+	if e.origin != nil { // adapted from a plain object: its Props are the truth
+		return e.Props
+	}
+	var own []Prop
+	if e.Stack != nil {
+		stack := e.Stack
+		own = append(own, Prop{Key: "stack", Hidden: true, IsAccessor: true, HasSetter: true,
+			Getter: func() (any, error) { return stack, nil }})
+	}
+	if e.Message != "" {
+		own = append(own, Prop{Key: "message", Value: e.Message, Hidden: true})
+	}
+	if e.HasCause && !hasKey(e.Props, "cause") {
+		own = append(own, Prop{Key: "cause", Value: e.Cause, Hidden: true})
+	}
+	return append(own, e.Props...)
+}
+
+func hasKey(props []Prop, key string) bool {
+	for _, p := range props {
+		if p.Key == key {
+			return true
 		}
 	}
-	return append(out, syms...)
+	return false
 }
 
 type formatterFn func(c *ctx, recurseTimes int) []string
@@ -274,13 +344,16 @@ func formatRaw(c *ctx, value any, recurseTimes int, typedArray bool) string {
 		formatter   formatterFn = func(*ctx, int) []string { return nil }
 		extraKeys   []Prop
 	)
-	depthExceeded := func() bool { return float64(recurseTimes) > c.Depth }
+	depthExceeded := func() bool { return !c.nanDepth && float64(recurseTimes) > c.Depth }
 	var protoProps []string
 	var pp *[]string
-	if c.ShowHidden && float64(recurseTimes) <= c.Depth {
+	if c.ShowHidden && (c.nanDepth || float64(recurseTimes) <= c.Depth) {
 		pp = &protoProps
 	}
 	noProto := func() bool { return len(protoProps) == 0 }
+	// hiddenKey is an own non-enumerable data property V8 gives built-ins
+	// (an array's length, a regexp's lastIndex), listed with showHidden.
+	hiddenKey := func(key string, value any) Prop { return Prop{Key: key, Value: value, Hidden: true} }
 
 	switch v := value.(type) {
 	case *Array:
@@ -290,7 +363,11 @@ func formatRaw(c *ctx, value any, recurseTimes int, typedArray bool) string {
 		if constructor == nil || *constructor != "Array" || tag != "" {
 			prefix = getPrefix(constructor, tag, "Array", fmt.Sprintf("(%d)", len(v.Items)))
 		}
-		keys = visibleKeys(v.Props, c.ShowHidden)
+		props := v.Props
+		if c.ShowHidden {
+			props = append([]Prop{hiddenKey("length", float64(len(v.Items)))}, props...)
+		}
+		keys = visibleKeys(props, c.ShowHidden)
 		braces = [2]string{prefix + "[", "]"}
 		if len(v.Items) == 0 && len(keys) == 0 && noProto() {
 			return braces[0] + "]"
@@ -369,10 +446,14 @@ func formatRaw(c *ctx, value any, recurseTimes int, typedArray bool) string {
 			{Key: "buffer", Value: v.Buffer},
 		}
 	case *ModuleNamespace:
-		s := "Module"
+		// Null prototype; its own non-enumerable Symbol.toStringTag is 'Module'.
 		constructor = nil
-		_ = s
+		tag = "Module"
 		keys = visibleKeys(v.Props, c.ShowHidden)
+		if c.ShowHidden {
+			d := "Symbol.toStringTag"
+			keys = append(keys, Prop{Key: Symbol{Description: &d}, Value: "Module", Hidden: true})
+		}
 		braces[0] = getPrefix(nil, tag, "Module", "") + "{"
 		nsKeys := keys
 		keys = nil
@@ -438,7 +519,11 @@ func formatRaw(c *ctx, value any, recurseTimes int, typedArray bool) string {
 		}
 	case *RegExp:
 		constructor = constructorOf(c, v, v.Proto, "RegExp", recurseTimes, pp)
-		keys = visibleKeys(v.Props, c.ShowHidden)
+		props := v.Props
+		if c.ShowHidden {
+			props = append([]Prop{hiddenKey("lastIndex", v.LastIndex)}, props...)
+		}
+		keys = visibleKeys(props, c.ShowHidden)
 		base = "/" + v.Source + "/" + v.Flags
 		if prefix := getPrefix(constructor, tag, "RegExp", ""); prefix != "RegExp " {
 			base = prefix + base
@@ -463,7 +548,11 @@ func formatRaw(c *ctx, value any, recurseTimes int, typedArray bool) string {
 		}
 	case *Error:
 		constructor = constructorOf(c, v, v.Proto, "Error", recurseTimes, pp)
-		keys = visibleKeys(v.Props, c.ShowHidden)
+		if c.ShowHidden {
+			keys = visibleKeys(errorOwnKeys(v), true)
+		} else {
+			keys = visibleKeys(v.Props, false)
+		}
 		base = formatError(v, constructor, tag, c, &keys)
 		if len(keys) == 0 && noProto() {
 			return base
@@ -496,7 +585,9 @@ func formatRaw(c *ctx, value any, recurseTimes int, typedArray bool) string {
 			formatter = func(c *ctx, rt int) []string { return []string{c.stylize("<items unknown>", "special")} }
 		}
 	case *MapIterator:
-		s := "Map"
+		// %MapIteratorPrototype% has no own constructor and %IteratorPrototype%'s
+		// is an accessor, so the chain walk ends at Object.prototype: "Object".
+		s := "Object"
 		constructor = &s
 		tag = v.Tag
 		if tag == "" {
@@ -505,8 +596,11 @@ func formatRaw(c *ctx, value any, recurseTimes int, typedArray bool) string {
 		keys = visibleKeys(v.Props, c.ShowHidden)
 		braces = getIteratorBraces("Map", tag)
 		formatter = func(c *ctx, rt int) []string { return formatIterator(&braces, c, v.Items, v.Entries, rt) }
+		if pp != nil {
+			protoProps = iteratorProtoProps(c, "Map Iterator", recurseTimes)
+		}
 	case *SetIterator:
-		s := "Set"
+		s := "Object"
 		constructor = &s
 		tag = v.Tag
 		if tag == "" {
@@ -515,10 +609,18 @@ func formatRaw(c *ctx, value any, recurseTimes int, typedArray bool) string {
 		keys = visibleKeys(v.Props, c.ShowHidden)
 		braces = getIteratorBraces("Set", tag)
 		formatter = func(c *ctx, rt int) []string { return formatIterator(&braces, c, v.Items, v.Entries, rt) }
+		if pp != nil {
+			protoProps = iteratorProtoProps(c, "Set Iterator", recurseTimes)
+		}
 	case *Boxed:
 		constructor = constructorOf(c, v, v.Proto, boxedType(v.Value), recurseTimes, pp)
 		tag = v.Tag
-		keys = visibleKeys(v.Props, c.ShowHidden)
+		props := v.Props
+		if s, ok := v.Value.(string); ok && c.ShowHidden {
+			// getBoxedBase removes the index keys, leaving `length`.
+			props = append([]Prop{hiddenKey("length", float64(utf16Len(s)))}, props...)
+		}
+		keys = visibleKeys(props, c.ShowHidden)
 		base = getBoxedBase(v, c, keys, constructor, tag)
 		if len(keys) == 0 && noProto() {
 			return base
@@ -584,6 +686,19 @@ func formatRaw(c *ctx, value any, recurseTimes int, typedArray bool) string {
 		c.Depth = -1
 	}
 	return res
+}
+
+// iteratorProtoProps ports what addPrototypeProperties finds for a Map or Set
+// iterator with showHidden: the Symbol.toStringTag of %MapIteratorPrototype% /
+// %SetIteratorPrototype% (the only non-function own key of the two prototypes
+// walked before reaching Object.prototype).
+func iteratorProtoProps(c *ctx, tag string, recurseTimes int) []string {
+	d := "Symbol.toStringTag"
+	value := formatProperty(c, Prop{Key: Symbol{Description: &d}, Value: tag, Hidden: true}, recurseTimes, kObjectType)
+	if c.Colors {
+		value = "\x1b[2m" + value + "\x1b[22m"
+	}
+	return []string{value}
 }
 
 func fallbackName(v any) string {
@@ -710,24 +825,7 @@ func errorToString(e *Error) string {
 }
 
 func formatError(e *Error, constructor *string, tag string, c *ctx, keys *[]Prop) string {
-	var stack string
-	switch s := e.Stack.(type) {
-	case string:
-		if s != "" {
-			stack = s
-		} else {
-			stack = errorToString(e)
-		}
-	case nil:
-		stack = errorToString(e)
-	default:
-		c.seen = append(c.seen, e)
-		c.indentationLvl += 4
-		r := formatValue(c, s, 0, false)
-		c.indentationLvl -= 4
-		c.seen = c.seen[:len(c.seen)-1]
-		stack = errorToString(e) + "\n    " + r
-	}
+	stack := getStackString(c, e)
 	name := e.Name
 	if !c.ShowHidden && len(*keys) != 0 {
 		filtered := (*keys)[:0:0]
@@ -874,38 +972,42 @@ func improveStack(stack string, constructor *string, name, tag string) string {
 	return stack
 }
 
-func remainingText(n int) string {
+// remainingText takes a float: maxArrayLength need not be an integer, and Node
+// prints e.g. "... 1.5 more items".
+func remainingText(n float64) string {
 	s := ""
 	if n > 1 {
 		s = "s"
 	}
-	return fmt.Sprintf("... %d more item%s", n, s)
+	return "... " + jsnum.String(n) + " more item" + s
 }
 
-func maxLen(c *ctx, n int) int {
-	m := math.Min(math.Max(0, c.MaxArrayLength), float64(n))
-	return int(m)
+// maxLen is MathMin(MathMax(0, ctx.maxArrayLength), n): a float, as in Node,
+// so fractional, Infinity and NaN limits behave the same (loops compare
+// against it; NaN stops an indexed loop at once and never breaks a for-of).
+func maxLen(c *ctx, n int) float64 {
+	return math.Min(math.Max(0, c.MaxArrayLength), float64(n))
 }
 
 func formatArray(c *ctx, v *Array, rt int) []string {
 	valLen := len(v.Items)
 	l := maxLen(c, valLen)
 	var output []string
-	for i := 0; i < l; i++ {
+	for i := 0; float64(i) < l; i++ {
 		if _, hole := v.Items[i].(Hole); hole {
 			return formatSpecialArray(c, v, rt, l, output, i)
 		}
 		output = append(output, formatProperty(c, Prop{Key: strconv.Itoa(i), Value: v.Items[i]}, rt, kArrayType))
 	}
-	if valLen-l > 0 {
-		output = append(output, remainingText(valLen-l))
+	if remaining := float64(valLen) - l; remaining > 0 {
+		output = append(output, remainingText(remaining))
 	}
 	return output
 }
 
-func formatSpecialArray(c *ctx, v *Array, rt, maxLength int, output []string, i int) []string {
+func formatSpecialArray(c *ctx, v *Array, rt int, maxLength float64, output []string, i int) []string {
 	index := i
-	for ; i < len(v.Items) && len(output) < maxLength; i++ {
+	for ; i < len(v.Items) && float64(len(output)) < maxLength; i++ {
 		if _, hole := v.Items[i].(Hole); hole {
 			continue
 		}
@@ -917,7 +1019,7 @@ func formatSpecialArray(c *ctx, v *Array, rt, maxLength int, output []string, i 
 			}
 			output = append(output, c.stylize(fmt.Sprintf("<%d empty item%s>", empty, s), "undefined"))
 			index = i
-			if len(output) == maxLength {
+			if float64(len(output)) == maxLength {
 				break
 			}
 		}
@@ -925,7 +1027,7 @@ func formatSpecialArray(c *ctx, v *Array, rt, maxLength int, output []string, i 
 		index++
 	}
 	remaining := len(v.Items) - index
-	if len(output) != maxLength {
+	if float64(len(output)) != maxLength {
 		if remaining > 0 {
 			s := ""
 			if remaining > 1 {
@@ -934,7 +1036,7 @@ func formatSpecialArray(c *ctx, v *Array, rt, maxLength int, output []string, i 
 			output = append(output, c.stylize(fmt.Sprintf("<%d empty item%s>", remaining, s), "undefined"))
 		}
 	} else if remaining > 0 {
-		output = append(output, remainingText(remaining))
+		output = append(output, remainingText(float64(remaining)))
 	}
 	return output
 }
@@ -942,16 +1044,16 @@ func formatSpecialArray(c *ctx, v *Array, rt, maxLength int, output []string, i 
 func formatTypedArray(c *ctx, v *TypedArray) []string {
 	n := typedLen(v)
 	m := maxLen(c, n)
-	out := make([]string, 0, m+1)
-	for i := 0; i < m; i++ {
+	var out []string
+	for i := 0; float64(i) < m; i++ {
 		if v.BigItems != nil {
 			out = append(out, formatBigInt(c.stylize, v.BigItems[i], c.NumericSeparator))
 		} else {
 			out = append(out, formatNumber(c.stylize, v.Items[i], c.NumericSeparator))
 		}
 	}
-	if n-m > 0 {
-		out = append(out, remainingText(n-m))
+	if remaining := float64(n) - m; remaining > 0 {
+		out = append(out, remainingText(remaining))
 	}
 	return out
 }
@@ -960,11 +1062,14 @@ func formatSet(c *ctx, v *Set, rt int) []string {
 	m := maxLen(c, len(v.Items))
 	var out []string
 	c.indentationLvl += 2
-	for i := 0; i < m; i++ {
+	for i := 0; i < len(v.Items); i++ {
+		if float64(i) >= m { // for-of with `if (i >= maxLength) break`
+			break
+		}
 		out = append(out, formatValue(c, v.Items[i], rt, false))
 	}
-	if len(v.Items)-m > 0 {
-		out = append(out, remainingText(len(v.Items)-m))
+	if remaining := float64(len(v.Items)) - m; remaining > 0 {
+		out = append(out, remainingText(remaining))
 	}
 	c.indentationLvl -= 2
 	return out
@@ -974,11 +1079,14 @@ func formatMap(c *ctx, v *Map, rt int) []string {
 	m := maxLen(c, len(v.Keys))
 	var out []string
 	c.indentationLvl += 2
-	for i := 0; i < m; i++ {
+	for i := 0; i < len(v.Keys); i++ {
+		if float64(i) >= m {
+			break
+		}
 		out = append(out, formatValue(c, v.Keys[i], rt, false)+" => "+formatValue(c, v.Values[i], rt, false))
 	}
-	if len(v.Keys)-m > 0 {
-		out = append(out, remainingText(len(v.Keys)-m))
+	if remaining := float64(len(v.Keys)) - m; remaining > 0 {
+		out = append(out, remainingText(remaining))
 	}
 	c.indentationLvl -= 2
 	return out
@@ -1001,7 +1109,7 @@ func formatProperty(c *ctx, p Prop, rt int, typ int) string {
 		} else {
 			str = formatValue(c, p.Value, rt, false)
 		}
-		if diff == 3 && int(c.BreakLength) < getStringWidth(str, c.Colors) {
+		if diff == 3 && c.BreakLength < float64(getStringWidth(str, c.Colors)) {
 			extra = "\n" + strings.Repeat(" ", c.indentationLvl)
 		}
 		c.indentationLvl -= diff
@@ -1058,18 +1166,20 @@ func formatProperty(c *ctx, p Prop, rt int, typ int) string {
 	return name + ":" + extra + str
 }
 
+// isBelowBreakLength compares in floating point: breakLength may be Infinity
+// (always below) or NaN (every comparison false, so also always below).
 func isBelowBreakLength(c *ctx, output []string, start int, base string) bool {
-	total := len(output) + start
-	if total+len(output) > int(c.BreakLength) {
+	total := float64(len(output) + start)
+	if total+float64(len(output)) > c.BreakLength {
 		return false
 	}
 	for _, o := range output {
 		if c.Colors {
-			total += utf16Len(removeColors(o))
+			total += float64(utf16Len(removeColors(o)))
 		} else {
-			total += utf16Len(o)
+			total += float64(utf16Len(o))
 		}
-		if total > int(c.BreakLength) {
+		if total > c.BreakLength {
 			return false
 		}
 	}
@@ -1083,7 +1193,7 @@ func reduceToSingleString(c *ctx, output []string, base string, braces [2]string
 			if extrasType == kArrayExtrasType && entries > 6 {
 				output = groupArrayElements(c, output, value)
 			}
-			if c.currentDepth-rt < compact && entries == len(output) {
+			if !c.nanDepth && c.currentDepth-rt < compact && entries == len(output) {
 				start := len(output) + c.indentationLvl + utf16Len(braces[0]) + utf16Len(base) + 10
 				if isBelowBreakLength(c, output, start, base) {
 					joined := strings.Join(output, ", ")
@@ -1275,7 +1385,9 @@ func formatNumber(fn func(string, string) string, n float64, sep bool) string {
 	}
 	dot := strings.Index(s, ".")
 	if dot == -1 {
-		return fn(s, "number")
+		// Node: indexOf gives -1, so the "integer part" is slice(0, -1) and
+		// the "fraction" slice(0): 1e-7 prints as 1e-.1e-_7.
+		return fn(addNumericSeparator(s[:len(s)-1])+"."+addNumericSeparatorEnd(s), "number")
 	}
 	return fn(addNumericSeparator(s[:dot])+"."+addNumericSeparatorEnd(s[dot+1:]), "number")
 }
@@ -1296,14 +1408,14 @@ func formatPrimitive(fn func(string, string) string, value any, c *ctx) string {
 		trailer := ""
 		u := utf16.Encode([]rune(v))
 		if float64(len(u)) > c.MaxStringLength {
-			remaining := len(u) - int(c.MaxStringLength)
-			v = string(utf16.Decode(u[:int(c.MaxStringLength)]))
-			u = u[:int(c.MaxStringLength)]
+			remaining := float64(len(u)) - c.MaxStringLength
+			u = u[:jsSliceEnd(c.MaxStringLength, len(u))]
+			v = string(utf16.Decode(u))
 			s := ""
 			if remaining > 1 {
 				s = "s"
 			}
-			trailer = fmt.Sprintf("... %d more character%s", remaining, s)
+			trailer = "... " + jsnum.String(remaining) + " more character" + s
 		}
 		if !c.CompactTrue && len(u) > kMinLineLength && float64(len(u)) > c.BreakLength-float64(c.indentationLvl)-4 {
 			// split on /(?<=\n)/ : keep the newline at the end of each piece
@@ -1339,6 +1451,20 @@ func formatPrimitive(fn func(string, string) string, value any, c *ctx) string {
 		return fn(v.String(), "symbol")
 	}
 	return fmt.Sprint(value)
+}
+
+// jsSliceEnd is the end index String.prototype.slice(0, end) uses for a
+// string of length n: truncated toward zero, negative values count from the
+// end, clamped to [0, n].
+func jsSliceEnd(end float64, n int) int {
+	if math.IsNaN(end) {
+		return 0
+	}
+	e := math.Trunc(end)
+	if e < 0 {
+		e = math.Max(float64(n)+e, 0)
+	}
+	return int(math.Min(e, float64(n)))
 }
 
 var meta = func() [160]string {

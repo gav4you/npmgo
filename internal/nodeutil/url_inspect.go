@@ -96,3 +96,38 @@ func (p *URLSearchParams) InspectCustom(depth float64, opts CustomOptions, inspe
 func (p *URLSearchParams) JSModel() any {
 	return &Object{Proto: Proto{Constructor: "URLSearchParams"}, Tag: "URLSearchParams"}
 }
+
+// serialize ports URLSearchParams.prototype.toString: the
+// application/x-www-form-urlencoded serializer.
+func (p *URLSearchParams) serialize() string {
+	var b strings.Builder
+	for i := range p.Names {
+		if i > 0 {
+			b.WriteByte('&')
+		}
+		b.WriteString(formURLEncode(p.Names[i]))
+		b.WriteByte('=')
+		b.WriteString(formURLEncode(p.Values[i]))
+	}
+	return b.String()
+}
+
+func formURLEncode(s string) string {
+	const hex = "0123456789ABCDEF"
+	var b strings.Builder
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		switch {
+		case c == ' ':
+			b.WriteByte('+')
+		case c == '*' || c == '-' || c == '.' || c == '_' ||
+			(c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'):
+			b.WriteByte(c)
+		default:
+			b.WriteByte('%')
+			b.WriteByte(hex[c>>4])
+			b.WriteByte(hex[c&15])
+		}
+	}
+	return b.String()
+}

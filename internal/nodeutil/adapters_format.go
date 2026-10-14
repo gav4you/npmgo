@@ -7,6 +7,8 @@ import (
 	"sort"
 	"strings"
 	"unicode/utf16"
+
+	"github.com/gav4you/npmgo/internal/jsnum"
 )
 
 // Iterator states (kWeak / kIterator / kMapEntries in inspect.js).
@@ -17,7 +19,7 @@ const (
 )
 
 func formatProxy(c *ctx, p *Proxy, recurseTimes int) string {
-	if float64(recurseTimes) > c.Depth {
+	if !c.nanDepth && float64(recurseTimes) > c.Depth {
 		return c.stylize("Proxy [Array]", "special")
 	}
 	recurseTimes++
@@ -63,18 +65,21 @@ func formatIterator(braces *[2]string, c *ctx, entries []any, isKeyValue bool, r
 	return formatSetIterInner(c, recurseTimes, entries, kIterator)
 }
 
+// formatSetIterInner / formatMapIterInner: Node allocates `new Array(maxLength)`
+// here, which throws RangeError for a fractional or NaN maxArrayLength; the Go
+// port formats floor(maxLength) entries instead (see PROGRESS.md).
 func formatSetIterInner(c *ctx, recurseTimes int, entries []any, state int) []string {
 	maxLength := maxLen(c, len(entries))
-	output := make([]string, maxLength)
+	var output []string
 	c.indentationLvl += 2
-	for i := 0; i < maxLength; i++ {
-		output[i] = formatValue(c, entries[i], recurseTimes, false)
+	for i := 0; float64(i) < maxLength; i++ {
+		output = append(output, formatValue(c, entries[i], recurseTimes, false))
 	}
 	c.indentationLvl -= 2
 	if state == kWeak && !c.Sorted {
 		sortJS(output)
 	}
-	if remaining := len(entries) - maxLength; remaining > 0 {
+	if remaining := float64(len(entries)) - maxLength; remaining > 0 {
 		output = append(output, remainingText(remaining))
 	}
 	return output
@@ -83,24 +88,24 @@ func formatSetIterInner(c *ctx, recurseTimes int, entries []any, state int) []st
 func formatMapIterInner(c *ctx, recurseTimes int, entries []any, state int) []string {
 	l := len(entries) / 2
 	maxLength := maxLen(c, l)
-	remaining := l - maxLength
-	output := make([]string, maxLength)
+	remaining := float64(l) - math.Max(c.MaxArrayLength, 0)
+	var output []string
 	c.indentationLvl += 2
 	if state == kWeak {
-		for i := 0; i < maxLength; i++ {
-			output[i] = formatValue(c, entries[2*i], recurseTimes, false) + " => " +
-				formatValue(c, entries[2*i+1], recurseTimes, false)
+		for i := 0; float64(i) < maxLength; i++ {
+			output = append(output, formatValue(c, entries[2*i], recurseTimes, false)+" => "+
+				formatValue(c, entries[2*i+1], recurseTimes, false))
 		}
 		if !c.Sorted {
 			sortJS(output)
 		}
 	} else {
-		for i := 0; i < maxLength; i++ {
+		for i := 0; float64(i) < maxLength; i++ {
 			res := []string{
 				formatValue(c, entries[2*i], recurseTimes, false),
 				formatValue(c, entries[2*i+1], recurseTimes, false),
 			}
-			output[i] = reduceToSingleString(c, res, "", [2]string{"[", "]"}, kArrayExtrasType, recurseTimes, nil)
+			output = append(output, reduceToSingleString(c, res, "", [2]string{"[", "]"}, kArrayExtrasType, recurseTimes, nil))
 		}
 	}
 	c.indentationLvl -= 2
@@ -419,7 +424,8 @@ func formatArrayBuffer(c *ctx, v *ArrayBuffer) []string {
 	if v.Detached {
 		return []string{c.stylize("(detached)", "special")}
 	}
-	n := maxLen(c, len(v.Bytes))
+	// hexSlice(buffer, 0, min(maxArrayLength, length)) truncates its end index.
+	n := jsSliceEnd(maxLen(c, len(v.Bytes)), len(v.Bytes))
 	var b strings.Builder
 	for i := 0; i < n; i++ {
 		if i > 0 {
@@ -428,12 +434,12 @@ func formatArrayBuffer(c *ctx, v *ArrayBuffer) []string {
 		b.WriteString(hexByte(v.Bytes[i]))
 	}
 	str := b.String()
-	if remaining := len(v.Bytes) - int(math.Max(c.MaxArrayLength, 0)); remaining > 0 && float64(len(v.Bytes)) > c.MaxArrayLength {
+	if remaining := float64(len(v.Bytes)) - c.MaxArrayLength; remaining > 0 {
 		s := ""
 		if remaining > 1 {
 			s = "s"
 		}
-		str += " ... " + itoa(remaining) + " more byte" + s
+		str += " ... " + jsnum.String(remaining) + " more byte" + s
 	}
 	return []string{c.stylize("[Uint8Contents]", "special") + ": <" + str + ">"}
 }
