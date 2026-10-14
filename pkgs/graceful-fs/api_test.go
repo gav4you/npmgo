@@ -348,6 +348,16 @@ func TestSortInvalidUTF8(t *testing.T) {
 	if !reflect.DeepEqual(files, want) {
 		t.Fatalf("sortFiles = %q, want %q", files, want)
 	}
+	// Names whose order depends on how the bytes are decoded: one U+FFFD per
+	// maximal invalid subsequence puts "\xf0\x9f\x98" (U+FFFD) before two real
+	// U+FFFDs and "\xe2\x82z" (U+FFFD z) before "��a"; Go's one
+	// U+FFFD per byte would reverse both.
+	files = []any{"��", "\xf0\x9f\x98", "��a", "\xe2\x82z"}
+	sortFiles(files)
+	want = []any{"\xf0\x9f\x98", "\xe2\x82z", "��", "��a"}
+	if !reflect.DeepEqual(files, want) {
+		t.Fatalf("sortFiles = %q, want %q", files, want)
+	}
 }
 
 func TestRealHost(t *testing.T) {

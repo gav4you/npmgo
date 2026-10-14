@@ -258,9 +258,10 @@ Sync forms, with the two- or three-argument call decided by the truthiness of op
 100 ms, the stat of the destination, the 59999 / 60000 window, a missing callback throwing, GRACEFUL_FS_PLATFORM
 overriding process.platform, empty or not); read and readSync after 10 and 11 EAGAINs, and the short form `read(fd,
 cb)`, which graceful-fs does not retry. A mutation check of the harness (39 deliberate changes to the port: `>` for
-`>=`, factor 1.25, cap 99, every copy patching close, an unstable sort, root counted as non-root …) detected every
-change that alters behaviour; the three it passed cannot (`setTimeout(retry, 1)`, which the clamp makes equal to 0,
-and two controls).
+`>=`, factor 1.25, cap 99, every copy patching close, an unstable sort, root counted as non-root …) failed the parity
+test for all but three: `setTimeout(retry, 1)` and a control, which change nothing (the clamp makes 0 and 1 equal),
+and sort keys taken from Go's decoding of a string, which differs only for strings that are not valid UTF-8 (not
+expressible in the JSON cases) and fails `TestSortInvalidUTF8`.
 
 Go API: `(*Runtime).Load(base)` is `require('graceful-fs')` where `require('fs')` is `base`, an `FS` (a struct of the
 functions graceful-fs reads, nil where the module has none), on a `Host` (the clock, timers and nextTick) with
@@ -325,7 +326,9 @@ The real file system (blocking functions):
   as UNKNOWN). libuv's fs-layer special cases (such as EISDIR for ERROR_FILE_EXISTS on an O_CREAT open) are not
   reproduced.
 - Machine-dependent, so covered by Go API tests rather than parity: real files and directories, a real Windows sharing
-  violation retried by rename until the handle closes, and a real-time EMFILE limit with 40 goroutines (`-race`).
+  violation retried by rename until the handle closes, and a real-time EMFILE limit with 40 goroutines. They ran with
+  `-race` on Windows and on Linux (the golang:1.26.5 image, as root and as uid 1000, where chown to root fails with
+  EPERM and graceful-fs ignores it); macOS and the other targets were only compiled (`go vet` for 13 GOOS).
 
 ## React (`pkgs/react`, `pkgs/react-dom`, `pkgs/react-dom/server`)
 Translated from the production CJS builds: `react.production.js`, `react-dom.production.js`,
