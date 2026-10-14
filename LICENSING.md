@@ -9,8 +9,11 @@ for the whole repository:
 - `internal/nodeutil/` is a translation of parts of Node.js (`lib/internal/util/inspect.js`,
   `lib/internal/url.js`, `src/node_i18n.cc`) and is distributed under the Node.js licence in
   `internal/nodeutil/LICENSE`. `width_table.go` is generated from Node's ICU data.
-- Files written for this project (`parity/`, `tools/`, `internal/jsnum/`, `internal/parityspec/`, docs)
-  are released under the MIT licence:
+- `pkgs/react-dom/server/murmurhash.go` is translated from the MurmurHash3 implementation bundled in
+  react-dom (MIT, Copyright (c) 2011 Gary Court); its notice is reproduced at the top of that file.
+- Files written for this project (`parity/`, `tools/`, `internal/jsnum/`, `internal/jsvalue/`,
+  `internal/jsloop/`, `internal/parityspec/`, `internal/reactspec/`, docs) are released under the MIT
+  licence:
 
   > Copyright (c) 2026 npmgo contributors
   >

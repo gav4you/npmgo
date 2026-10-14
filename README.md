@@ -17,6 +17,8 @@ go test ./...
 | [`ms`](pkgs/ms) | 2.1.3 | 107 |
 | [`debug`](pkgs/debug) | 4.4.3 | colours, enable/disable matrix, log lines, extend, formatters, in 2 env modes |
 | [Node `util.inspect` / `util.format`](internal/nodeutil) | Node v25.9.0 | 194 inspect, 46 format, ICU string width |
+| [`react`](pkgs/react) | 19.2.4 | verified through react-dom/server's cases |
+| [`react-dom`](pkgs/react-dom) server rendering ([`server`](pkgs/react-dom/server)) | 19.2.4 | 342 cases, 976 checks: `renderToString`, `renderToStaticMarkup`, `renderToPipeableStream` |
 
 The full ledger is in [`PROGRESS.md`](PROGRESS.md) and the plan is in [`ROADMAP.md`](ROADMAP.md).
 The pilot is the dependency tree of [Postiz](https://github.com/gitroomhq/postiz-app) (3,972 packages),
@@ -28,6 +30,7 @@ ported in order of how many other packages depend on each one.
 |---|---|
 | `pkgs/<name>/` | Go port + the original package's `LICENSE` |
 | `internal/nodeutil/` | Node `util.inspect` / `util.format` port + Node.js `LICENSE` |
+| `internal/jsvalue/`, `internal/jsloop/` | JavaScript value semantics and a Node-like event loop, used by the React port |
 | `parity/` | value specs, Node oracle scripts, test cases, recorded Node outputs |
 | `tools/` | generators that derive data tables from Node |
 

@@ -4,8 +4,9 @@
 no Node runtime, no embedded JavaScript engine, no compatibility VM. The output is ordinary Go
 modules (`go get`) and, eventually, whole applications compiled to a single binary.
 
-Status as of 2026-10-14: Phase 1 is underway (`ms`, `debug` and Node's `util.inspect`/`util.format`
-are ported and verified; see `PROGRESS.md`).
+Status as of 2026-10-14: Phase 1 is underway (`ms`, `debug`, Node's `util.inspect`/`util.format` and
+React 19's server renderer — `react` plus `react-dom/server` — are ported and verified; see
+`PROGRESS.md`).
 
 ---
 
