@@ -210,9 +210,9 @@ func (c *Chalk) applyStyle(s string) string {
 // colour-code table for the chalk's level. A level outside 0 to 3 has no
 // table, and reading the model's function from undefined throws.
 func (c *Chalk) levelDynamic(model string, bg bool) ansistyles.Dynamic {
-	g := &ansistyles.Color
+	g := &colorGroup
 	if bg {
-		g = &ansistyles.BgColor
+		g = &bgColorGroup
 	}
 	switch c.Level() {
 	case 0, 1:
@@ -230,9 +230,9 @@ func (c *Chalk) levelDynamic(model string, bg bool) ansistyles.Dynamic {
 // colour (or background colour) reset.
 func (c *Chalk) model(model string, bg bool, code func(ansistyles.Dynamic) string) *Chalk {
 	open := code(c.levelDynamic(model, bg))
-	close := ansistyles.Color.Close
+	close := colorGroup.Close
 	if bg {
-		close = ansistyles.BgColor.Close
+		close = bgColorGroup.Close
 	}
 	return c.createBuilder(createStyler(open, close, c.styler), c.isEmpty)
 }

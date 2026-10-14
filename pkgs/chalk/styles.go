@@ -7,9 +7,25 @@ import (
 	ansistyles "github.com/gav4you/npmgo/pkgs/ansi-styles"
 )
 
+// The ansi-styles tables chalk loaded. JavaScript's require('ansi-styles')
+// returns a fresh object each time, so chalk's copy cannot be changed through
+// anyone else's; these copies keep chalk independent of changes to the
+// package-level ansistyles tables.
+var (
+	styleCodes = func() map[string]ansistyles.Style {
+		m := make(map[string]ansistyles.Style, len(ansistyles.Styles))
+		for k, v := range ansistyles.Styles {
+			m[k] = v
+		}
+		return m
+	}()
+	colorGroup   = ansistyles.Color
+	bgColorGroup = ansistyles.BgColor
+)
+
 // named is a named style's getter: a builder adding the style.
 func (c *Chalk) named(name string) *Chalk {
-	st := ansistyles.Styles[name]
+	st := styleCodes[name]
 	return c.createBuilder(createStyler(st.Open, st.Close, c.styler), c.isEmpty)
 }
 
@@ -253,7 +269,7 @@ var models = map[string]struct {
 // isStyle reports whether name is a getter of chalk's prototype that
 // returns a builder: an ansi-styles style or visible.
 func isStyle(name string) bool {
-	_, ok := ansistyles.Styles[name]
+	_, ok := styleCodes[name]
 	return ok || name == "visible"
 }
 
