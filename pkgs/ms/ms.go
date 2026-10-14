@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode/utf16"
 
 	"github.com/gav4you/npmgo/internal/jsnum"
 )
@@ -28,7 +29,7 @@ var re = regexp.MustCompile(`(?i)^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|s
 // Parse converts a duration string to milliseconds. ok is false where the
 // JavaScript original returns undefined.
 func Parse(str string) (ms float64, ok bool) {
-	if len([]rune(str)) > 100 {
+	if len(utf16.Encode([]rune(str))) > 100 { // str.length counts UTF-16 code units
 		return 0, false
 	}
 	match := re.FindStringSubmatch(str)

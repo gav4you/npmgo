@@ -1,4 +1,5 @@
 // Runs the ORIGINAL npm ms against parity cases; prints expected outputs as JSON.
+// Run: node parity/oracle_ms.cjs <ms package dir> <absolute path to parity/ms/cases.json> > parity/ms/expected.json
 const ms = require(process.argv[2]);
 const c = require(process.argv[3]);
 const long = 'x'.repeat(101) + 'ms';
