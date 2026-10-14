@@ -81,6 +81,57 @@ func TestParseInt(t *testing.T) {
 	}
 }
 
+func TestParseIntRadix(t *testing.T) {
+	nan, negZero := math.NaN(), math.Copysign(0, -1)
+	for _, c := range []struct {
+		in    string
+		radix int
+		want  float64
+	}{
+		{"0x3", 10, 0}, {"0x3", 16, 3}, {"0x3", 0, 3}, {"  2", 10, 2}, {"2.9", 10, 2}, {"-0", 10, negZero},
+		{"-1", 10, -1}, {"abc", 10, nan}, {"", 10, nan}, {"5", 10, 5}, {"3abc", 10, 3}, {"ff", 16, 255},
+		{"FF", 16, 255}, {"0xff", 16, 255}, {"g", 16, nan}, {"z", 36, 35}, {"10", 2, 2}, {"12", 2, 1},
+		{"7", 8, 7}, {"1", 1, nan}, {"1", 37, nan}, {"-ff", 16, -255}, {"+12", 10, 12}, {nbsp + "12", 10, 12},
+		{nel + "12", 10, nan}, {"1e3", 10, 1}, {"99999999999999999999999", 10, 1e+23}, {"0b11", 10, 0},
+		{"ffffffffffffffffffff", 16, 1.2089258196146292e+24},
+	} {
+		if got := ParseIntRadix(c.in, c.radix); !same(got, c.want) {
+			t.Errorf("ParseIntRadix(%q, %d) = %v, want %v", c.in, c.radix, got, c.want)
+		}
+	}
+}
+
+func TestToInt32(t *testing.T) {
+	inf := math.Inf(1)
+	for _, c := range []struct {
+		in   float64
+		want int32
+	}{
+		{0, 0}, {math.Copysign(0, -1), 0}, {1.9, 1}, {-1.9, -1}, {2147483647, 2147483647},
+		{2147483648, -2147483648}, {-2147483649, 2147483647}, {4294967296, 0}, {4294967297.5, 1},
+		{1e10, 1410065408}, {-1e10, -1410065408}, {6e10, -129542144}, {1e21, -559939584},
+		{9007199254740994, 2}, {1.7976931348623157e308, 0}, {math.NaN(), 0}, {inf, 0}, {-inf, 0},
+		{0.5, 0}, {-0.5, 0}, {255.5, 255}, {-255.5, -255},
+	} {
+		if got := ToInt32(c.in); got != c.want {
+			t.Errorf("ToInt32(%v) = %d, want %d", c.in, got, c.want)
+		}
+	}
+}
+
+func TestPow(t *testing.T) {
+	nan, inf, negZero := math.NaN(), math.Inf(1), math.Copysign(0, -1)
+	for _, c := range []struct{ x, y, want float64 }{
+		{1, nan, nan}, {-1, inf, nan}, {1, -inf, nan}, {nan, 0, 1}, {2, 0.5, 1.4142135623730951},
+		{-8, 1.0 / 3, nan}, {0, -1, inf}, {negZero, -1, -inf}, {negZero, 3, negZero}, {4, 0.5, 2},
+		{2, 3, 8}, {10, -2, 0.01}, {1.5, inf, inf}, {0.5, -inf, inf}, {-2, 3, -8}, {-2, 2, 4},
+	} {
+		if got := Pow(c.x, c.y); !same(got, c.want) {
+			t.Errorf("Pow(%v, %v) = %v, want %v", c.x, c.y, got, c.want)
+		}
+	}
+}
+
 func TestParseFloat(t *testing.T) {
 	nan := math.NaN()
 	for _, c := range []struct {
