@@ -1,12 +1,16 @@
-// Package jsloop is a small deterministic event loop modelled on Node's, used
-// to run one React render the way Node would: a microtask queue that is
-// drained after every macrotask, and a FIFO macrotask (setImmediate) queue.
+// Package jsloop holds small event loops modelled on Node's.
 //
+// Loop runs one React render the way Node would: a microtask queue that is
+// drained after every macrotask, and a FIFO macrotask (setImmediate) queue.
 // Any goroutine may queue work (that is how promises settled elsewhere wake a
 // render); only the goroutine driving the loop runs it. After Close, queued
 // work runs on the queuing goroutine (or on the goroutine already running
 // such work), one task at a time, which models microtasks running after a
 // synchronous render has returned.
+//
+// Virtual is a deterministic loop on a virtual clock (Date.now, setTimeout,
+// clearTimeout, process.nextTick and host work such as I/O completions), for
+// replaying timer-driven code identically in Go and in a parity oracle.
 package jsloop
 
 import "sync"
