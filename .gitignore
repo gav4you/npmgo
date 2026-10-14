@@ -11,3 +11,6 @@ node_modules/
 Thumbs.db
 .vscode/
 .idea/
+
+# Claude Code agent worktrees and local settings
+.claude/
