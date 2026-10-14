@@ -15,7 +15,7 @@ Run all checks: `go test ./...`  ·  Re-record a package's originals: see the he
 | debug | 4.4.3 | MIT | ✅ match | ×2 env modes (plain, colored): 14 colors, 13×10 enable matrix, 13 disable, 18 log lines, extend, custom formatter, enabled override |
 | tslib | 2.8.1 | 0BSD | N/A: TypeScript compiler helpers (`__extends`, `__awaiter`…); Go has these natively | - |
 | react | 19.2.4 | MIT | ✅ match (server rendering) | verified through react-dom/server below: elements, `Children`, `cloneElement`, context, every hook React serves on the server, `forwardRef`, `memo`, `lazy`, class components, promises / thenables |
-| react-dom (server: `renderToString`, `renderToStaticMarkup`, `renderToPipeableStream`; resource hints, form hooks, `flushSync`, `createPortal`) | 19.2.4 | MIT | ✅ match (server stage; client renderer not started) | 341 cases → 973 checks: 317 `renderToString`, 317 `renderToStaticMarkup`, 339 `renderToPipeableStream` (HTML + callback order, with scripted promise resolution, pipe timing and aborts); 136 error results. 301 of the stream cases are also rendered through the public `Pipe` / `Wait` API. Plus Go API tests (`api_test.go`, clean under `-race`) |
+| react-dom (server: `renderToString`, `renderToStaticMarkup`, `renderToPipeableStream`; resource hints, form hooks, `flushSync`, `createPortal`) | 19.2.4 | MIT | ✅ match (server stage; client renderer not started) | 359 cases → 1021 checks: 332 `renderToString`, 332 `renderToStaticMarkup`, 357 `renderToPipeableStream` (HTML + callback order, with scripted promise resolution, pipe timing and aborts); 181 error results. 310 of the stream cases are also rendered through the public `Pipe` / `Wait` API. Plus Go API tests (`api_test.go`, clean under `-race`) |
 | scheduler | 0.27.0 | MIT | N/A for this stage: only `react-dom/client` requires it (neither server build does); deferred to the client-renderer stage | - |
 
 ## Adapters (Go stand-ins for V8 internals) — `internal/nodeutil/adapters.go`
@@ -58,6 +58,10 @@ renders each stream case without scripted steps or aborts (301 of 339) through t
 end / destroy is inferred from what `Pipe` / `Wait` return. Cases with steps or aborts cannot be
 timed deterministically through the public API, so they are checked through the internal driver
 only, and the public `Abort` (asynchronous, see below) is covered by the Go API tests, not by parity.
+Review note: a case whose expected output is an error that the case did not mean to provoke is a
+void case (both sides fail the same way). The generator now refuses an element expression used as
+an element type, the mistake that had voided 18 Suspense cases; `parity/react/expected.json`
+should be scanned for unintended errors when cases are added.
 
 Go API: components receive a `react.Hooks` value (`h.UseState(0)`, `h.UseId()`, `h.Use(p)`…) instead
 of reaching a global dispatcher, and all render state is per request, so renders on different
@@ -95,7 +99,10 @@ these differences):
   The parity tests apply aborts through the internal synchronous `abort`.
 - `ErrorInfo.ComponentStack` lists component names only (`\n    at Name (<anonymous>)`); V8 source
   locations cannot be reproduced. Plain Go funcs have no name: wrap them in `react.FunctionComponent`.
-  Component stacks are not parity-checked.
+  It is built for every error (JavaScript builds it when `componentStack` is read), so a lazy type
+  in the stack is described as the component it resolved to, or as `Lazy`; building the stack never
+  runs a loader. Component stacks are not parity-checked.
+- `react.CloneElement(nil)` reports "you passed null." (JavaScript distinguishes `undefined`).
 - Functions have no source text: where JavaScript would stringify a function (an `<option>` /
   `<textarea>` function child, `String(fn)` in the `use()` error) Go prints a placeholder.
 - Strings cannot hold lone UTF-16 surrogates; `toLowerCase` special cases (e.g. U+0130) differ in the
