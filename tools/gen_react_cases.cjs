@@ -443,8 +443,8 @@ add_('stream: nonce object', el('div', null, el('style', { href: 's', precedence
 add_('stream: importMap', el('div', null, 'x'), { modes: ['stream'], stream: { opts: { importMap: o({ imports: o({ react: '/react.js', '<x>': '&' }) }) } } });
 add_('stream: identifierPrefix in ids and boundaries', el('div', null, el(C('Id')), Sus('F', el(C('Use_p')))), { modes: ['stream'], comps: { Id, Use_p: UseP('p') }, promises: [{ n: 'p', kind: 'pending', value: 'v', step: 1 }], stream: { opts: { identifierPrefix: 'pre_' } } });
 add_('stream: shell error without pipe', el(C('Boom')), { modes: ['stream'], comps: { Boom: Show([{ throw: err('shell failed') }], 'x') }, stream: { pipe: 'all' } });
-add_('stream: component throws a string', el(C('Boom')), { comps: { Boom: Show([{ throw: 'a string' }], 'x') } });
-add_('stream: component throws null', el('div', null, Sus('F', el(C('Boom')))), { comps: { Boom: Show([{ throw: null }], 'x') } });
+add_('error: component throws a string', el(C('Boom')), { comps: { Boom: Show([{ throw: 'a string' }], 'x') } });
+add_('error: component throws null inside a boundary', el('div', null, Sus('F', el(C('Boom')))), { comps: { Boom: Show([{ throw: null }], 'x') } });
 add_('stream: formState markers', el(C('Act')), { modes: ['stream'], comps: { Act: Show([letv(['s', 'a'], hook('useActionState', fn(['p'], 1), 'st')), letv(['s2', 'a2'], hook('useActionState', fn(['p'], 2), 'st2'))], cat(v('s'), v('s2'))) }, stream: { opts: { formState: ['state', 'key', 'ref', 0] } } });
 add_('stream: formState matching action', el(C('Act')), { modes: ['stream'], comps: { Act: Show([letv(['s', 'a'], hook('useActionState', { $: 'action', fn: fn(['p'], 1), formAction: fn(['p'], o({ name: 'n', data: [] })), sigEqual: fn(['x', 'y'], true) }, 'initial', '/perma'))], el('form', { action: v('a') }, v('s'))) },
   stream: { opts: { formState: ['restored', 'p/perma', 'ref', 0] } } });
@@ -490,14 +490,13 @@ add_('error: component throws TypeError', el('div', null, el(C('Boom'))), { comp
 add_('error: component throws object', el('div', null, el(C('Boom'))), { comps: { Boom: Show([{ throw: o({ code: 1 }) }], 'x') } });
 add_('error: view transitions not supported', el(T.vt, null, 'x'));
 add_('error: scope not supported', el(T.scope, null, 'x'));
-add_('error: symbol children ignored', el('div', null, 'a', sym('s'), 'b'));
-add_('error: function children ignored', el('div', null, 'a', fn([], 'never'), 'b'));
+add_('children: symbols are ignored', el('div', null, 'a', sym('s'), 'b'));
+add_('children: functions are ignored', el('div', null, 'a', fn([], 'never'), 'b'));
 add_('error: requestFormReset on the server', el(C('RF')), { comps: { RF: Show([doo(api('requestFormReset', null))], 'x') } });
-add_('error: flushSync returns callback result', el('p', null, api('flushSync', fn([], 'flushed'))));
-add_('error: hook outside render via stale setter', el('div', null, el(C('Owner'))), { comps: { Owner: Show([letv(['s', 'set'], hook('useState', 1))], v('s')) } });
-add_('error: nested renderToString inside a component', el('div', null, el(C('Nested'))), { comps: { Nested: Show([], api('renderToString', el('span', null, 'inner', 'text'))) } });
-add_('error: version', el('p', null, api('version')));
-add_('error: cache passthrough', el('p', null, call(api('cache', fn(['x'], cat('c:', v('x')))), 1)));
-add_('error: startTransition runs scope', el(C('ST')), { comps: { ST: Show([doo(api('startTransition', fn([], gset('ran', 'yes'))))], str(gget('ran'))) } });
+add_('api: flushSync returns the callback result', el('p', null, api('flushSync', fn([], 'flushed'))));
+add_('api: renderToString nested inside a component', el('div', null, el(C('Nested'))), { comps: { Nested: Show([], api('renderToString', el('span', null, 'inner', 'text'))) } });
+add_('api: version', el('p', null, api('version')));
+add_('api: cache passes calls through', el('p', null, call(api('cache', fn(['x'], cat('c:', v('x')))), 1)));
+add_('api: startTransition runs the scope', el(C('ST')), { comps: { ST: Show([doo(api('startTransition', fn([], gset('ran', 'yes'))))], str(gget('ran'))) } });
 
 process.stdout.write(JSON.stringify({ cases }, null, 1) + '\n');

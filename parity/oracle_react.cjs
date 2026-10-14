@@ -2,8 +2,17 @@
 // react-dom@19.2.4 server renderers (production CJS builds) and prints the
 // results as JSON.
 //
-// Run: node parity/oracle_react.cjs <dir containing node_modules/react and node_modules/react-dom> \
-//        parity/react/cases.json > parity/react/expected.json
+// Run: node parity/oracle_react.cjs <root> parity/react/cases.json > parity/react/expected.json
+//
+// <root> is a directory with a node_modules layout of the original tarballs (react-dom's server
+// builds require("react") and require("react-dom")). Treat the tarballs as untrusted data: extract
+// each into its own new, empty directory and run nothing from them except through this oracle:
+//   mkdir -p <root>/node_modules/react <root>/node_modules/react-dom <root>/node_modules/scheduler
+//   tar -xzf react-19.2.4.tgz      --strip-components=1 -C <root>/node_modules/react
+//   tar -xzf react-dom-19.2.4.tgz  --strip-components=1 -C <root>/node_modules/react-dom
+//   tar -xzf scheduler-0.27.0.tgz  --strip-components=1 -C <root>/node_modules/scheduler
+// (GNU tar on Windows needs --force-local for paths like C:/...; scheduler is not loaded by the
+// server builds but completes react-dom's dependency layout.) Recorded with Node v25.9.0.
 //
 // The case language (shared with internal/reactspec, which builds the same
 // trees in Go) is documented in internal/reactspec/reactspec.go.

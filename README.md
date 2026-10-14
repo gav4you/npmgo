@@ -18,7 +18,7 @@ go test ./...
 | [`debug`](pkgs/debug) | 4.4.3 | colours, enable/disable matrix, log lines, extend, formatters, in 2 env modes |
 | [Node `util.inspect` / `util.format`](internal/nodeutil) | Node v25.9.0 | 194 inspect, 46 format, ICU string width |
 | [`react`](pkgs/react) | 19.2.4 | verified through react-dom/server's cases |
-| [`react-dom`](pkgs/react-dom) server rendering ([`server`](pkgs/react-dom/server)) | 19.2.4 | 342 cases, 976 checks: `renderToString`, `renderToStaticMarkup`, `renderToPipeableStream` |
+| [`react-dom`](pkgs/react-dom) server rendering ([`server`](pkgs/react-dom/server)) | 19.2.4 | 341 cases, 973 checks: `renderToString`, `renderToStaticMarkup`, `renderToPipeableStream` |
 
 The full ledger is in [`PROGRESS.md`](PROGRESS.md) and the plan is in [`ROADMAP.md`](ROADMAP.md).
 The pilot is the dependency tree of [Postiz](https://github.com/gitroomhq/postiz-app) (3,972 packages),

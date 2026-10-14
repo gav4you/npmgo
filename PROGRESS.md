@@ -15,7 +15,7 @@ Run all checks: `go test ./...`  ·  Re-record a package's originals: see the he
 | debug | 4.4.3 | MIT | ✅ match | ×2 env modes (plain, colored): 14 colors, 13×10 enable matrix, 13 disable, 18 log lines, extend, custom formatter, enabled override |
 | tslib | 2.8.1 | 0BSD | N/A: TypeScript compiler helpers (`__extends`, `__awaiter`…); Go has these natively | - |
 | react | 19.2.4 | MIT | ✅ match (server rendering) | verified through react-dom/server below: elements, `Children`, `cloneElement`, context, every hook React serves on the server, `forwardRef`, `memo`, `lazy`, class components, promises / thenables |
-| react-dom (server: `renderToString`, `renderToStaticMarkup`, `renderToPipeableStream`; resource hints, form hooks, `flushSync`, `createPortal`) | 19.2.4 | MIT | ✅ match (server stage; client renderer not started) | 342 cases → 976 checks: 318 `renderToString`, 318 `renderToStaticMarkup`, 340 `renderToPipeableStream` (HTML + callback order, with scripted promise resolution, pipe timing and aborts); 136 error results. Plus Go API tests (`api_test.go`, clean under `-race`) |
+| react-dom (server: `renderToString`, `renderToStaticMarkup`, `renderToPipeableStream`; resource hints, form hooks, `flushSync`, `createPortal`) | 19.2.4 | MIT | ✅ match (server stage; client renderer not started) | 341 cases → 973 checks: 317 `renderToString`, 317 `renderToStaticMarkup`, 339 `renderToPipeableStream` (HTML + callback order, with scripted promise resolution, pipe timing and aborts); 136 error results. 301 of the stream cases are also rendered through the public `Pipe` / `Wait` API. Plus Go API tests (`api_test.go`, clean under `-race`) |
 | scheduler | 0.27.0 | MIT | N/A for this stage: only `react-dom/client` requires it (neither server build does); deferred to the client-renderer stage | - |
 
 ## Adapters (Go stand-ins for V8 internals) — `internal/nodeutil/adapters.go`
@@ -50,7 +50,14 @@ Verification: `parity/oracle_react.cjs` renders each case in `parity/react/cases
 three tarballs with `NODE_ENV=production`; `internal/reactspec` builds the same trees in Go from the
 same JSON; `pkgs/react-dom/server/parity_test.go` diffs HTML, errors and stream callback order.
 Streaming cases resolve promises in numbered steps applied when the event loop is idle, so both sides
-see the same interleaving.
+see the same interleaving. `TestReactParity` drives every stream through an internal test driver
+(attach a recording destination, run the event loop to idle, apply the step, repeat; aborts are
+applied synchronously, as the oracle calls `abort()`). `TestReactParityPublicStream` additionally
+renders each stream case without scripted steps or aborts (301 of 339) through the public
+`RenderToPipeableStream(...).Pipe(w)` / `Wait()` path into a `bytes.Buffer`; there the destination's
+end / destroy is inferred from what `Pipe` / `Wait` return. Cases with steps or aborts cannot be
+timed deterministically through the public API, so they are checked through the internal driver
+only, and the public `Abort` (asynchronous, see below) is covered by the Go API tests, not by parity.
 
 Go API: components receive a `react.Hooks` value (`h.UseState(0)`, `h.UseId()`, `h.Use(p)`…) instead
 of reaching a global dispatcher, and all render state is per request, so renders on different
@@ -82,8 +89,10 @@ these differences):
   `RenderToString` nested inside a component does not reset the outer component's hook state (in
   JavaScript it does).
 - `RenderToPipeableStream` starts rendering when the stream is driven by `Pipe` or `Wait` (Node: in a
-  microtask). Output equals Node's pattern of piping right after creating the stream. `Abort` called
-  from inside a stream callback takes effect after the current task (Node: immediately).
+  microtask). Output equals Node's pattern of piping right after creating the stream.
+- The public `Abort` is asynchronous: it queues the abort on the stream's event loop (so it is safe
+  from any goroutine) and takes effect after the current task; Node's `abort()` runs synchronously.
+  The parity tests apply aborts through the internal synchronous `abort`.
 - `ErrorInfo.ComponentStack` lists component names only (`\n    at Name (<anonymous>)`); V8 source
   locations cannot be reproduced. Plain Go funcs have no name: wrap them in `react.FunctionComponent`.
   Component stacks are not parity-checked.

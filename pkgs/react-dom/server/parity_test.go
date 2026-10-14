@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"reflect"
@@ -209,6 +210,127 @@ func runStream(c *reactspec.Case) (res *streamResult) {
 	}
 	html := strings.Join(dest.chunks, "")
 	return &streamResult{HTML: &html, Events: events}
+}
+
+// publicStreamable reports whether a case can be driven deterministically
+// through the public API: no promise settles at a scripted step and nothing
+// aborts (those need the internal driver, which applies each step when the
+// event loop is idle).
+func publicStreamable(c *reactspec.Case) bool {
+	if c.Stream != nil && c.Stream.Abort != nil {
+		return false
+	}
+	for _, p := range c.Promises {
+		if p["kind"] == "pending" {
+			return false
+		}
+	}
+	return true
+}
+
+// runPublicStream renders a case with RenderToPipeableStream and Pipe / Wait
+// writing to a bytes.Buffer, as a user would. The destination's end/destroy
+// is inferred from what Pipe or Wait returns.
+func runPublicStream(c *reactspec.Case) (html string, events []string, terminal string) {
+	env := reactspec.Setup(c)
+	var buf bytes.Buffer
+	sc := c.Stream
+	if sc == nil {
+		sc = &reactspec.StreamSpec{}
+	}
+	pipeWhen := sc.Pipe
+	if pipeWhen == "" {
+		pipeWhen = "now"
+	}
+	piped := false
+	var s *PipeableStream
+	opts := streamOptions(c, env, &events)
+	opts.OnShellReady = func() {
+		events = append(events, "shellReady")
+		if pipeWhen == "shell" {
+			piped = true
+			s.Pipe(&buf)
+		}
+	}
+	opts.OnShellError = func(err error) { events = append(events, "shellError:"+errMessage(err)) }
+	opts.OnAllReady = func() {
+		events = append(events, "allReady")
+		if pipeWhen == "all" {
+			piped = true
+			s.Pipe(&buf)
+		}
+	}
+	opts.OnError = func(err error, _ ErrorInfo) string {
+		events = append(events, "error:"+errMessage(err))
+		if sc.Digest == "msg" {
+			return "D:" + errMessage(err)
+		}
+		return ""
+	}
+	s = RenderToPipeableStream(env.EvalTop(c.Tree), opts)
+	var err error
+	if pipeWhen == "now" {
+		piped = true
+		err = s.Pipe(&buf)
+	} else {
+		err = s.Wait()
+	}
+	if piped {
+		terminal = "end"
+		if err != nil {
+			terminal = "destroy:" + errMessage(err)
+		}
+	}
+	return buf.String(), events, terminal
+}
+
+// TestReactParityPublicStream renders the stream cases that need no scripted
+// steps through the public Pipe / Wait API and diffs the HTML and callback
+// order against the original.
+func TestReactParityPublicStream(t *testing.T) {
+	reactspec.RenderToString = func(node any) (string, error) { return RenderToString(node) }
+	cases, err := reactspec.LoadCases(load(t, "../../../parity/react/cases.json", nil))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var want struct {
+		Results []*caseResult `json:"results"`
+	}
+	load(t, "../../../parity/react/expected.json", &want)
+	checks, fails := 0, 0
+	for i, c := range cases {
+		if !c.HasMode("stream") || !publicStreamable(c) {
+			continue
+		}
+		w := want.Results[i].Stream
+		if w.HTML == nil {
+			continue
+		}
+		checks++
+		html, events, terminal := runPublicStream(c)
+		// Node may call destroy(err) and later end(); a destroyed stream is
+		// what Pipe reports.
+		var wantEvents []string
+		wantTerminal := ""
+		for _, e := range w.Events {
+			switch {
+			case strings.HasPrefix(e, "destroy:"):
+				wantTerminal = e
+			case e == "end":
+				if wantTerminal == "" {
+					wantTerminal = e
+				}
+			default:
+				wantEvents = append(wantEvents, e)
+			}
+		}
+		if html != *w.HTML || !reflect.DeepEqual(events, wantEvents) || terminal != wantTerminal {
+			fails++
+			t.Errorf("%s [Pipe]\n--- node html=%s\n         events=%q end=%q\n+++ go   html=%s\n         events=%q end=%q",
+				c.Name, *w.HTML, wantEvents, wantTerminal, html, events, terminal)
+		}
+	}
+	t.Logf("%d stream cases rendered through Pipe/Wait, %d mismatches", checks, fails)
 }
 
 func load(t *testing.T, path string, v any) []byte {

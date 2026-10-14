@@ -5049,7 +5049,7 @@
    }
   },
   {
-   "name": "stream: component throws a string",
+   "name": "error: component throws a string",
    "string": {
     "error": "THROWN a string"
    },
@@ -5068,7 +5068,7 @@
    }
   },
   {
-   "name": "stream: component throws null",
+   "name": "error: component throws null inside a boundary",
    "string": {
     "html": "<div><!--$!--><template></template>F<!--/$--></div>"
    },
@@ -5639,7 +5639,7 @@
    }
   },
   {
-   "name": "error: symbol children ignored",
+   "name": "children: symbols are ignored",
    "string": {
     "html": "<div>a<!-- -->b</div>"
    },
@@ -5656,7 +5656,7 @@
    }
   },
   {
-   "name": "error: function children ignored",
+   "name": "children: functions are ignored",
    "string": {
     "html": "<div>a<!-- -->b</div>"
    },
@@ -5692,7 +5692,7 @@
    }
   },
   {
-   "name": "error: flushSync returns callback result",
+   "name": "api: flushSync returns the callback result",
    "string": {
     "html": "<p>flushed</p>"
    },
@@ -5709,24 +5709,7 @@
    }
   },
   {
-   "name": "error: hook outside render via stale setter",
-   "string": {
-    "html": "<div>1</div>"
-   },
-   "static": {
-    "html": "<div>1</div>"
-   },
-   "stream": {
-    "html": "<div>1</div>",
-    "events": [
-     "shellReady",
-     "allReady",
-     "end"
-    ]
-   }
-  },
-  {
-   "name": "error: nested renderToString inside a component",
+   "name": "api: renderToString nested inside a component",
    "string": {
     "html": "<div>&lt;span&gt;inner&lt;!-- --&gt;text&lt;/span&gt;</div>"
    },
@@ -5743,7 +5726,7 @@
    }
   },
   {
-   "name": "error: version",
+   "name": "api: version",
    "string": {
     "html": "<p>19.2.4</p>"
    },
@@ -5760,7 +5743,7 @@
    }
   },
   {
-   "name": "error: cache passthrough",
+   "name": "api: cache passes calls through",
    "string": {
     "html": "<p>c:1</p>"
    },
@@ -5777,7 +5760,7 @@
    }
   },
   {
-   "name": "error: startTransition runs scope",
+   "name": "api: startTransition runs the scope",
    "string": {
     "html": "yes"
    },

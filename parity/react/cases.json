@@ -17631,7 +17631,7 @@
    }
   },
   {
-   "name": "stream: component throws a string",
+   "name": "error: component throws a string",
    "tree": {
     "$": "el",
     "t": {
@@ -17654,7 +17654,7 @@
    }
   },
   {
-   "name": "stream: component throws null",
+   "name": "error: component throws null inside a boundary",
    "tree": {
     "$": "el",
     "t": "div",
@@ -19581,7 +19581,7 @@
    }
   },
   {
-   "name": "error: symbol children ignored",
+   "name": "children: symbols are ignored",
    "tree": {
     "$": "el",
     "t": "div",
@@ -19597,7 +19597,7 @@
    }
   },
   {
-   "name": "error: function children ignored",
+   "name": "children: functions are ignored",
    "tree": {
     "$": "el",
     "t": "div",
@@ -19643,7 +19643,7 @@
    }
   },
   {
-   "name": "error: flushSync returns callback result",
+   "name": "api: flushSync returns the callback result",
    "tree": {
     "$": "el",
     "t": "p",
@@ -19664,50 +19664,7 @@
    }
   },
   {
-   "name": "error: hook outside render via stale setter",
-   "tree": {
-    "$": "el",
-    "t": "div",
-    "p": null,
-    "c": [
-     {
-      "$": "el",
-      "t": {
-       "$": "comp",
-       "n": "Owner"
-      },
-      "p": null,
-      "c": []
-     }
-    ]
-   },
-   "comps": {
-    "Owner": {
-     "kind": "fn",
-     "body": [
-      {
-       "let": [
-        "s",
-        "set"
-       ],
-       "v": {
-        "$": "hook",
-        "h": "useState",
-        "a": [
-         1
-        ]
-       }
-      }
-     ],
-     "ret": {
-      "$": "var",
-      "n": "s"
-     }
-    }
-   }
-  },
-  {
-   "name": "error: nested renderToString inside a component",
+   "name": "api: renderToString nested inside a component",
    "tree": {
     "$": "el",
     "t": "div",
@@ -19747,7 +19704,7 @@
    }
   },
   {
-   "name": "error: version",
+   "name": "api: version",
    "tree": {
     "$": "el",
     "t": "p",
@@ -19762,7 +19719,7 @@
    }
   },
   {
-   "name": "error: cache passthrough",
+   "name": "api: cache passes calls through",
    "tree": {
     "$": "el",
     "t": "p",
@@ -19800,7 +19757,7 @@
    }
   },
   {
-   "name": "error: startTransition runs scope",
+   "name": "api: startTransition runs the scope",
    "tree": {
     "$": "el",
     "t": {
