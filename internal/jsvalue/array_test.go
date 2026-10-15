@@ -68,6 +68,22 @@ func TestObjectSymbols(t *testing.T) {
 	}
 }
 
+// TestPutProto: o.__proto__ = v goes to Object.prototype's accessor (no property) unless o has an own "__proto__"
+// property, which is then assigned like any other.
+func TestPutProto(t *testing.T) {
+	o := NewObject("a", 1.0)
+	o.Put("__proto__", NewObject())
+	o.Put("b", 2.0)
+	if o.Has("__proto__") || len(o.Keys()) != 2 {
+		t.Fatalf("accessor: %v", o.Keys())
+	}
+	own := NewObject("__proto__", 5.0, "c", 3.0)
+	own.Put("__proto__", Undefined{})
+	if !IsUndefined(own.Get("__proto__")) || own.Keys()[0] != "__proto__" {
+		t.Fatalf("own: %v", own.Keys())
+	}
+}
+
 func TestJSONCircular(t *testing.T) {
 	msg := func(v any) (s string) {
 		defer func() {

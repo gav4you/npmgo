@@ -360,6 +360,8 @@ const comment = (value, idOpt) => (idOpt ? obj(idOpt, [['type', 'CommentBlock'],
   call('ensureBlock', N('WhileStatement', { test: id('t'), body: N('VariableDeclaration', { kind: 'var', declarations: [] }) }));
   call('ensureBlock', N('WhileStatement', { test: id('t'), body: N('ClassMethod') }));
   call('ensureBlock', null);
+  call('ensureBlock', obj(null, [['type', 'WhileStatement'], ['test', id('t')], ['__proto__', exprStmt(id('x'))]]), '__proto__');
+  call('ensureBlock', N('WhileStatement', { test: id('t'), body: exprStmt(id('x')) }), '__proto__');
   call('toBlock', id('x'), fnExpr);
   call('toBlock', id('x'), null);
   call('toBlock', N('EmptyStatement'), null);
@@ -504,6 +506,12 @@ const comment = (value, idOpt) => (idOpt ? obj(idOpt, [['type', 'CommentBlock'],
   call('removeProperties', obj('s', [['type', 'Identifier'], ['start', null], ['end', U]], [[sym('a'), 1], [symfor('b'), 2]]));
   call('removeProperties', null);
   call('removeProperties', 'str');
+  // An own "__proto__" property (as JSON.parse makes) is assigned like any other; without one, the assignment goes to
+  // Object.prototype's accessor, which ignores a primitive.
+  call('removeProperties', obj(null, [['type', 'Identifier'], ['__proto__', 5], ['_q', 1]]));
+  call('removeProperties', obj(null, [['type', 'Identifier'], ['__proto__', null], ['_q', 1]]));
+  call('inherits', id('c'), obj(null, [['type', 'Identifier'], ['__proto__', 7], ['_k', 1]]));
+  call('inherits', obj(null, [['type', 'Identifier'], ['__proto__', 1]]), obj(null, [['type', 'Identifier'], ['__proto__', 7]]));
   const deep = N('BinaryExpression', { operator: '+', left: id('a', { start: 0, _p: 1 }), right: N('CallExpression', { callee: id('f', { loc: 1 }), arguments: [numLit(1)], end: 3 }), start: 0 });
   call('removePropertiesDeep', deep);
   call('removePropertiesDeep', deep, { preserveComments: true });

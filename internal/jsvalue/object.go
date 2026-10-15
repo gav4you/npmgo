@@ -128,11 +128,12 @@ func (o *Object) Set(k string, v any) {
 	}
 }
 
-// Put is the assignment o[k] = v on an ordinary object: Set, except for the key "__proto__", which names the
-// Object.prototype accessor: assigning it changes the object's prototype (an object or null value) or does nothing,
-// and creates no property. The prototype itself is not modelled.
+// Put is the assignment o[k] = v on an ordinary object: Set, except for the key "__proto__" on an object without an
+// own property of that name (one JSON.parse or Object.defineProperty made), where the assignment goes to the
+// Object.prototype accessor: that changes the object's prototype (an object or null value) or does nothing, and
+// creates no property. The prototype itself is not modelled.
 func (o *Object) Put(k string, v any) {
-	if k == "__proto__" {
+	if k == "__proto__" && !o.Has(k) {
 		return
 	}
 	o.Set(k, v)
