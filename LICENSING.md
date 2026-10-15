@@ -16,6 +16,13 @@ for the whole repository:
   npmgo contributors, from which original files; the generated semantic-conventions files say they were
   generated from the original module by `tools/gen_semconv.cjs`, and their documentation comments are the
   original's.
+- `pkgs/babel/types`, `pkgs/babel/helper-validator-identifier` and `pkgs/babel/helper-string-parser` translate
+  @babel/types 7.29.0, @babel/helper-validator-identifier 7.28.5 and @babel/helper-string-parser 7.27.1, which are under the
+  MIT licence (Copyright (c) 2014-present Sebastian McKenzie and other contributors); each directory has the package's
+  `LICENSE`, and every translated Go file carries the copyright line and names the original files it translates (the few
+  written for the port, such as the JavaScript object model, say so). The generated files (`*_gen.go` of
+  `pkgs/babel/types`, `data.go` of helper-validator-identifier) are generated from the original packages by
+  `tools/gen_babel_types.cjs` and `tools/gen_babel_identifier.cjs` and carry the same notice.
 - `pkgs/opentelemetry/core/merge.go`'s `isPlainObject` is translated from core's `utils/lodash.merge.js`,
   which is based on lodash (MIT, Copyright OpenJS Foundation and other contributors); lodash's notice is
   reproduced at the top of that file.
