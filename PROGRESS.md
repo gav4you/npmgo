@@ -502,7 +502,8 @@ Review notes:
   drain, …). The first run caught 32: seven survived for want of cases (a header of exactly 8192 units, metadata that
   fits in UTF-16 units but not in bytes, TraceState sets and unsets exactly at 512, an exact negative half nanosecond,
   promise steps whose microtask turns and reaction order nothing observed), one was equivalent and one did not build.
-  With those cases added and the two mutations fixed, all 41 fail the parity tests.
+  With those cases added and the two mutations fixed, all 41 fail the parity tests. `node tools/mutate_opentelemetry.cjs`
+  re-runs the check (on a clean tree: it restores each file with git checkout).
 - Re-running the generator and the oracle reproduces cases.json and expected.json byte for byte, and `tools/gen_semconv.cjs`
   reproduces the generated Go files.
 - Two lines of the api parity test are asserted from the Go types rather than computed: the metadata brand ("branded")
