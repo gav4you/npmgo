@@ -49,9 +49,9 @@ Run all checks: `go test ./...`  ·  Re-record a package's originals: see the he
 | @jest/types | 29.6.3 | MIT | N/A: types-only (`build/index.js` is just `'use strict'`) | - |
 | inherits | 2.0.4 | ISC | N/A: re-export of Node's `util.inherits` (prototype-chain wiring, with a browser fallback); Go types have no prototype chain | - |
 | define-properties | 1.2.1 | MIT | N/A: intrinsic shim, defines non-enumerable data properties unless a predicate says otherwise (used by es-shim polyfills); Go has no mutable built-ins | - |
-| @opentelemetry/api (`pkgs/opentelemetry/api`) | 1.9.0 | Apache-2.0 | ✅ match (pending review; `experimental` entry point not ported) | 248 cases, 820 trace lines and checks: contexts and keys, the globalThis registry (with records of other versions), 133 semver pairs, 31 diag set-ups (every level, NaN / fractional / out-of-range levels, override messages, the self-logger error, component loggers, DiagConsoleLogger over 4 consoles), baggage, the propagation API and default getter / setter, 16 id checks, 13 tracer programs (no-op, proxy and delegate tracers, every startActiveSpan arity), 27 TraceState programs, no-op metrics, enums, exports |
-| @opentelemetry/core (`pkgs/opentelemetry/core`) | 2.11.0 | Apache-2.0 | ✅ match (pending review) | 674 cases, 1,891 trace lines: 223 traceparent strings, trace-context extract (42) and inject (28), 28 TraceState programs, baggage extract (60) and inject (46) at every W3C limit, 43 composite runs, attributes, 44 merges (cycles, sharing, 25 levels), time utilities, environment readers, the error handlers over 21 exception kinds, the anchored clock, and 30 promise programs (callWithTimeout, BindOnceFuture, internal._export) on a virtual clock |
-| @opentelemetry/semantic-conventions (`pkgs/opentelemetry/semantic-conventions`) | 1.40.0 | Apache-2.0 | ✅ match (pending review) | every export: 601 of the main entry point, 2,353 of `incubating` (template functions over 5 sample keys) |
+| @opentelemetry/api (`pkgs/opentelemetry/api`) | 1.9.0 | Apache-2.0 | ✅ match (reviewed; `experimental` entry point not ported) | 248 cases, 820 trace lines and checks: contexts and keys, the globalThis registry (with records of other versions), 133 semver pairs, 31 diag set-ups (every level, NaN / fractional / out-of-range levels, override messages, the self-logger error, component loggers, DiagConsoleLogger over 4 consoles), baggage, the propagation API and default getter / setter, 16 id checks, 13 tracer programs (no-op, proxy and delegate tracers, every startActiveSpan arity), 27 TraceState programs, no-op metrics, enums, exports |
+| @opentelemetry/core (`pkgs/opentelemetry/core`) | 2.11.0 | Apache-2.0 | ✅ match (reviewed) | 676 cases, 1,898 trace lines: 223 traceparent strings, trace-context extract (42) and inject (28), 28 TraceState programs, baggage extract (61) and inject (46) at every W3C limit, 43 composite runs, attributes, 44 merges (cycles, sharing, 25 levels), time utilities, environment readers, the error handlers over 21 exception kinds, the anchored clock, and 30 promise programs (callWithTimeout, BindOnceFuture, internal._export) on a virtual clock |
+| @opentelemetry/semantic-conventions (`pkgs/opentelemetry/semantic-conventions`) | 1.40.0 | Apache-2.0 | ✅ match (reviewed) | every export: 601 of the main entry point, 2,353 of `incubating` (template functions over 5 sample keys) |
 
 Licences of the N/A rows were checked in each tarball (`LICENSE` with the MIT/ISC text and copyright, and the
 `package.json` licence field). Other versions of the chalk family in the ranking are not yet ported: chalk 5.6.2,
@@ -460,11 +460,17 @@ Deviations (none is reachable through the TypeScript types):
 - `UrlMatches` takes a `*regexp.Regexp` for a RegExp (Go's RE2 syntax: no lookaround or backreferences, no sticky or global
   lastIndex state); any other value is compiled from its string as `new RegExp(value)` would be (undefined matches all).
 - Case mapping (getBooleanFromEnv's toLowerCase, diagLogLevelFromString's toUpperCase) uses golang.org/x/text (Unicode
-  15.0); Node's ICU is Unicode 17.0: the 55 + 55 code points whose case mappings were added since map to themselves here.
+  15.0) with the 55 + 55 simple mappings Node's ICU (Unicode 17.0) has added since, the Latin and Cyrillic letters of
+  Unicode 16 and the Garay and Beria Erfe scripts (`internal/jsvalue/casemap_supplement.go`, derived by
+  `tools/gen_casemap.go` from `parity/jsvalue/casemap.json`, Node's mapping of every code point, against which
+  `TestCaseMappingParity` checks ToUpperCase and ToLowerCase of every code point). x/text does not know those letters as
+  cased, which only the final-sigma rule reads: a Σ whose only neighbouring cased letter is one of them lower-cases to σ
+  here, where ICU gives ς.
 - TimeInput: a `time.Time` stands for a Date (getTime() is its milliseconds, rounded down); an invalid Date cannot be
   expressed. `TimeInputToHrTime` returns an HrTime by value (JavaScript returns the input array itself).
-- Timers: a fractional timeout is rounded up to whole milliseconds, as Node's timers run it (not covered by the recording,
-  whose virtual clock takes whole milliseconds); Node's TimeoutOverflowWarning above 2^31-1 ms is not emitted. Unhandled
+- Timers: a fractional timeout is truncated to whole milliseconds, as Node's timers list it (checked against Node v25.9.0:
+  a 30.9 ms timer fires with the 30 ms ones; not covered by the recording, whose virtual clock takes whole milliseconds);
+  Node's TimeoutOverflowWarning above 2^31-1 ms is not emitted. Unhandled
   promise rejections are not tracked (Node reports them and exits).
 - `Otperformance`'s real clock starts when the package is initialised (Go has no record of the process start) and reads Go's
   monotonic clock. `SDK_INFO` reports the Node platform's values (runtime "node", language "nodejs"), as the original does.
@@ -488,26 +494,46 @@ Limits:
 
 New helpers: `jsnum.StringRadix` (Number.prototype.toString(radix): V8's DoubleToRadixCString, which matched V8 on 70,175
 calls across the double range), `jsvalue.EncodeURIComponent` / `DecodeURIComponent` (URIError), `ToUpperCase` /
-`ToLowerCase` (full case mapping; every code point but the Unicode 16 and 17 ones, 32 contextual strings, 3,000 encodes
-and 6,000 decodes matched V8), `Len16`, `Object.Put` (assignment semantics for `__proto__`), `ArrayIndex`,
+`ToLowerCase` (full case mapping, checked on every code point against Node's ICU, `parity/jsvalue/casemap.json`, and on
+32 contextual strings; 3,000 encodes and 6,000 decodes matched V8), `Len16`, `Object.Put` (assignment semantics for `__proto__`), `ArrayIndex`,
 `jsloop.Virtual.QueueMicrotask` (drained after the ticks, as Node's processTicksAndRejections does; the ordering checked
 against Node), `internal/jspromise` (resolution, adoption of promises and thenables through NewPromiseResolveThenableJob,
 then / catch, Promise.resolve / reject / race; seven programs match V8's job order) and `parityspec.BuildJS` / `Enc`.
 
 Review notes:
-- A mutation check of the harness: 41 deliberate changes (23 to core, 11 to the api, 3 to semantic-conventions, 2 to
-  jspromise, one each to jsloop and jsvalue: limits off by one, bytes counted for UTF-16 units, the version-00 rule, flags
+- A mutation check of the harness: 42 deliberate changes (23 to core, 11 to the api, 3 to semantic-conventions, 2 to
+  jspromise, one to jsloop and two to jsvalue: limits off by one, bytes counted for UTF-16 units, the version-00 rule, flags
   in decimal, merge's level cap and inherited methods, rounding, the registry's override and version checks, the semver
   comparison, the NaN level, the TraceState truncation order, no thenable job, reactions in reverse order, no microtask
   drain, …). The first run caught 32: seven survived for want of cases (a header of exactly 8192 units, metadata that
   fits in UTF-16 units but not in bytes, TraceState sets and unsets exactly at 512, an exact negative half nanosecond,
   promise steps whose microtask turns and reaction order nothing observed), one was equivalent and one did not build.
-  With those cases added and the two mutations fixed, all 41 fail the parity tests. `node tools/mutate_opentelemetry.cjs`
+  With those cases added and the two mutations fixed, all fail the parity tests. `node tools/mutate_opentelemetry.cjs`
   re-runs the check (on a clean tree: it restores each file with git checkout).
 - Re-running the generator and the oracle reproduces cases.json and expected.json byte for byte, and `tools/gen_semconv.cjs`
   reproduces the generated Go files.
 - Two lines of the api parity test are asserted from the Go types rather than computed: the metadata brand ("branded")
   and the TimeoutError static row (name Error, an Error, no enumerable properties). They are not independent checks.
+- Reviewed line by line against the originals, every export of the three packages: core's traceparent match (the regular
+  expression written out for Go's regexp, with JavaScript's `\s` and `.` sets), both TraceState classes' length and
+  truncation accounting (the api's reversed order of a list cut at 32 members), the baggage limits in UTF-16 units and the
+  record's assignment semantics, the composite propagator's warnings, the time utilities' operation order and rounding,
+  the environment readers over process.env's inherited names (checked against Node: `process.env.toString` is inherited
+  there too, and "raw.trim is not a function" / "process.env[key]?.trim is not a function" are V8's messages), merge's
+  cycle records and inherited methods, flattenException's prototype walks (the own-property orders of Number.prototype,
+  Boolean.prototype, Error.prototype and TypeError.prototype checked against V8), the promise utilities' job order; the
+  api's registry and semver check, the diag set-up and filter, the context, baggage and propagation helpers, the no-op,
+  proxy and non-recording trace objects with startActiveSpan's arities, the no-op metrics; and the generated semantic
+  conventions, whose generator reproduces every Go file. The case generator and the oracle, re-run, reproduce cases.json
+  and expected.json byte for byte.
+- Fixed in review: `decodeURIComponent` rejected the valid escape of U+FFFD (`%EF%BF%BD`), which a baggage header may
+  carry, because Go's decoder reports that sequence as RuneError; a fractional timeout was rounded up where Node
+  truncates it; and the Unicode 16 and 17 case pairs are now supplemented from Node's ICU (above). Parity cases were
+  added for these (the escape in a baggage header and in parseKeyPairsIntoRecord, Garay and Beria Erfe capitals through
+  getBooleanFromEnv) and a 42nd mutation (the supplement off); all 42 fail the parity tests.
+- The other listed deviations were judged unavoidable without widening the Go types: a value of another type under the
+  span, baggage or RPC-metadata key cannot come back through a `Span`, `Baggage` or `*RPCMetadata` result; undefined
+  fields have no Go form but a zero value or nil; and a `this` argument has no Go counterpart (a method value binds it).
 
 ## React (`pkgs/react`, `pkgs/react-dom`, `pkgs/react-dom/server`)
 Translated from the production CJS builds: `react.production.js`, `react-dom.production.js`,

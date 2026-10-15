@@ -7,7 +7,7 @@ modules (`go get`) and, eventually, whole applications compiled to a single bina
 Status as of 2026-10-15: Phase 1 is underway (`ms`, `debug`, Node's `util.inspect`/`util.format`,
 React 19's server renderer — `react` plus `react-dom/server` — `chalk` 4 with its dependency tree and
 `graceful-fs` 4 are ported and verified; `@opentelemetry/core` 2.11.0 with `@opentelemetry/api` 1.9.0 and
-`@opentelemetry/semantic-conventions` 1.40.0 are ported and verified, pending review; see `PROGRESS.md`).
+`@opentelemetry/semantic-conventions` 1.40.0 are ported and verified; see `PROGRESS.md`).
 
 ---
 

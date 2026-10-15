@@ -26,7 +26,7 @@ go test ./...
 | [`color-convert`](pkgs/color-convert) | 2.0.1 | 210 routes, 8,484 conversions |
 | [`color-name`](pkgs/color-name) | 1.1.4 | 148 |
 | [`graceful-fs`](pkgs/graceful-fs) | 4.2.11 | 193 cases, 11,771 checks: full traces on a virtual clock over a scripted fs module |
-| [`@opentelemetry/core`](pkgs/opentelemetry/core) | 2.11.0 | 674 cases, 1,891 trace lines: W3C trace-context and baggage propagation, TraceState, time, attributes, merge, environment, error handler, promise utilities on a virtual clock |
+| [`@opentelemetry/core`](pkgs/opentelemetry/core) | 2.11.0 | 676 cases, 1,898 trace lines: W3C trace-context and baggage propagation, TraceState, time, attributes, merge, environment, error handler, promise utilities on a virtual clock |
 | [`@opentelemetry/api`](pkgs/opentelemetry/api) | 1.9.0 | 248 cases, 820 trace lines: contexts, the global registry, diag, baggage, propagation, tracers, trace state, metrics |
 | [`@opentelemetry/semantic-conventions`](pkgs/opentelemetry/semantic-conventions) | 1.40.0 | every export: 601, and 2,353 of `incubating` |
 
