@@ -150,8 +150,12 @@ func IsVar(node any) bool {
 	return IsVariableDeclaration(node, jsvalue.NewObject("kind", "var")) && !truthy(getSymbolProp(node, BLOCK_SCOPED_SYMBOL))
 }
 
-// IsNodesEquivalent is isNodesEquivalent(a, b): a deep comparison of the fields of two nodes.
-func IsNodesEquivalent(a, b any) bool {
+// IsNodesEquivalent is isNodesEquivalent(a, b): a deep comparison of the fields of two nodes. Cyclic nodes panic
+// with JavaScript's RangeError (maxCallDepth).
+func IsNodesEquivalent(a, b any) bool { return isNodesEquivalent(a, b, 0) }
+
+func isNodesEquivalent(a, b any, depth int) bool {
+	depth = deeper(depth)
 	if jsvalue.TypeOf(a) != "object" || jsvalue.TypeOf(b) != "object" || nullish(a) || nullish(b) {
 		return strictEquals(a, b)
 	}
@@ -183,7 +187,7 @@ func IsNodesEquivalent(a, b any) bool {
 				return false
 			}
 			for i := 0; i < len(items(valA)); i++ {
-				if !IsNodesEquivalent(items(valA)[i], items(valB)[i]) {
+				if !isNodesEquivalent(items(valA)[i], items(valB)[i], depth) {
 					return false
 				}
 			}
@@ -197,7 +201,7 @@ func IsNodesEquivalent(a, b any) bool {
 			}
 			continue
 		}
-		if !IsNodesEquivalent(valA, valB) {
+		if !isNodesEquivalent(valA, valB, depth) {
 			return false
 		}
 	}
@@ -365,6 +369,8 @@ func MatchesPattern(member, match any, allowPartial ...bool) bool {
 		for _, p := range strings.Split(s, ".") {
 			parts = append(parts, p)
 		}
+	} else if nullish(match) {
+		panic(readError(match, "split"))
 	} else {
 		panic(typeError("match.split is not a function"))
 	}
