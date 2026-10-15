@@ -6,7 +6,8 @@ modules (`go get`) and, eventually, whole applications compiled to a single bina
 
 Status as of 2026-10-15: Phase 1 is underway (`ms`, `debug`, Node's `util.inspect`/`util.format`,
 React 19's server renderer — `react` plus `react-dom/server` — `chalk` 4 with its dependency tree and
-`graceful-fs` 4 are ported and verified; see `PROGRESS.md`).
+`graceful-fs` 4 are ported and verified; `@opentelemetry/core` 2.11.0 with `@opentelemetry/api` 1.9.0 and
+`@opentelemetry/semantic-conventions` 1.40.0 are ported and verified, pending review; see `PROGRESS.md`).
 
 ---
 
@@ -135,7 +136,7 @@ npm becomes one front-end; PyPI, RubyGems, Java and PHP are candidates for later
 
 | Path | Contents |
 |---|---|
-| `pkgs/<name>/` | Go port + original `LICENSE` |
+| `pkgs/<name>/` | Go port + original `LICENSE` (scoped `@scope/name` in `pkgs/scope/name/`: Go import paths cannot contain `@`) |
 | `internal/nodeutil/`, future `internal/node*/` | Node built-in API ports |
 | `parity/` | shared value specs, Node oracle scripts, cases, recorded expected outputs |
 | `tools/` | generators (tables from Node, case builders) |
