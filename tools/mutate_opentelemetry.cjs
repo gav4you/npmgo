@@ -59,7 +59,7 @@ const M = [
   ['jspromise: adopting a promise without the thenable job', 'internal/jspromise/promise.go', 'p.q.QueueMicrotask(func() {\n\t\t\tresolve, reject := p.resolvingFunctions()\n\t\t\tr.performThen', 'func(f func()) { f() }(func() {\n\t\t\tresolve, reject := p.resolvingFunctions()\n\t\t\tr.performThen', core],
   ['jspromise: reactions in reverse order', 'internal/jspromise/promise.go', 'for _, r := range reactions {', 'for i := range reactions {\n\t\tr := reactions[len(reactions)-1-i]', core],
   ['jsloop: microtasks never drained', 'internal/jsloop/virtual.go', '\t\tv.drainMicrotasks()\n', '\t\t_ = v.micro\n', core],
-  ['jsvalue: decodeURIComponent accepts malformed UTF-8', 'internal/jsvalue/strings.go', 'if r, size := utf8.DecodeRune(seq); r == utf8.RuneError || size != n {', 'if r, size := utf8.DecodeRune(seq); false && (r == utf8.RuneError || size != n) {', core],
+  ['jsvalue: decodeURIComponent accepts malformed UTF-8', 'internal/jsvalue/strings.go', 'if _, size := utf8.DecodeRune(seq); size != n {', 'if _, size := utf8.DecodeRune(seq); false && size != n {', core],
 ];
 
 let failures = 0;

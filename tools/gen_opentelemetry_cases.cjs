@@ -142,7 +142,7 @@ const traceStates = [];
 const baggageExtract = [];
 {
   for (const h of ['a=1', 'a=1,b=2', ' a = 1 , b = 2 ', 'key1=value1;metadata1,key2=value2;m=2;n', 'a=1;', 'a=1; ;x', 'a=%20b%3Bc',
-    'a%3Db=1', '%E2%82%AC=%F0%9F%98%80', 'a=%', 'a=%zz,b=2', '%C0%80=1,b=2', 'a=b=c', '=1', 'a=', ' =1', 'a= ', ',,a=1,,',
+    'a%3Db=1', '%E2%82%AC=%F0%9F%98%80', 'a=%', 'a=%zz,b=2', '%C0%80=1,b=2', '%EF%BF%BD=%EF%BF%BD,b=2', 'a=b=c', '=1', 'a=', ' =1', 'a= ', ',,a=1,,',
     'a', '', ' ', 'b=1,a=2,2=x,1=y,b=3', '__proto__=1', '%5F%5Fproto%5F%5F=1,b=2', 'constructor=1,toString=2', 'a=1,a=2,a=3',
     'ké=v€', 'a=x;é', 'a=1\t', ' a=1', 'a=1,' + 'b=' + 'x'.repeat(4094), 'a=1,' + 'b=' + 'x'.repeat(4093),
     'x='.concat('y'.repeat(4096)), 'a=1;' + 'm'.repeat(4100),
@@ -203,7 +203,7 @@ const baggageInject = [];
 }
 
 // --- parseKeyPairsIntoRecord
-const parseRecord = ['a=1', 'a=1,b=2', ' a = 1 ;meta, b=2', 'b=1,a=2,2=x,1=y,b=3', '__proto__=1,a=2', 'a=%E2%82%AC', 'a=%zz,b=2', 'a=',
+const parseRecord = ['a=1', 'a=1,b=2', ' a = 1 ;meta, b=2', 'b=1,a=2,2=x,1=y,b=3', '__proto__=1,a=2', 'a=%E2%82%AC', 'a=%EF%BF%BD', 'a=%zz,b=2', 'a=',
   '=1', '', ',', 'a', 'ké=v', 'constructor=1', 5, null, undef, arr('a=1'), obj(['a', '1'])];
 
 // --- composite propagators

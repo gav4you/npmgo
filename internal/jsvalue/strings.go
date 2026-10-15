@@ -126,8 +126,10 @@ func DecodeURIComponent(s string) (string, error) {
 			seq = append(seq, next)
 		}
 		// Go's decoder rejects overlong forms, surrogates and values above
-		// U+10FFFF, as the spec requires.
-		if r, size := utf8.DecodeRune(seq); r == utf8.RuneError || size != n {
+		// U+10FFFF, as the spec requires: it then reads one byte. (It also
+		// returns RuneError, with size 3, for the valid encoding of U+FFFD
+		// itself, which decodes to U+FFFD.)
+		if _, size := utf8.DecodeRune(seq); size != n {
 			return "", malformed
 		}
 		b.Write(seq)

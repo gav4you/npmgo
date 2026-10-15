@@ -60,6 +60,8 @@ func TestURIComponent(t *testing.T) {
 		{"é%20", "é "},
 		{"no escapes", "no escapes"},
 		{"%3b%3B", ";;"},
+		{"%EF%BF%BD", "�"}, // the valid encoding of U+FFFD (utf8.DecodeRune reports it as RuneError)
+		{"k%EF%BF%BDv", "k�v"},
 	} {
 		if got, err := DecodeURIComponent(c.in); err != nil || got != c.want {
 			t.Errorf("decodeURIComponent(%q) = %q, %v; want %q", c.in, got, err, c.want)
