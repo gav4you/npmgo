@@ -4,7 +4,8 @@
 //
 // Values follow the jsvalue model (nil is null, jsvalue.Undefined{} is
 // undefined). A handler or executor that panics is a JavaScript throw: the
-// panic value becomes the rejection reason. Resolving a promise with a
+// panic value becomes the rejection reason (Throw throws any value, null
+// included). Resolving a promise with a
 // *Promise or with a Thenable adopts its state through a
 // NewPromiseResolveThenableJob, which costs the same microtask turns as in
 // V8.
@@ -73,7 +74,7 @@ func New(q jsloop.Microtasks, executor func(resolve, reject func(any))) *Promise
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
-				c.reject(r)
+				c.reject(Caught(r))
 			}
 		}()
 		executor(c.resolve, c.reject)
@@ -188,7 +189,7 @@ func (p *Promise) resolveWith(resolution any) {
 			resolve, reject := p.resolvingFunctions()
 			defer func() {
 				if x := recover(); x != nil {
-					reject(x)
+					reject(Caught(x))
 				}
 			}()
 			r.Then(resolve, reject)
@@ -250,8 +251,23 @@ func (p *Promise) queueReactionJob(r reaction, state State, argument any) {
 func call(handler func(any) any, argument any) (value any, abrupt bool) {
 	defer func() {
 		if x := recover(); x != nil {
-			value, abrupt = x, true
+			value, abrupt = Caught(x), true
 		}
 	}()
 	return handler(argument), false
+}
+
+// thrown carries a value thrown with Throw.
+type thrown struct{ value any }
+
+// Throw throws value (JavaScript's throw value) from a handler or executor: the promise is rejected with value
+// itself, which may be nil (null), unlike panic(nil), which Go turns into a *runtime.PanicNilError.
+func Throw(value any) { panic(thrown{value}) }
+
+// Caught returns the thrown value a recovered panic stands for: the value given to Throw, or the panic value.
+func Caught(recovered any) any {
+	if t, ok := recovered.(thrown); ok {
+		return t.value
+	}
+	return recovered
 }

@@ -31,6 +31,10 @@ func NewObject(kv ...any) *Object {
 	return o
 }
 
+// ArrayIndex reports whether k is a canonical array index ("0", "1", ...,
+// below 2^32-1), which JavaScript enumerates before other keys, and its value.
+func ArrayIndex(k string) (uint64, bool) { return arrayIndex(k) }
+
 // arrayIndex reports whether k is a canonical array index ("0", "1", ...,
 // below 2^32-1), which JavaScript enumerates before other keys.
 func arrayIndex(k string) (uint64, bool) {
@@ -115,6 +119,16 @@ func (o *Object) Set(k string, v any) {
 	if o.index != nil || len(o.entries) >= indexThreshold {
 		o.reindex()
 	}
+}
+
+// Put is the assignment o[k] = v on an ordinary object: Set, except for the key "__proto__", which names the
+// Object.prototype accessor: assigning it changes the object's prototype (an object or null value) or does nothing,
+// and creates no property. The prototype itself is not modelled.
+func (o *Object) Put(k string, v any) {
+	if k == "__proto__" {
+		return
+	}
+	o.Set(k, v)
 }
 
 // Delete removes property k and reports whether it existed.
