@@ -525,6 +525,10 @@ api.propagation = [
   { carrier: undef },
   { carrier: obj() },
   { global: true, carrier: obj(['traceparent', 'x']) },
+  // The setter assigns: __proto__ on an ordinary carrier reaches Object.prototype's accessor (a string changes nothing),
+  // and an own __proto__ property (as JSON.parse makes) is overwritten.
+  { carrier: obj(['a', '1']), set: [['__proto__', 'x'], ['b', '2']] },
+  { carrier: obj(['__proto__', 'own'], ['a', '1']), set: [['__proto__', 'x']] },
 ];
 api.traceIds = ['4bf92f3577b34da6a3ce929d0e0e4736', '4BF92F3577B34DA6A3CE929D0E0E4736', Z32, 'x'.repeat(32), TID.slice(1), TID + '0', '', TID + '\n',
   '00f067aa0ba902b7', '00F067AA0BA902B7', Z16, SID.slice(1), SID + '0', 'g'.repeat(16), SID + '\n', '٠'.repeat(16)];

@@ -635,6 +635,7 @@ func TestParity(t *testing.T) {
 		var spec struct {
 			Carrier json.RawMessage
 			Global  bool
+			Set     [][2]string
 		}
 		decode(raw, &spec)
 		carrier := build(spec.Carrier)
@@ -645,6 +646,9 @@ func TestParity(t *testing.T) {
 		}
 		s.Set(carrier, "new", "v")
 		s.Set(carrier, "a", "replaced")
+		for _, kv := range spec.Set {
+			s.Set(carrier, kv[0], kv[1])
+		}
 		rec("after set -> " + enc(carrier))
 		key := CreateContextKey("extracted")
 		if spec.Global {

@@ -12728,6 +12728,28 @@
     "extract -> value \"yes\"",
     "propagator inject",
     "after inject -> {\"traceparent\":\"x\",\"new\":\"v\",\"a\":\"replaced\",\"injected\":\"1\"}"
+   ],
+   [
+    "keys -> [\"a\"]",
+    "get a -> \"1\"",
+    "get b -> undefined",
+    "get 2 -> undefined",
+    "get missing -> undefined",
+    "after set -> {\"a\":\"replaced\",\"new\":\"v\",\"b\":\"2\"}",
+    "fields -> []",
+    "extract -> same",
+    "after inject -> {\"a\":\"replaced\",\"new\":\"v\",\"b\":\"2\"}"
+   ],
+   [
+    "keys -> [\"__proto__\",\"a\"]",
+    "get a -> \"1\"",
+    "get b -> undefined",
+    "get 2 -> undefined",
+    "get missing -> undefined",
+    "after set -> {\"__proto__\":\"x\",\"a\":\"replaced\",\"new\":\"v\"}",
+    "fields -> []",
+    "extract -> same",
+    "after inject -> {\"__proto__\":\"x\",\"a\":\"replaced\",\"new\":\"v\"}"
    ]
   ],
   "traceIds": [

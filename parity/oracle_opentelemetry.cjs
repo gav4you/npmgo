@@ -709,6 +709,7 @@ apiOut.propagation = A.propagation.map(c => runCase(c => {
   for (const k of ['a', 'b', '2', 'missing']) rec(`get ${k} -> ${enc(g.get(carrier, k))}`);
   s.set(carrier, 'new', 'v');
   s.set(carrier, 'a', 'replaced');
+  for (const [k, v] of c.set || []) s.set(carrier, k, v);
   rec('after set -> ' + enc(carrier));
   const key = api.createContextKey('extracted');
   if (c.global) {
