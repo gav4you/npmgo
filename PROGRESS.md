@@ -23,7 +23,7 @@ Run all checks: `go test ./...`  ·  Re-record a package's originals: see the he
 | has-flag | 4.0.0 | MIT | ✅ match (reviewed) | 25 cases |
 | color-convert | 2.0.1 | MIT | ✅ match (reviewed; `**` routes within 1e-9) | 210 routes (`.conversion`), 8,484 conversions (303 inputs through every route, rounded and raw): 3,894 input/route pairs exact, 348 on `**` routes within 1e-9 (largest deviation 1.8e-12) |
 | color-name | 1.1.4 | MIT | ✅ match (reviewed) | 148 colours in key order |
-| graceful-fs | 4.2.11 | ISC | ✅ match (pending review) | 193 cases, 11,753 checks: the whole trace of each case on a virtual clock (10,746 events: every call graceful-fs makes to a scripted fs module, every callback, step result, exception and stream event), end time, timer fires (count and hash of their times), the queue left over and the functions of the loaded module (965), and 6 scheduler programs (42 events) |
+| graceful-fs | 4.2.11 | ISC | ✅ match (reviewed) | 193 cases, 11,771 checks: the whole trace of each case on a virtual clock (10,746 events: every call graceful-fs makes to a scripted fs module, every callback, step result, exception and stream event), end time, timer fires (count and hash of their times), the queue left over and the functions of the loaded module (965), and 7 scheduler programs (60 events) |
 | es-errors | 1.3.0 | MIT | N/A: re-export of the built-in Error constructors (`Error`, `TypeError`, …); Go returns its own error values | - |
 | call-bind | 1.0.8 | MIT | N/A: intrinsic shim, `Function.prototype.call.bind(fn)` with a corrected `length`; Go calls functions and methods directly | - |
 | call-bound | 1.0.4 | MIT | N/A: intrinsic shim, call-bound built-ins by name (`%String.prototype.indexOf%` …); Go calls the operation directly | - |
@@ -229,14 +229,15 @@ virtual clock rather than the real disk. `parity/oracle_gracefulfs.cjs` loads th
 clean `require.cache`) over a fake fs module injected with a `Module._load` hook (graceful-fs captures fs's functions
 when it loads), with `Date.now`, `setTimeout`, `clearTimeout` and `process.nextTick` replaced by one virtual scheduler;
 `parity_test.go` runs the same cases through the Go port over the same fake on `internal/jsloop`'s `Virtual`, the Go
-twin of that scheduler (ticks before tasks and after every task, tasks by due time then scheduling order, Node's
-setTimeout clamp: 0 ms runs after 1 ms). The fake completes each asynchronous call as a task `ms` later (never
+twin of that scheduler (ticks before tasks and after every task, except that after an uncaught exception they wait
+for the task due now, if any, to complete, as Node runs them from the no-op setImmediate it queues then; tasks by due
+time then scheduling order; Node's setTimeout clamp: 0 ms runs after 1 ms). The fake completes each asynchronous call as a task `ms` later (never
 synchronously) with the next scripted outcome for that function, and each error carries the number of the call that
 produced it, so the trace shows which error reached a callback. Compared per case: every call to the fs module (its
 arguments and virtual time), every user callback and its arguments, step results and exceptions, uncaught exceptions,
 stream events, the end time, the queue left over, the functions the loaded module has, and the timer fires as a count
 and an FNV-1a hash of their times (an entry in 100 ms backoff fires the retry timer every millisecond, so they are not
-listed). The scheduler models are also diffed on their own (6 programs). Cases come from
+listed). The scheduler models are also diffed on their own (7 programs). Cases come from
 `tools/gen_gracefulfs_cases.cjs`; recorded with Node v25.9.0 on win32-x64 (nothing in the recording depends on the
 machine). The oracle refuses a case whose script runs out, even where graceful-fs swallows the exception itself
 (lutimesSync's closeSync).
@@ -328,7 +329,37 @@ The real file system (blocking functions):
 - Machine-dependent, so covered by Go API tests rather than parity: real files and directories, a real Windows sharing
   violation retried by rename until the handle closes, and a real-time EMFILE limit with 40 goroutines. They ran with
   `-race` on Windows and on Linux (the golang:1.26.5 image, as root and as uid 1000, where chown to root fails with
-  EPERM and graceful-fs ignores it); macOS and the other targets were only compiled (`go vet` for 13 GOOS).
+  EPERM and graceful-fs ignores it); macOS and the other targets were only compiled (`go vet`, tests included, for
+  linux, darwin, freebsd, openbsd, netbsd, dragonfly, solaris, illumos, aix, android, plan9, js and wasip1 besides
+  windows; ios needs cgo).
+
+Review notes:
+- Reviewed line by line against graceful-fs.js, polyfills.js and clone.js: the queue (enqueue, retry and resetQueue,
+  the 1.2 factor in floating point, the floor of 1 ms and the cap of 100 ms, the 60 s cutoff with the stored error and
+  `args.pop`, `startTime || Date.now()`, one retry timer per loaded copy, only the first copy patching close, closeSync
+  resetting only when it does not throw), the six EMFILE / ENFILE wrappers and their optional-argument shuffles, the
+  readdir sort, chownErOk and the Sync fixes, statFix's two- and three-argument calls, the win32 rename (its codes,
+  backoff, the stat of the destination, the window), read and readSync's EAGAIN cap, and the lchmod, lchown and
+  lutimes fallbacks. The generator and the oracle, re-run, reproduce cases.json and expected.json byte for byte. The
+  Windows error table was diffed entry by entry against libuv 1.51.0's src/win/error.c (all 100 mappings, in the same
+  order, with x/sys/windows's values). A further 13 mutations of the port (the cutoff comparison, the factor, cap and
+  floor, a reset that keeps lastTime, a retry that leaves its timer, startTime counted as set at 0, every copy
+  patching close, the EAGAIN and backoff caps, no getuid counted as root, statFix passing falsy options, an unstable
+  sort) each failed the parity test.
+- The scheduler model was checked against Node v25.9.0 itself with probe programs: the setTimeout clamp (negative, 0,
+  NaN and above 2^31-1 all run after 1 ms, in scheduling order), timers of different durations due at the same time
+  (scheduling order, also for one scheduled from a timer callback) and the ticks between the timers of one list all
+  matched. One deviation was found and fixed on both sides: when a callback throws, Node skips its tick queue
+  (`InternalCallbackScope::Close` returns on failure) and queues a no-op setImmediate, so the pending ticks run after
+  the next callback that completes, and `processTimers` is re-entered for the timers still due; both models ran them
+  at once. They now wait for the task due now, if any (`Virtual.held`). The 193 case traces are unchanged (re-recorded
+  identical: no case has a tick pending across a throw); the scheduler program's recording changed and a new program
+  covers the rule. The order of a timer and an I/O completion due in the same millisecond stays an abstraction (Node
+  runs its timers phase before its poll phase, but a completion does not arrive on a whole millisecond): scheduling
+  order, on both sides.
+- Fixed in review: the tests did not build on plan9 (`syscall.Errno`; the errno cases are now in
+  errcode_posix_test.go), and TestRealHost compared independent timers 19 ms apart, which a stalled machine can
+  reorder; it now schedules each timer from the previous one and checks the delays instead.
 
 ## React (`pkgs/react`, `pkgs/react-dom`, `pkgs/react-dom/server`)
 Translated from the production CJS builds: `react.production.js`, `react-dom.production.js`,

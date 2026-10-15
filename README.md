@@ -25,7 +25,7 @@ go test ./...
 | [`has-flag`](pkgs/has-flag) | 4.0.0 | 25 |
 | [`color-convert`](pkgs/color-convert) | 2.0.1 | 210 routes, 8,484 conversions |
 | [`color-name`](pkgs/color-name) | 1.1.4 | 148 |
-| [`graceful-fs`](pkgs/graceful-fs) | 4.2.11 | 193 cases, 11,753 checks: full traces on a virtual clock over a scripted fs module |
+| [`graceful-fs`](pkgs/graceful-fs) | 4.2.11 | 193 cases, 11,771 checks: full traces on a virtual clock over a scripted fs module |
 
 The full ledger is in [`PROGRESS.md`](PROGRESS.md) and the plan is in [`ROADMAP.md`](ROADMAP.md).
 The pilot is the dependency tree of [Postiz](https://github.com/gitroomhq/postiz-app) (3,972 packages),

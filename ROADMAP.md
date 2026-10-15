@@ -5,8 +5,8 @@ no Node runtime, no embedded JavaScript engine, no compatibility VM. The output 
 modules (`go get`) and, eventually, whole applications compiled to a single binary.
 
 Status as of 2026-10-15: Phase 1 is underway (`ms`, `debug`, Node's `util.inspect`/`util.format`,
-React 19's server renderer — `react` plus `react-dom/server` — and `chalk` 4 with its dependency tree
-are ported and verified; `graceful-fs` 4 is ported and verified, pending review; see `PROGRESS.md`).
+React 19's server renderer — `react` plus `react-dom/server` — `chalk` 4 with its dependency tree and
+`graceful-fs` 4 are ported and verified; see `PROGRESS.md`).
 
 ---
 
