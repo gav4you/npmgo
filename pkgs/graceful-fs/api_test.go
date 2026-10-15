@@ -350,21 +350,36 @@ func TestSortInvalidUTF8(t *testing.T) {
 	}
 }
 
+// The real-time host: a tick runs after the current task and before any
+// timer, a timer runs no earlier than its delay (a 0 ms one after 1 ms, as
+// in Node) and a cleared timer never runs. Each timer here is scheduled from
+// the previous one, so the order checked is fixed by causality, not by the
+// relative timing of independent timers, which a stalled machine can reorder.
 func TestRealHost(t *testing.T) {
 	h := newRealHost()
 	if d := h.Now() - time.Now().UnixMilli(); d < -5 || d > 5 {
 		t.Fatalf("Now is %d ms off", d)
 	}
-	var mu sync.Mutex
 	var order []string
-	log := func(s string) { mu.Lock(); order = append(order, s); mu.Unlock() }
+	var elapsed0, elapsed20 time.Duration
+	log := func(s string) { order = append(order, s) } // loop goroutine only
 	done := make(chan struct{})
+	start := time.Now()
 	h.post(func() {
-		h.SetTimeout(func() { log("t20") }, 20)
 		cleared := h.SetTimeout(func() { log("never") }, 5)
 		h.ClearTimeout(cleared)
 		h.ClearTimeout(nil)
-		h.SetTimeout(func() { log("t0"); h.SetTimeout(func() { log("t40"); close(done) }, 40) }, 0)
+		h.SetTimeout(func() {
+			elapsed0 = time.Since(start)
+			log("t0")
+			h.NextTick(func() { log("tick-in-t0") })
+			from := time.Now()
+			h.SetTimeout(func() {
+				elapsed20 = time.Since(from)
+				log("t20") // the cleared 5 ms timer has had over 20 ms to run by now
+				close(done)
+			}, 20)
+		}, 0)
 		h.NextTick(func() { log("tick") })
 		log("task")
 	})
@@ -373,8 +388,14 @@ func TestRealHost(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Fatal("timers did not run")
 	}
-	if got := fmt.Sprint(order); got != "[task tick t0 t20 t40]" {
+	if got := fmt.Sprint(order); got != "[task tick t0 tick-in-t0 t20]" {
 		t.Fatalf("order %s", got)
+	}
+	if elapsed0 < time.Millisecond {
+		t.Fatalf("the 0 ms timer ran after %v, before 1 ms", elapsed0)
+	}
+	if elapsed20 < 20*time.Millisecond {
+		t.Fatalf("the 20 ms timer ran after %v", elapsed20)
 	}
 }
 
