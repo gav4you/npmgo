@@ -52,7 +52,7 @@ Run all checks: `go test ./...`  ·  Re-record a package's originals: see the he
 | @opentelemetry/api (`pkgs/opentelemetry/api`) | 1.9.0 | Apache-2.0 | ✅ match (reviewed; `experimental` entry point not ported) | 248 cases, 820 trace lines and checks: contexts and keys, the globalThis registry (with records of other versions), 133 semver pairs, 31 diag set-ups (every level, NaN / fractional / out-of-range levels, override messages, the self-logger error, component loggers, DiagConsoleLogger over 4 consoles), baggage, the propagation API and default getter / setter, 16 id checks, 13 tracer programs (no-op, proxy and delegate tracers, every startActiveSpan arity), 27 TraceState programs, no-op metrics, enums, exports |
 | @opentelemetry/core (`pkgs/opentelemetry/core`) | 2.11.0 | Apache-2.0 | ✅ match (reviewed) | 676 cases, 1,898 trace lines: 223 traceparent strings, trace-context extract (42) and inject (28), 28 TraceState programs, baggage extract (61) and inject (46) at every W3C limit, 43 composite runs, attributes, 44 merges (cycles, sharing, 25 levels), time utilities, environment readers, the error handlers over 21 exception kinds, the anchored clock, and 30 promise programs (callWithTimeout, BindOnceFuture, internal._export) on a virtual clock |
 | @opentelemetry/semantic-conventions (`pkgs/opentelemetry/semantic-conventions`) | 1.40.0 | Apache-2.0 | ✅ match (reviewed) | every export: 601 of the main entry point, 2,353 of `incubating` (template functions over 5 sample keys) |
-| @babel/types (`pkgs/babel/types`) | 7.29.0 | MIT | ✅ match (pending review) | 15,891 traces in the default environment and 13,221 with `BABEL_TYPES_8_BREAKING`: the 1,356 exports, every table entry (1,183 lines, with the sharing of arrays, objects and validators), 308 `is*` and 308 `assert*` over 297 values (182,952 outcomes, 4,620 messages), 676 option checks, 8,710 builder calls (257 builders under 596 names: valid, each argument invalid, missing), 3,322 calls of the other exports, 27 deprecation warnings |
+| @babel/types (`pkgs/babel/types`) | 7.29.0 | MIT | ✅ match (pending review) | 15,918 traces in the default environment and 13,248 with `BABEL_TYPES_8_BREAKING`: the 1,356 exports, every table entry (1,183 lines, with the sharing of arrays, objects and validators), 308 `is*` and 308 `assert*` over 297 values (182,952 outcomes, 4,620 messages), 676 option checks, 8,710 builder calls (257 builders under 596 names: valid, each argument invalid, missing), 3,349 calls of the other exports, 27 deprecation warnings |
 | @babel/helper-validator-identifier (`pkgs/babel/helper-validator-identifier`) | 7.28.5 | MIT | ✅ match (pending review) | 2,228,784 checks: isIdentifierStart / isIdentifierChar on every code point and 32 other numbers, isIdentifierName on 48 strings, the keyword predicates on 60 words |
 | @babel/helper-string-parser (`pkgs/babel/helper-string-parser`) | 7.27.1 | MIT | ✅ match (pending review) | 3,606 cases: readStringContents (1,751: template, double and single quotes, 1,500 of them fuzzed), readInt (1,827), readCodePoint (28), with every call to the errors object |
 
@@ -555,13 +555,15 @@ How it is translated:
   (`TSCallSignatureDeclaration` and `TSConstructSignatureDeclaration` share their options, the `importAttributes` fields are
   shared by five types, `fnOrCtrBase`'s arrays by two). It records where `definitions/placeholders.js` loads (between
   `jsx.js` and `misc.js`). Each validator closure is classified by its source text against a fresh instance of each factory
-  of `definitions/utils.js` and replayed as that factory's call with the arguments its properties hold; the 31 closures no
-  factory makes (18 in the default environment) are listed in the generator with their site and exact source text, and
-  call hand-written translations (`custom.go`). The replay is recorded twice, in child processes without and with
+  of `definitions/utils.js` and replayed as that factory's call with the arguments its properties hold. The closures no
+  factory makes are listed in the generator with their site and exact source text (34 sites: 15 in both environments, 3
+  no-op validators only in the default one, 10 field validators and 6 parent validations only with
+  `BABEL_TYPES_8_BREAKING`) and call 31 hand-written translations (`custom.go`: the three class-key sites share one, as do
+  the two BindExpression no-ops). The replay is recorded twice, in child processes without and with
   `BABEL_TYPES_8_BREAKING`. `builders_gen.go`, `validators_gen.go`, `asserts_gen.go` and `constants_gen.go` are generated
   from `lib/builders/generated`, `lib/validators/generated`, `lib/asserts/generated` and `lib/constants/generated`, whose
   function bodies the generator parses strictly (it fails on a body of an unknown shape), and `exports_gen.go` lists the
-  1,356 export names in `Object.keys` order with their Go values. The generator also checks a SHA-256 of the 72 modules
+  1,356 export names in `Object.keys` order with their Go values. The generator also checks a SHA-256 of the 73 modules
   translated by hand, so a changed original cannot be regenerated without a review. `tools/gen_babel_identifier.cjs` copies
   the two character-class strings and the two astral tables of helper-validator-identifier's `lib/identifier.js` into
   `data.go` (checked against the loaded module on every BMP code unit, with a SHA-256 of the code around the data).
@@ -572,9 +574,11 @@ How it is translated:
   TypeScript / React builders; and the two helpers.
 
 `BABEL_TYPES_8_BREAKING` (read when the package is initialised, as Node reads it when `lib/index.js` loads): both
-environments are ported and verified. The default one is used unless the variable is set and non-empty; with it set, the
-package prints lib/index.js's notice through `ConsoleWarn`, and that environment's definitions, its 13 other validator
-closures and 6 parent validations, and assertEach's validation of each element against its parent apply.
+environments are ported and verified. The default one is used unless the variable is set and non-empty. With it set, the
+package prints lib/index.js's notice through `ConsoleWarn` while it is initialised (so before any importer can replace
+`ConsoleWarn`: the notice always goes to standard error), and that environment's definitions apply: 10 field validators
+and the 6 parent validations (`NODE_PARENT_VALIDATIONS`) that no factory makes, factory validators in place of the
+default environment's 3 no-op ones, and assertEach's validation of each element against its parent.
 
 Verification: `parity/oracle_babel_types.cjs` loads the three originals from a `node_modules` layout and records
 `parity/babel-types/expected.json` from `parity/babel-types/cases.json` (generated by `tools/gen_babel_types_cases.cjs`,
@@ -591,21 +595,23 @@ shallow clone shares its children) and of comments cloned once is compared. Reco
 nothing depends on the machine (the stack lines of deprecation warnings are counted, not recorded).
 
 Checks:
-- @babel/types: 15,891 traces in the default environment and 13,221 with `BABEL_TYPES_8_BREAKING` (167 table lines, 478
-  builder calls and 190 other calls differ from the default): the 1,356 export names and kinds; every entry of every table
+- @babel/types: 15,918 traces in the default environment and 13,248 with `BABEL_TYPES_8_BREAKING` (167 table lines, 478
+  builder calls and 202 other calls differ from the default): the 1,356 export names and kinds; every entry of every table
   (1,183 lines: VISITOR_KEYS, ALIAS_KEYS, FLIPPED_ALIAS_KEYS, NODE_FIELDS with each field's `validate` / `optional` /
-  `default` / `deprecated` in key order and each validator's name and properties, BUILDER_KEYS, DEPRECATED_KEYS,
+  `default` / `deprecated` in key order and each validator's name, length and properties, BUILDER_KEYS, DEPRECATED_KEYS,
   NODE_PARENT_VALIDATIONS, NODE_UNION_SHAPES__PRIVATE, the placeholder tables, TYPES, every constant,
   `getBindingIdentifiers.keys`, `traverseFast.skip` / `stop`, `toKeyAlias.uid`); the 308 generated `is*` and 308 `assert*`
   functions on 297 sample values (every node type, deprecated types, aliases, placeholders of every kind, odd values:
   182,952 outcomes and 4,620 assert messages) and 676 option checks; 8,710 builder calls (the 257 builders under all 596
   export names with valid arguments; every argument replaced in turn by 16 to 20 invalid values, 7,660 calls, the
-  validators' messages compared exactly; every shorter argument list, 454); 3,322 calls of the other 75 exports and of
+  validators' messages compared exactly; every shorter argument list, 454); 3,349 calls of the other 75 exports and of
   builders in particular states (cloneNode and its variants, the comment helpers, every converter, valueToNode over 41
-  values, the modifications, removeTypeDuplicates for flow and TypeScript, the retrievers over 32 node shapes, traverse and
-  traverseFast with every handler form, is / isType / isPlaceholderType including names of Object.prototype, the other
-  validators, matchesPattern, the React helpers, 621 validate calls including every validator only
-  `BABEL_TYPES_8_BREAKING` uses); 27 deprecation warnings from callers inside and outside a Babel package.
+  values, the modifications, ensureBlock, inherits and removeProperties on nodes with an own `__proto__` property,
+  removeTypeDuplicates for flow and TypeScript, the retrievers over 32 node shapes, traverse and traverseFast with every
+  handler form, is / isType / isPlaceholderType including names of Object.prototype, the other validators,
+  matchesPattern, shallowEqual on validators read from NODE_FIELDS (their name, length and properties), the React
+  helpers, 621 validate calls including every validator only `BABEL_TYPES_8_BREAKING` uses); 27 deprecation warnings from
+  callers inside and outside a Babel package.
 - helper-validator-identifier: 2,228,784 checks: isIdentifierStart and isIdentifierChar on every code point (as ranges) and
   on 32 other numbers (fractions, NaN, ±Infinity, -0, beyond 0x10FFFF), isIdentifierName on 48 strings, the five keyword
   predicates on 60 words.
@@ -644,8 +650,8 @@ Go API (JavaScript-shaped, see the ROADMAP's Phase 2 question):
   `_NODE_PARENT_VALIDATI.call is not a function` and one of type `__defineGetter__` V8's "Expecting function"). The tables
   can be changed, as in JavaScript; the package reads them when it uses them.
 - `NODE_FIELDS[t][f].validate` and `NODE_PARENT_VALIDATIONS[t]` are `*Validator` values (typeof "function") with
-  JavaScript's name and properties (`Props()`), callable with `Call`. The validator factories of `definitions/utils.js`,
-  which only a deep import reaches, are not exported.
+  JavaScript's name and length (`Name()`, `Length()`) and properties (`Props()`), callable with `Call`. The validator
+  factories of `definitions/utils.js`, which only a deep import reaches, are not exported.
 - `ConsoleWarn` is console.warn (standard error by default). Deprecation warnings are given once per name, as in
   JavaScript, unless the caller of the deprecated function is itself in a Babel package (`pkgs/babel/...`, the Go form of
   the `/@babel/` file-name test); the two lines of stack after the message are Go frames.
@@ -653,34 +659,42 @@ Go API (JavaScript-shaped, see the ROADMAP's Phase 2 question):
   nodes; `toKeyAlias`'s counter and the deprecation cache are locked (checked under `-race`). Changing the tables, or a node
   another goroutine uses, is a data race.
 
-Deviations (none is reachable through the TypeScript types):
-- Lone UTF-16 surrogates cannot be represented: input strings never hold one, and one in a result becomes U+FFFD (a
-  template's cooked value or a readStringContents result for an escape such as `\uD83D` on its own; the message of the
-  `BABEL_TYPES_8_BREAKING` RegExp-flags check, which reads code units). The harnesses compare such results with U+FFFD in
-  place of the lone surrogate and say how many they compared so: 2 traces of @babel/types in each environment and 6
-  string-parser results.
-- Prototypes are not modelled: an object is an ordinary object or a null-prototype one (getBindingIdentifiers' and
-  getAssignmentIdentifiers' results) only by how the port treats it (`__proto__` or `constructor` is an own property of those
-  results, as in JavaScript); `ensureBlock(node, "__proto__")` creates no property (JavaScript changes the node's
-  prototype); a class instance, Date, Map or Go map is not a plain object for valueToNode.
-- Named properties of arrays and functions are not modelled: `removeComments` on an array or a function sets nothing
-  (JavaScript sets the three comment properties on it).
-- A RegExp value is `*jsvalue.RegExp` (its source and flags as JavaScript reports them); a `*regexp.Regexp` gives valueToNode
-  its Go pattern and no flags. A value that claims to be a RegExp through Symbol.toStringTag is not modelled.
+Deviations that well-typed code can meet (the TypeScript types allow these inputs; Go behaves differently):
+- A lone UTF-16 surrogate in a result becomes U+FFFD, since a Go string cannot hold one: the cooked value of a template
+  whose raw text has an escape such as `\uD83D` on its own (`templateElement({raw: "\\uD83D"})`), a readStringContents
+  result for such an escape, and the message of the `BABEL_TYPES_8_BREAKING` RegExp-flags check (which reads code units).
+  The harnesses compare such results with U+FFFD in place of the lone surrogate and say how many they compared so: 2
+  traces of @babel/types in each environment and 6 string-parser results.
+- A cyclic AST (a node that contains itself) overflows the Go stack in cloneNode and the traversals, a fatal error that
+  cannot be recovered, where V8 throws a RangeError ("Maximum call stack size exceeded"). (JSON.stringify of a circular
+  structure, in toKeyAlias and the validators' messages, throws V8's TypeError with its description of the circle, as in
+  JavaScript.)
+- helper-string-parser: positions, line numbers and radixes are ints, where the TypeScript types say number (a fraction
+  is accepted by JavaScript).
+
+Inputs the Go API cannot express (the port has no counterpart for them; most are outside the TypeScript types):
+- Lone surrogates in input strings (a Go string's invalid UTF-8 reads as U+FFFD).
+- Prototypes: an object is an ordinary object or a null-prototype one (getBindingIdentifiers' and getAssignmentIdentifiers'
+  results) only by how the port treats it (`__proto__` or `constructor` is an own property of those results, as in
+  JavaScript); an object made with another prototype cannot be passed. An assignment to `__proto__` sets the object's own
+  `__proto__` property if it has one, as in JavaScript, and otherwise creates nothing, where JavaScript's accessor would
+  make an object value the prototype (`inherits` from a parent with an own object-valued `__proto__`). A class instance,
+  Date, Map or Go map is not a plain object for valueToNode, as in JavaScript.
+- Named properties of arrays and functions: `removeComments` on an array or a function sets nothing (JavaScript sets the
+  three comment properties on it). A validator's `prototype`, and the `call` / `apply` / `bind` of Function.prototype, are
+  not modelled (a validator reads Object.prototype's members only).
+- A value that claims to be a RegExp through Symbol.toStringTag. A RegExp is `*jsvalue.RegExp` (its source and flags as
+  JavaScript reports them); a `*regexp.Regexp` gives valueToNode its Go pattern and no flags.
 - Functions passed as values are Go funcs; `TraverseFast`'s enter is typed (`func(node, opts any) any`), so a non-function
   enter cannot be passed. traverse's ancestors are a `*jsvalue.Array` of `{node, key, index}` objects, the array traverse
   keeps, as in JavaScript.
 - The TypeScript types' booleans and strings (cloneNode's deep and withoutLoc, isValidIdentifier's reserved, ensureBlock's
   key, ...) cannot receive other JavaScript values; for the booleans JavaScript reads only their truthiness.
-- helper-string-parser: positions, line numbers and radixes are ints (JavaScript accepts fractions); an errors object is a
-  struct of funcs (a nil one is a missing method: "errors.unterminated is not a function"), and invalidDigit returns a bool.
-  As in JavaScript, an unterminated handler that returns, met at a newline in a string literal, is called again forever (the
-  harness's throws on its second call).
+- helper-string-parser: an errors object is a struct of funcs (a nil one is a missing method: "errors.unterminated is not
+  a function"), and invalidDigit returns a bool. As in JavaScript, an unterminated handler that returns, met at a newline in
+  a string literal, is called again forever (the harness's throws on its second call).
 - helper-validator-identifier: code points are float64 (any number, as in JavaScript); strings are read as UTF-16 code
   units.
-- A cyclic AST (a node that contains itself) overflows the Go stack in cloneNode and the traversals, a fatal error, where V8
-  throws a RangeError ("Maximum call stack size exceeded"). JSON.stringify of a circular structure (toKeyAlias, the
-  validators' messages) throws V8's TypeError, with its description of the circle.
 
 Not ported:
 - `lib/builders/validateNode.js`: not exported, and no module uses it.
@@ -690,32 +704,57 @@ Not ported:
 Limits:
 - Values of internal types (`*jsvalue.Object`, `*jsvalue.Array`, `jsvalue.Symbol`, `jsvalue.Undefined`) appear in the
   exported API, as in the earlier ports.
+- `BABEL_TYPES_8_BREAKING` is read once, when the package is initialised, and its notice is printed then, through
+  `ConsoleWarn`'s default (standard error): a Go program cannot silence or redirect it, as a Node program can by replacing
+  console.warn before it loads the package. 7.29.0 itself calls the variable unsupported ("BABEL_TYPES_8_BREAKING is not
+  supported anymore. Use the latest Babel 8.0.0 pre-release instead!"); its environment is ported because the package
+  still has the code for it.
+- The internal / external test of the deprecation warnings is a Go analog: Node looks for `/@babel/` in the file names of
+  the stack, Go at the package path of the deprecated function's caller.
+- The table checks compare the Go tables with the original's, but `definitions_gen.go` is generated from the same
+  definitions, so they mainly check the replay and the hand-translated parts (defineType, placeholders, deprecated
+  aliases, the type expansion). The independent check of each definition is behavioural: the builder calls and validate
+  calls run every validator on valid and invalid values.
 
 New helpers: `jsvalue.Array` (an array with reference semantics: `Push`, `Unshift`, `Pop`, `Shift`, `SetAt`, `Includes`,
 `IndexOf`), symbol-keyed properties of `jsvalue.Object` (`SetSymbol`, `GetSymbol`, `SymbolKeys`, copied by `Clone` and
 `Assign`), `jsvalue.Error`, `jsvalue.RegExp`, `jsvalue.SameValueZero`, `jsvalue.SymbolKeyFor`, and a `JSONStringify` that
 throws V8's TypeError for a circular structure, with V8's description of the circle (checked against Node's messages in
 `array_test.go`); `parityspec.CallFromOutside` (a caller outside the Babel packages, for the deprecation warnings).
+`jsvalue.Object.Put` (the assignment `o[k] = v`) now assigns an own `__proto__` property, as JavaScript does; it used to
+drop every `__proto__` assignment, which is right only for an object without one. The other users of `Put` assign to
+objects they have just made, except the OpenTelemetry text-map setter on a caller's carrier, which now also behaves as in
+JavaScript.
 
 Review notes:
 - A mutation check of the harness: `node tools/mutate_babel_types.cjs` (on a clean tree; an argument selects mutations by
-  description) applies 52 deliberate changes: to the generated builders, validators, asserts, definitions and constants,
+  description) applies 54 deliberate changes: to the generated builders, validators, asserts, definitions and constants,
   the definer (alias order, inherited fields, the shared builder keys, placeholders, deprecated aliases, the type
   expansion), the validators (placeholders, assertShape, the `BABEL_TYPES_8_BREAKING` assertEach, optional-chain walk,
-  RestElement and Identifier checks), the customs, the Object.prototype tables, the Map keys, the utilities, the
-  deprecation warnings, jsvalue (unshift, Object.assign's symbols, the circular message) and the two helpers. The first
-  run caught 48 of 52: two mutations did not build (they left a variable unused; rewritten), one was equivalent (Map keys
-  of -0 and +0: Go map keys already compare floats with ==; replaced by BigInt keys by identity), and one survived for want
-  of a case: `BABEL_TYPES_8_BREAKING`'s validation of each array element against its parent is only visible where the
-  element validator does not validate the child itself, which only `File.tokens`'s does not; `file()` cases with a
-  RestElement and a VariableDeclaration among the tokens were added. All 52 are caught now.
+  a chain's length, RestElement and Identifier checks), the customs, the Object.prototype tables, the Map keys, the
+  utilities, the deprecation warnings, jsvalue (unshift, Object.assign's symbols, an own `__proto__`, the circular
+  message) and the two helpers. The first run caught 48 of 52: two mutations did not build (they left a variable unused;
+  rewritten), one was equivalent (Map keys of -0 and +0: Go map keys already compare floats with ==; replaced by BigInt
+  keys by identity), and one survived for want of a case: `BABEL_TYPES_8_BREAKING`'s validation of each array element
+  against its parent is only visible where the element validator does not validate the child itself, which only
+  `File.tokens`'s does not; `file()` cases with a RestElement and a VariableDeclaration among the tokens were added. Two
+  mutations were added after the first review (a chain validator's length, an own `__proto__`). All 54 are caught.
+- After a first review: validators carry the JavaScript function's length, which the encoding compares for every
+  validator in the tables, and cases read validators through NODE_FIELDS; cases with an own `__proto__` property found
+  that `jsvalue.Object.Put` dropped its assignment (3 mismatches in each environment until `Put` was fixed); cases for
+  traverseFast on an unknown type and `is` with a symbol type were added for coverage.
 - Re-running the generators and the oracle reproduces `definitions_gen.go`, `builders_gen.go`, `validators_gen.go`,
   `asserts_gen.go`, `constants_gen.go`, `exports_gen.go`, `data.go`, `cases.json` and `expected.json` byte for byte.
-- Coverage of the parity tests, both environments together: every block of the generated code and of the hand-written
-  translation that a JavaScript input can reach, except the internal-error closures of the TemplateElement check (the
-  template reader never calls them) and the errors of `defineType` for options no definition has. The Go-only paths (Go
-  slices, `Pusher` scopes, typed nils, `*regexp.Regexp`, the typed handler forms, the export table) are covered by
-  `api_test.go`.
+- Coverage (Go's block coverage of `pkgs/babel/types`, the two environments merged): the parity tests reach 4,117 of
+  4,216 blocks, and with `api_test.go` (the Go-only paths: Go slices, `Pusher` scopes, `*regexp.Regexp`, the typed
+  handler forms, the export table) 4,137. The 79 left: 9 that no input reaches in JavaScript either (toIdentifier's final
+  `|| "_"`, gatherSequenceExpressions' `indexOf` of a node from its own list, the internal-error handlers of the
+  TemplateElement check, the push onto a duplicates list that is always an array, a shape validator's non-TypeError); 7
+  errors of `defineType` and `chain` for options no definition has; 13 for table contents the original tables never hold
+  (a string or a symbol where a list of names is, a parent validation that is not a function), which a program can only
+  reach by changing the exported tables; 20 Go-only guards (typed nils, Map keys of other Go kinds, a nil `*big.Int`, a
+  short stack, the `String` / `JSTypeOf` methods of Object.prototype's functions); and 30 branches of the object-model
+  helpers (getProp, setProp, objectKeys, arrayFrom, hasIn, hasOwn) for receivers no call site passes.
 
 ## React (`pkgs/react`, `pkgs/react-dom`, `pkgs/react-dom/server`)
 Translated from the production CJS builds: `react.production.js`, `react-dom.production.js`,

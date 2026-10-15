@@ -29,7 +29,7 @@ go test ./...
 | [`@opentelemetry/core`](pkgs/opentelemetry/core) | 2.11.0 | 676 cases, 1,898 trace lines: W3C trace-context and baggage propagation, TraceState, time, attributes, merge, environment, error handler, promise utilities on a virtual clock |
 | [`@opentelemetry/api`](pkgs/opentelemetry/api) | 1.9.0 | 248 cases, 820 trace lines: contexts, the global registry, diag, baggage, propagation, tracers, trace state, metrics |
 | [`@opentelemetry/semantic-conventions`](pkgs/opentelemetry/semantic-conventions) | 1.40.0 | every export: 601, and 2,353 of `incubating` |
-| [`@babel/types`](pkgs/babel/types) | 7.29.0 | 15,891 traces, and 13,221 with `BABEL_TYPES_8_BREAKING`: every definition table, 257 builders with valid, invalid and missing arguments, 308 `is*` and 308 `assert*` over 297 values, the other 75 exports (pending review) |
+| [`@babel/types`](pkgs/babel/types) | 7.29.0 | 15,918 traces, and 13,248 with `BABEL_TYPES_8_BREAKING`: every definition table, 257 builders with valid, invalid and missing arguments, 308 `is*` and 308 `assert*` over 297 values, the other 75 exports (pending review) |
 | [`@babel/helper-validator-identifier`](pkgs/babel/helper-validator-identifier) | 7.28.5 | 2,228,784: every code point, names, reserved words (pending review) |
 | [`@babel/helper-string-parser`](pkgs/babel/helper-string-parser) | 7.27.1 | 3,606 cases: string and template contents, integers, code points (pending review) |
 
