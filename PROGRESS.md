@@ -448,7 +448,9 @@ Deviations (none is reachable through the TypeScript types):
   with the TypeError the no-op context manager raises.
 - Carriers (DefaultTextMapGetter / Setter): `*jsvalue.Object`, `map[string]string`, `map[string][]string` (the setter
   writes a one-element list) and `map[string]any`; inherited properties (`carrier['toString']`) are not modelled; a Go map
-  lists its keys sorted (array-index keys first, then by UTF-16 code units), having no insertion order.
+  lists its keys sorted (array-index keys first, then by UTF-16 code units), having no insertion order. Since the
+  @babel/types port fixed `jsvalue.Object.Put`, the setter assigns a `*jsvalue.Object` carrier's own `__proto__` property,
+  as JavaScript does (it used to drop it); no OpenTelemetry case sets the key `__proto__` on a carrier.
 - `CreateBaggage` takes the record as its property assignments in order (pairs); they are ordered as a JavaScript object
   orders them, and a `__proto__` assignment creates no property.
 - merge: plain objects are `*jsvalue.Object`, arrays Go slices, a Date a `time.Time` (or pointer), a RegExp a
