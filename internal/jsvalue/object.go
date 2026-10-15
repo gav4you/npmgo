@@ -196,13 +196,15 @@ func (o *Object) Clone() *Object {
 }
 
 // Assign copies the own properties of each source onto o, like
-// Object.assign(o, ...sources): string keys, then symbol keys. Non-object
-// sources contribute nothing.
+// Object.assign(o, ...sources): string keys, then symbol keys, each by
+// assignment (Put), so a source's own "__proto__" property reaches o only
+// when o has an own property of that name. Non-object sources contribute
+// nothing.
 func (o *Object) Assign(sources ...any) *Object {
 	for _, s := range sources {
 		if src, ok := s.(*Object); ok && src != nil {
 			for _, e := range src.entries {
-				o.Set(e.key, e.val)
+				o.Put(e.key, e.val)
 			}
 			for _, e := range src.syms {
 				o.SetSymbol(e.key, e.val)

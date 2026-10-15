@@ -82,6 +82,17 @@ func TestPutProto(t *testing.T) {
 	if !IsUndefined(own.Get("__proto__")) || own.Keys()[0] != "__proto__" {
 		t.Fatalf("own: %v", own.Keys())
 	}
+	// Object.assign assigns, so {...} = Object.assign({}, own) gets no __proto__ property, while a target with an own
+	// one has it overwritten; {...own} (Clone) copies it as an own property.
+	if got := NewObject().Assign(own); got.Has("__proto__") || len(got.Keys()) != 1 {
+		t.Fatalf("Assign onto an ordinary object: %v", got.Keys())
+	}
+	if got := NewObject("__proto__", 1.0).Assign(NewObject("__proto__", 2.0)); got.Get("__proto__") != 2.0 {
+		t.Fatalf("Assign onto an own __proto__: %v", got.Get("__proto__"))
+	}
+	if got := own.Clone(); !got.Has("__proto__") {
+		t.Fatal("Clone drops an own __proto__")
+	}
 }
 
 func TestJSONCircular(t *testing.T) {
