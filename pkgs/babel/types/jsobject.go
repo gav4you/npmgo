@@ -232,15 +232,6 @@ func setProp(v any, key string, val any) {
 	}
 }
 
-// setSymbolProp is v[sym] = val.
-func setSymbolProp(v any, sym jsvalue.Symbol, val any) {
-	if o, ok := v.(*jsvalue.Object); ok && o != nil {
-		o.SetSymbol(sym, val)
-		return
-	}
-	setProp(v, sym.String(), val) // the errors, for anything that is not an object
-}
-
 // objectKeys is Object.keys(v).
 func objectKeys(v any) []string {
 	switch x := v.(type) {

@@ -63,6 +63,17 @@ func SymbolFor(key string) Symbol {
 	return s.(Symbol)
 }
 
+// SymbolKeyFor is Symbol.keyFor(s): the key of a symbol made by SymbolFor; ok is false for any other symbol.
+func SymbolKeyFor(s Symbol) (key string, ok bool) {
+	if s.s == nil {
+		return "", false
+	}
+	if v, found := registry.Load(s.s.desc); found && v.(Symbol) == s {
+		return s.s.desc, true
+	}
+	return "", false
+}
+
 // Description is the symbol's description.
 func (s Symbol) Description() string {
 	if s.s == nil {
