@@ -420,6 +420,12 @@ const scheduler = [
     { after: 0, id: 'a', panic: true, then: [{ tick: 'not-reached' }] }, { tick: 't', panic: true }, { tick: 'u' }, { after: 1, id: 'b' },
     { timeout: 1, id: 'c', panic: true },
   ] },
+  { name: 'the ticks pending at an uncaught exception wait for the task due now', ops: [
+    { tick: 't', panic: true }, { tick: 'u' }, { after: 0, id: 'io0' }, // io0 is due now: u runs after it
+    { timeout: 1, id: 'a', panic: true, pre: [{ tick: 'tick-from-a' }] }, { timeout: 1, id: 'b' }, // b is due with a: the tick runs after b
+    { timeout: 3, id: 'c', panic: true, pre: [{ tick: 'tick-from-c' }] }, { timeout: 4, id: 'd' }, // nothing due with c: the tick runs at once
+    { timeout: 5, id: 'e', panic: true, pre: [{ tick: 'tick-from-e' }] }, { timeout: 5, id: 'f', panic: true }, { timeout: 5, id: 'g' }, // f throws too
+  ] },
   { name: 'a clock that starts at a real time', start: 1700000000000, ops: [{ timeout: 0, id: 'a' }, { after: 7, id: 'b' }] },
 ];
 

@@ -88,6 +88,38 @@ func TestVirtualUncaught(t *testing.T) {
 	}()
 }
 
+// After an uncaught exception the pending ticks wait for the next task due
+// at the current time to complete, as Node runs them from the no-op
+// setImmediate it queues then; with no task due they run at once.
+func TestVirtualTicksAfterUncaught(t *testing.T) {
+	v := NewVirtual(0)
+	var log []string
+	rec := func(s string) func() {
+		return func() { log = append(log, fmt.Sprintf("%d %s", v.Now(), s)) }
+	}
+	v.Uncaught = func(r any) { log = append(log, fmt.Sprintf("%d uncaught %v", v.Now(), r)) }
+	v.NextTick(func() { rec("t")(); panic("t") })
+	v.NextTick(rec("u"))   // waits for io0, due now
+	v.After(0, rec("io0")) // runs before u
+	v.SetTimeout(func() { rec("a")(); v.NextTick(rec("tick-from-a")); panic("a") }, 1)
+	v.SetTimeout(rec("b"), 1) // due with a: tick-from-a runs after b
+	v.SetTimeout(func() { rec("c")(); v.NextTick(rec("tick-from-c")); panic("c") }, 3)
+	v.SetTimeout(rec("d"), 4) // nothing due with c: tick-from-c runs at once
+	v.SetTimeout(func() { rec("e")(); v.NextTick(rec("tick-from-e")); panic("e") }, 5)
+	v.SetTimeout(func() { rec("f")(); panic("f") }, 5) // throws too: the tick waits for g
+	v.SetTimeout(rec("g"), 5)
+	v.Run()
+	want := []string{
+		"0 t", "0 uncaught t", "0 io0", "0 u",
+		"1 a", "1 uncaught a", "1 b", "1 tick-from-a",
+		"3 c", "3 uncaught c", "3 tick-from-c", "4 d",
+		"5 e", "5 uncaught e", "5 f", "5 uncaught f", "5 g", "5 tick-from-e",
+	}
+	if got := strings.Join(log, "|"); got != strings.Join(want, "|") {
+		t.Fatalf("order:\n got %s\nwant %s", got, strings.Join(want, "|"))
+	}
+}
+
 func TestVirtualMaxTasks(t *testing.T) {
 	v := NewVirtual(0)
 	v.MaxTasks = 10

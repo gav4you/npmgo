@@ -23,6 +23,11 @@ import (
 //     without the timer clamp.
 //   - Run runs timers and host work in order of due time, then in the order
 //     they were scheduled, until neither tasks nor ticks remain.
+//   - After an uncaught exception (see Uncaught) the pending ticks are not
+//     run at once: Node skips the tick queue when a callback throws and
+//     queues a no-op setImmediate so that the next callback to complete
+//     runs them. Here they wait for the next task due at the current time
+//     to complete normally, and run at once when no task is due.
 //
 // A Virtual is not safe for concurrent use.
 type Virtual struct {
@@ -39,6 +44,9 @@ type Virtual struct {
 	ticks []func()
 	tasks taskQueue
 	ran   int
+	// held is set after an uncaught exception: the ticks wait for the next
+	// task due now, if any, to complete.
+	held bool
 }
 
 // NewVirtual returns an empty loop whose clock reads now.
@@ -94,7 +102,16 @@ func (v *Virtual) Pending() int { return len(v.tasks) }
 // Run runs ticks and tasks until none remain.
 func (v *Virtual) Run() {
 	for {
-		v.drainTicks()
+		// Ticks run before the first task and after every task, except that
+		// after an uncaught exception they wait for a task due now to
+		// complete (Node's no-op setImmediate runs them otherwise).
+		if !v.held || len(v.tasks) == 0 || v.tasks[0].due > v.now {
+			v.held = false
+			v.drainTicks()
+			if v.held { // a tick threw: look again
+				continue
+			}
+		}
 		if len(v.tasks) == 0 {
 			return
 		}
@@ -106,20 +123,27 @@ func (v *Virtual) Run() {
 		if t.due > v.now {
 			v.now = t.due
 		}
-		v.call(t.fn)
+		v.held = !v.call(t.fn)
 	}
 }
 
+// drainTicks runs the queued ticks, and the ticks they queue, in order,
+// stopping (with held set) at one that throws.
 func (v *Virtual) drainTicks() {
 	for len(v.ticks) > 0 {
 		fn := v.ticks[0]
 		v.ticks[0] = nil
 		v.ticks = v.ticks[1:]
-		v.call(fn)
+		if !v.call(fn) {
+			v.held = true
+			return
+		}
 	}
 }
 
-func (v *Virtual) call(fn func()) {
+// call runs fn and reports whether it completed; a panic goes to Uncaught
+// when that is set, otherwise it propagates.
+func (v *Virtual) call(fn func()) (completed bool) {
 	if v.Uncaught != nil {
 		defer func() {
 			if r := recover(); r != nil {
@@ -128,6 +152,7 @@ func (v *Virtual) call(fn func()) {
 		}()
 	}
 	fn()
+	return true
 }
 
 // vtask is a scheduled timer or piece of host work; index is its position in

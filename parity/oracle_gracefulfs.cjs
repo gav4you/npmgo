@@ -9,8 +9,10 @@
 // Each case loads graceful-fs afresh (a clean require.cache) over a scripted fake fs module, injected with a
 // Module._load hook because graceful-fs captures fs's functions when it loads. Date.now, setTimeout, clearTimeout
 // and process.nextTick are replaced by one virtual scheduler (class Virtual, the twin of internal/jsloop's
-// Virtual): ticks run before tasks and after every task, tasks run by due time then scheduling order, and
-// setTimeout clamps delays outside 1..2^31-1 to 1 ms as Node does. The fake fs completes each asynchronous call
+// Virtual): ticks run before tasks and after every task (after an uncaught exception they wait for the next task
+// due at the current time to complete, as Node runs them from the no-op setImmediate it queues then), tasks run by
+// due time then scheduling order, and setTimeout clamps delays outside 1..2^31-1 to 1 ms as Node does. The fake fs
+// completes each asynchronous call
 // as a task `ms` milliseconds later (default 0, never synchronously) with the next scripted outcome for that
 // function. The trace lists every call graceful-fs makes to the fake fs (its arguments, trailing undefineds
 // dropped, and the virtual time relative to the start), every user callback with its arguments, the return value
@@ -35,7 +37,7 @@ class VTask {
   constructor(due, seq, fn, timer) { this.due = due; this.seq = seq; this.fn = fn; this.timer = timer; this.queued = true; }
 }
 class Virtual {
-  constructor(now) { this.now = now; this.seq = 0; this.ticks = []; this.tasks = []; this.ran = 0; this.uncaught = null; this.maxTasks = 0; }
+  constructor(now) { this.now = now; this.seq = 0; this.ticks = []; this.tasks = []; this.ran = 0; this.uncaught = null; this.maxTasks = 0; this.held = false; }
   nextTick(fn) { this.ticks.push(fn); }
   setTimeout(fn, ms) {
     if (!Number.isInteger(ms)) throw new Error('virtual setTimeout: delay ' + ms + ' is not an integer');
@@ -49,25 +51,42 @@ class Virtual {
   }
   after(ms, fn) { this.schedule(ms < 0 ? 0 : ms, fn, false); }
   schedule(ms, fn, timer) { const t = new VTask(this.now + ms, this.seq++, fn, timer); this.tasks.push(t); return t; }
+  // call runs fn and reports whether it completed; an exception goes to uncaught when that is set.
   call(fn) {
-    if (!this.uncaught) return fn();
-    try { fn(); } catch (e) { this.uncaught(e); }
+    if (!this.uncaught) { fn(); return true; }
+    try { fn(); return true; } catch (e) { this.uncaught(e); return false; }
+  }
+  // drainTicks runs the queued ticks, and the ticks they queue, in order, stopping (with held set) at one that throws.
+  drainTicks() {
+    while (this.ticks.length) {
+      if (!this.call(this.ticks.shift())) { this.held = true; return; }
+    }
+  }
+  // next is the index of the task due first: by due time, then scheduling order.
+  next() {
+    let b = 0;
+    for (let i = 1; i < this.tasks.length; i++) {
+      const t = this.tasks[i], u = this.tasks[b];
+      if (t.due < u.due || (t.due === u.due && t.seq < u.seq)) b = i;
+    }
+    return b;
   }
   run() {
     for (;;) {
-      while (this.ticks.length) this.call(this.ticks.shift());
+      // Ticks run before the first task and after every task, except that after an uncaught exception they wait for
+      // a task due now to complete (Node's no-op setImmediate runs them otherwise).
+      if (!this.held || !this.tasks.length || this.tasks[this.next()].due > this.now) {
+        this.held = false;
+        this.drainTicks();
+        if (this.held) continue; // a tick threw: look again
+      }
       if (!this.tasks.length) return;
       if (this.maxTasks > 0 && this.ran >= this.maxTasks) throw new Error('virtual loop ran more than ' + this.maxTasks + ' tasks');
       this.ran++;
-      let b = 0;
-      for (let i = 1; i < this.tasks.length; i++) {
-        const t = this.tasks[i], u = this.tasks[b];
-        if (t.due < u.due || (t.due === u.due && t.seq < u.seq)) b = i;
-      }
-      const t = this.tasks.splice(b, 1)[0];
+      const t = this.tasks.splice(this.next(), 1)[0];
       t.queued = false;
       if (t.due > this.now) this.now = t.due;
-      this.call(t.fn);
+      this.held = !this.call(t.fn);
     }
   }
 }
@@ -347,8 +366,8 @@ function runCase(c) {
 }
 
 // --- The scheduler on its own: programs of timers ({timeout: ms, id}), host work ({after: ms, id}) and ticks
-// ({tick: id}), each logging "<time> <id>" when it runs, then throwing its id if it has panic: true, or else
-// running its "then" ops; {clear: id} clears a timer.
+// ({tick: id}), each logging "<time> <id>" when it runs, then running its "pre" ops, then throwing its id if it
+// has panic: true, or else running its "then" ops; {clear: id} clears a timer.
 function runProgram(p) {
   const V = new Virtual(p.start || 0);
   const log = [];
@@ -357,6 +376,7 @@ function runProgram(p) {
   const fire = op => {
     const id = 'tick' in op ? op.tick : op.id;
     log.push(V.now + ' ' + id);
+    (op.pre || []).forEach(exec);
     if (op.panic) throw id;
     (op.then || []).forEach(exec);
   };

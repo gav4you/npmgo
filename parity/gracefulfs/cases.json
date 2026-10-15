@@ -218,6 +218,69 @@
    ]
   },
   {
+   "name": "the ticks pending at an uncaught exception wait for the task due now",
+   "ops": [
+    {
+     "tick": "t",
+     "panic": true
+    },
+    {
+     "tick": "u"
+    },
+    {
+     "after": 0,
+     "id": "io0"
+    },
+    {
+     "timeout": 1,
+     "id": "a",
+     "panic": true,
+     "pre": [
+      {
+       "tick": "tick-from-a"
+      }
+     ]
+    },
+    {
+     "timeout": 1,
+     "id": "b"
+    },
+    {
+     "timeout": 3,
+     "id": "c",
+     "panic": true,
+     "pre": [
+      {
+       "tick": "tick-from-c"
+      }
+     ]
+    },
+    {
+     "timeout": 4,
+     "id": "d"
+    },
+    {
+     "timeout": 5,
+     "id": "e",
+     "panic": true,
+     "pre": [
+      {
+       "tick": "tick-from-e"
+      }
+     ]
+    },
+    {
+     "timeout": 5,
+     "id": "f",
+     "panic": true
+    },
+    {
+     "timeout": 5,
+     "id": "g"
+    }
+   ]
+  },
+  {
    "name": "a clock that starts at a real time",
    "start": 1700000000000,
    "ops": [

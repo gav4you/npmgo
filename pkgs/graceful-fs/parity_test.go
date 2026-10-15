@@ -42,6 +42,7 @@ type op struct {
 	Clear   *string `json:"clear"`
 	ID      string  `json:"id"`
 	Panic   bool    `json:"panic"`
+	Pre     []op    `json:"pre"`
 	Then    []op    `json:"then"`
 }
 
@@ -947,6 +948,9 @@ func runProgram(p program) []string {
 			id = *o.Tick
 		}
 		log = append(log, fmt.Sprintf("%d %s", v.Now(), id))
+		for _, t := range o.Pre {
+			exec(t)
+		}
 		if o.Panic {
 			panic(id)
 		}

@@ -44,12 +44,32 @@
   [
    "0 t",
    "0 uncaught t",
-   "0 u",
    "0 a",
    "0 uncaught a",
+   "0 u",
    "1 b",
    "1 c",
    "1 uncaught c"
+  ],
+  [
+   "0 t",
+   "0 uncaught t",
+   "0 io0",
+   "0 u",
+   "1 a",
+   "1 uncaught a",
+   "1 b",
+   "1 tick-from-a",
+   "3 c",
+   "3 uncaught c",
+   "3 tick-from-c",
+   "4 d",
+   "5 e",
+   "5 uncaught e",
+   "5 f",
+   "5 uncaught f",
+   "5 g",
+   "5 tick-from-e"
   ],
   [
    "1700000000001 a",
