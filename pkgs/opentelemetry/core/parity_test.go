@@ -906,6 +906,25 @@ func runAsync(raw json.RawMessage) {
 	h := &recHost{v: v}
 	und := jsvalue.Undefined{}
 	at := func(format string, a ...any) string { return fmt.Sprintf("t=%d ", v.Now()) + fmt.Sprintf(format, a...) }
+	// ticker and listen are the oracle's: a chain of six microtasks, and two reactions on one promise.
+	ticker := func(label string) {
+		n := 0
+		var step func(any) any
+		step = func(any) any {
+			n++
+			rec(at("%s %d", label, n))
+			if n < 6 {
+				jspromise.Resolve(h, und).Then(step, nil)
+			}
+			return und
+		}
+		jspromise.Resolve(h, und).Then(step, nil)
+	}
+	listen := func(p *jspromise.Promise, label string) {
+		p.Then(func(x any) any { rec(at("%s ok %s", label, enc(x))); return und }, func(e any) any { rec(at("%s err %s", label, enc(e))); return und })
+		p.Then(func(x any) any { rec(at("%s second listener ok %s", label, enc(x))); return und },
+			func(e any) any { rec(at("%s second listener err %s", label, enc(e))); return und })
+	}
 	switch spec.Kind {
 	case "cwt":
 		var inner any
@@ -923,8 +942,10 @@ func runAsync(raw json.RawMessage) {
 		case json.Unmarshal(spec.Settle, &never) == nil && never == "never":
 			inner = jspromise.New(h, func(_, _ func(any)) {})
 		case json.Unmarshal(spec.Settle, &s) == nil && s.Plain != nil:
+			ticker("tick")
 			inner = build(s.Plain)
 		case s.Now != "":
+			ticker("tick")
 			if s.Now == "ok" {
 				inner = jspromise.Resolve(h, build(s.Value))
 			} else {
@@ -934,6 +955,7 @@ func runAsync(raw json.RawMessage) {
 			inner = jspromise.New(h, func(resolve, reject func(any)) {
 				v.After(*s.At, func() {
 					rec(at("settling the promise"))
+					ticker("tick")
 					switch {
 					case s.Ok != nil && s.Adopt:
 						resolve(jspromise.Resolve(h, build(s.Ok)))
@@ -946,9 +968,9 @@ func runAsync(raw json.RawMessage) {
 			})
 		}
 		p := CallWithTimeout(h, inner, spec.Timeout)
-		p.Then(func(x any) any { rec(at("result ok %s", enc(x))); return und }, func(e any) any { rec(at("result err %s", enc(e))); return und })
+		listen(p, "result")
 		if ip, ok := inner.(*jspromise.Promise); ok {
-			ip.Then(func(x any) any { rec(at("promise ok %s", enc(x))); return und }, func(e any) any { rec(at("promise err %s", enc(e))); return und })
+			listen(ip, "promise")
 		}
 	case "bof":
 		cb := func(args ...any) any {
@@ -981,10 +1003,11 @@ func runAsync(raw json.RawMessage) {
 		}
 		f := NewBindOnceFuture(h, cb)
 		rec("isCalled " + strconv.FormatBool(f.IsCalled()))
-		f.Promise().Then(func(x any) any { rec(at("promise ok %s", enc(x))); return und }, func(e any) any { rec(at("promise err %s", enc(e))); return und })
-		for _, call := range spec.Calls {
-			call := call
+		listen(f.Promise(), "promise")
+		for i, call := range spec.Calls {
+			i, call := i, call
 			v.After(call.At, func() {
+				ticker("tick" + strconv.Itoa(i))
 				args := make([]any, len(call.Args))
 				for i, a := range call.Args {
 					args[i] = build(a)
@@ -1019,6 +1042,7 @@ func runAsync(raw json.RawMessage) {
 			case "never":
 			}
 		})
+		ticker("tick")
 		p := Internal.Export(h, exporter, build(spec.Arg))
 		p.Then(func(r any) any {
 			res := r.(ExportResult)
@@ -1029,6 +1053,7 @@ func runAsync(raw json.RawMessage) {
 			rec(at("result code=%s error=%s", parityspec.EncNumber(float64(res.Code)), errText))
 			return und
 		}, func(e any) any { rec(at("rejected %s", enc(e))); return und })
+		p.Then(func(any) any { rec(at("second listener ok")); return und }, func(any) any { rec(at("second listener err")); return und })
 		rec("active suppressed=" + strconv.FormatBool(IsTracingSuppressed(api.Ctx.Active())))
 	default:
 		panic(errBadOp)

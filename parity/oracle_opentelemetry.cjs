@@ -912,22 +912,35 @@ apiOut.static = {
   for (const c of C.async) {
     coreOut.async.push(await runCaseAsync(async c => {
       await withVirtualClock(V => {
+        // ticker runs a chain of six microtasks, one after the other: where its lines fall among the others shows
+        // how many microtask turns each step of the code under test takes.
+        const ticker = label => {
+          let n = 0;
+          const step = () => { rec(`t=${V.now} ${label} ${++n}`); if (n < 6) Promise.resolve().then(step); };
+          Promise.resolve().then(step);
+        };
+        // listen registers two reactions on a promise: their order shows the order reactions run in.
+        const listen = (p, label) => {
+          p.then(v => rec(`t=${V.now} ${label} ok ${enc(v)}`), e => rec(`t=${V.now} ${label} err ${enc(e)}`));
+          p.then(v => rec(`t=${V.now} ${label} second listener ok ${enc(v)}`), e => rec(`t=${V.now} ${label} second listener err ${enc(e)}`));
+        };
         switch (c.kind) {
           case 'cwt': {
             const s = c.settle;
             let inner;
             if (s === 'never') inner = new Promise(() => {});
-            else if ('plain' in s) inner = build(s.plain);
-            else if ('now' in s) inner = s.now === 'ok' ? Promise.resolve(build(s.value)) : Promise.reject(build(s.value));
+            else if ('plain' in s) { ticker('tick'); inner = build(s.plain); }
+            else if ('now' in s) { ticker('tick'); inner = s.now === 'ok' ? Promise.resolve(build(s.value)) : Promise.reject(build(s.value)); }
             else {
               inner = new Promise((resolve, reject) => V.after(s.at, () => {
                 rec(`t=${V.now} settling the promise`);
+                ticker('tick');
                 if ('ok' in s) resolve(s.adopt ? Promise.resolve(build(s.ok)) : build(s.ok)); else reject(build(s.err));
               }));
             }
             const p = core.callWithTimeout(inner, c.timeout);
-            p.then(v => rec(`t=${V.now} result ok ${enc(v)}`), e => rec(`t=${V.now} result err ${enc(e)}`));
-            if (inner instanceof Promise) inner.then(v => rec(`t=${V.now} promise ok ${enc(v)}`), e => rec(`t=${V.now} promise err ${enc(e)}`));
+            listen(p, 'result');
+            if (inner instanceof Promise) listen(inner, 'promise');
             break;
           }
           case 'bof': {
@@ -946,13 +959,14 @@ apiOut.static = {
             };
             const f = new core.BindOnceFuture(cb(c.callback), null);
             rec('isCalled ' + f.isCalled);
-            f.promise.then(v => rec(`t=${V.now} promise ok ${enc(v)}`), e => rec(`t=${V.now} promise err ${enc(e)}`));
-            for (const call of c.calls) {
+            listen(f.promise, 'promise');
+            c.calls.forEach((call, i) => {
               V.after(call.at, () => {
+                ticker('tick' + i);
                 const p = f.call(...call.args.map(a => build(a)));
                 rec(`t=${V.now} call -> ${p === f.promise ? 'the promise' : 'another promise'}, isCalled ${f.isCalled}`);
               });
-            }
+            });
             break;
           }
           case 'export': {
@@ -969,8 +983,10 @@ apiOut.static = {
                 }
               },
             };
+            ticker('tick');
             const p = core.internal._export(exporter, build(c.arg));
             p.then(r => rec(`t=${V.now} result code=${enc(r.code)} error=${enc(r.error)}`), e => rec(`t=${V.now} rejected ${enc(e)}`));
+            p.then(() => rec(`t=${V.now} second listener ok`), () => rec(`t=${V.now} second listener err`));
             rec('active suppressed=' + core.isTracingSuppressed(api.context.active()));
             break;
           }

@@ -121,6 +121,20 @@ const traceStates = [];
     ['unset', 'big2'], ['set', 'big3', 'z'.repeat(150)], ['serialize'], ['unset', 'big'], ['unset', 'big3'], ['set', 'only', 'o'.repeat(500)], ['serialize']];
   traceStates.push({ raw: '', ops: shrink });
   traceStates.push({ raw: 'a=1,a=2,a=3', ops: ops(['serialize'], ['unset', 'a'], ['serialize'], ['set', 'b', '1'], ['serialize']) });
+  // The 512-character limit exactly (values are at most 256 characters): a=x{256} is 258, ",b=y{240}" makes 501,
+  // ",c=z{9}" would make 513, ",c=z{8}" makes 512.
+  traceStates.push({
+    raw: '', ops: ops(['set', 'a', 'x'.repeat(256)], ['set', 'b', 'y'.repeat(240)], ['set', 'c', 'z'.repeat(9)], ['set', 'c', 'z'.repeat(8)],
+      ['serialize'], ['set', 'b', 'y'.repeat(241)], ['set', 'b', 'y'.repeat(240)]),
+  });
+  // unset takes the separator off: 258 + ",b=y{200}" is 461, unsetting b gives 258 again, and ",c=z{251}" makes 512.
+  traceStates.push({
+    raw: '', ops: ops(['set', 'a', 'x'.repeat(256)], ['set', 'b', 'y'.repeat(200)], ['unset', 'b'], ['set', 'c', 'z'.repeat(252)],
+      ['set', 'c', 'z'.repeat(251)], ['serialize'], ['unset', 'a'], ['unset', 'c'], ['set', 'd', 'w'.repeat(256)], ['serialize']),
+  });
+  // A header of exactly 512 characters (253 + "," + 258), and of 513.
+  traceStates.push({ raw: 'a=' + 'x'.repeat(251) + ',b=' + 'y'.repeat(256), ops: ops(['serialize'], ['set', 'c', '1'], ['serialize']) });
+  traceStates.push({ raw: 'a=' + 'x'.repeat(252) + ',b=' + 'y'.repeat(256), ops: ops(['serialize'], ['get', 'a']) });
   traceStates.push({ raw: Array.from({ length: 33 }, (_, i) => `k${i}=v`).join(','), ops: ops(['set', 'new', 'v'], ['serialize'], ['get', 'k32']) });
 }
 
@@ -137,6 +151,9 @@ const baggageExtract = [];
     Array.from({ length: 4 }, (_, i) => `k${i}=` + 'x'.repeat(2045)).join(','),
     Array.from({ length: 4 }, (_, i) => `k${i}=` + 'x'.repeat(2044)).join(','),
     Array.from({ length: 5 }, (_, i) => `k${i}=` + 'x'.repeat(2000)).join(',') + ',z=1',
+    // Exactly 8192 units in all (2048 + 3 × (1 + 2047)), and one unit more.
+    ['k0=' + 'x'.repeat(2045), ...[1, 2, 3].map(i => `k${i}=` + 'x'.repeat(2044))].join(','),
+    ['k0=' + 'x'.repeat(2045), ...[1, 2].map(i => `k${i}=` + 'x'.repeat(2044)), 'k3=' + 'x'.repeat(2045)].join(','),
     'a=\u{1F600}'.repeat(1) + ',b=' + '\u{1F600}'.repeat(2046)]) {
     baggageExtract.push({ header: h });
   }
@@ -171,6 +188,8 @@ const baggageInject = [];
     e(['a', 'x'.repeat(4094)]), e(['a', 'x'.repeat(4095)]), e(['a', '1', 'm'.repeat(4092)]), e(['a', '1', 'm'.repeat(4093)]),
     e(['a', 'x'.repeat(4000)], ['b', 'y'.repeat(4000)], ['c', 'z'.repeat(300)], ['d', '1']),
     e(['a', '\u{1F600}'.repeat(1000)]), e(['a', '1', '\u{1F600}'.repeat(2046)]), e(['a', '1', '\u{1F600}'.repeat(2047)]),
+    // Unencoded metadata: 8009 UTF-16 units in all (the limit counts them), 16009 UTF-8 bytes.
+    e(['a', '1', '\u{1F600}'.repeat(2000)], ['b', '2', 'é'.repeat(4000)]),
     Array.from({ length: 200 }, (_, i) => [`k${i}`, `v${i}`]),
     [['big', 'x'.repeat(5000)], ...Array.from({ length: 185 }, (_, i) => [`k${i}`, 'v'])],
     [],
@@ -290,8 +309,11 @@ const timeCases = [
       ['millisToHrTime', -1500], ['millisToHrTime', -0.5], ['millisToHrTime', num('-0')], ['millisToHrTime', num('NaN')],
       ['millisToHrTime', num('Infinity')], ['millisToHrTime', 1700000000123.4567], ['millisToHrTime', 2 ** 53], ['millisToHrTime', 1e21],
       ['millisToHrTime', 0.0000004], ['millisToHrTime', 0.0000005], ['millisToHrTime', 999.9999996], ['millisToHrTime', -999.9999996],
+      // 2^-7 ms is exactly 7812.5 ns: Math.round rounds halves up, also below zero.
+      ['millisToHrTime', 0.0078125], ['millisToHrTime', -0.0078125], ['millisToHrTime', -1000.0078125], ['millisToHrTime', 1000.0234375],
     ],
   },
+  { perf: { timeOrigin: 1700000000000, now: [-0.0078125] }, calls: [['hrTime'], ['hrTime', 0.0234375], ['hrTime', -0.0234375]] },
   {
     perf: { timeOrigin: 1700000000000, now: [1000] }, calls: [
       ['timeInputToHrTime', hr(1, 2)], ['timeInputToHrTime', 1000], ['timeInputToHrTime', 849999999999.9], ['timeInputToHrTime', 850000000000],
