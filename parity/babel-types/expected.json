@@ -17236,6 +17236,8 @@
    ["enter Program {}","enter ExpressionStatement {}","enter BinaryExpression {}","enter Identifier {}","enter NumericLiteral {}","enter IfStatement {}","enter Identifier {}","enter BlockStatement {}","ret [true,{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"+\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"NumericLiteral\",\"value\":1}}},null,{\"type\":\"IfStatement\",\"test\":{\"type\":\"Identifier\",\"name\":\"t\"},\"consequent\":{\"type\":\"BlockStatement\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"Identifier\",\"name\":\"c\"}}],\"directives\":[]},\"alternate\":null}],\"directives\":[]}]"],
    ["ret [false,null]"],
    ["enter toString {}","throws TypeError: keys is not iterable args [{\"type\":\"toString\"}]"],
+   ["ret [false,{\"type\":\"Unknown\",\"body\":[{\"type\":\"Identifier\",\"name\":\"x\"}]}]"],
+   ["enter ExpressionStatement {}","ret [false,{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"Unknown\",\"argument\":{\"type\":\"Identifier\",\"name\":\"y\"}}}]"],
    ["enter Program {\"o\":1}","enter ExpressionStatement {\"o\":1}","enter BinaryExpression {\"o\":1}","enter Identifier {\"o\":1}","enter NumericLiteral {\"o\":1}","enter IfStatement {\"o\":1}","enter Identifier {\"o\":1}","enter BlockStatement {\"o\":1}","enter ExpressionStatement {\"o\":1}","enter Identifier {\"o\":1}","ret [false,{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"+\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"NumericLiteral\",\"value\":1}}},null,{\"type\":\"IfStatement\",\"test\":{\"type\":\"Identifier\",\"name\":\"t\"},\"consequent\":{\"type\":\"BlockStatement\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"Identifier\",\"name\":\"c\"}}],\"directives\":[]},\"alternate\":null}],\"directives\":[]}]"],
    ["ret [true,\"Identifier\",{\"type\":\"Identifier\",\"name\":\"x\"}]"],
    ["ret [true,\"Identifier\",{\"type\":\"Identifier\",\"name\":\"x\"},{\"name\":\"x\"}]"],
@@ -17814,6 +17816,7 @@
    ["ret [false,\"hasOwnProperty\",{\"type\":\"__proto__\"},{\"name\":\"x\"}]"],
    ["ret [false,\"hasOwnProperty\",{\"type\":\"__proto__\"},null]"],
    ["ret [false,Symbol(t),{\"type\":\"Identifier\",\"name\":\"x\"}]"],
+   ["ret [false,Symbol(t),{\"type\":\"Placeholder\",\"expectedNode\":\"Identifier\"}]"],
    ["ret [false,5,{\"type\":\"5\"}]"],
    ["ret [true,\"Identifier\",\"Identifier\"]"],
    ["ret [true,\"Identifier\",\"Expression\"]"],
@@ -28568,6 +28571,9 @@
    "="
   ],
   "calls": [
+   "=",
+   "=",
+   "=",
    "=",
    "=",
    "=",

@@ -677,6 +677,8 @@ const comment = (value, idOpt) => (idOpt ? obj(idOpt, [['type', 'CommentBlock'],
   for (const mode of ['all', 'skip:IfStatement', 'stop:Identifier', 'skip:Program', 'stop:BlockStatement']) callWith('traverseFast', { enter: mode }, tree);
   callWith('traverseFast', { enter: 'all' }, null);
   callWith('traverseFast', { enter: 'all' }, N('toString'));
+  callWith('traverseFast', { enter: 'all' }, N('Unknown', { body: [id('x')] }));
+  callWith('traverseFast', { enter: 'all' }, exprStmt(N('Unknown', { argument: id('y') })));
   callWith('traverseFast', { enter: 'all', opts: { o: 1 } }, tree);
 }
 
@@ -695,6 +697,7 @@ const comment = (value, idOpt) => (idOpt ? obj(idOpt, [['type', 'CommentBlock'],
     }
   }
   call('is', sym('t'), id('x'));
+  call('is', sym('t'), placeholder('Identifier'));
   call('is', 5, N('5'));
   for (const [a, b] of [['Identifier', 'Identifier'], ['Identifier', 'Expression'], ['Identifier', 'Statement'], [null, 'Expression'],
     [U, U], ['Placeholder', 'Expression'], ['Identifier', 'toString'], ['Identifier', '__proto__'], ['toString', 'toString'],
