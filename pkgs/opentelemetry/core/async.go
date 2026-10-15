@@ -7,8 +7,6 @@
 package core
 
 import (
-	"math"
-
 	"github.com/gav4you/npmgo/internal/jsloop"
 	"github.com/gav4you/npmgo/internal/jspromise"
 	"github.com/gav4you/npmgo/internal/jsvalue"
@@ -39,12 +37,14 @@ func NewTimeoutError(message string) *TimeoutError { return &TimeoutError{Messag
 func (e *TimeoutError) Error() string { return e.Message }
 
 // timerDelay is the delay Node's setTimeout(fn, ms) waits, in whole milliseconds: 1 outside 1..2^31-1 (NaN
-// included), otherwise ms rounded up (Node runs a timer once a whole millisecond is reached past it).
+// included), otherwise ms truncated: Node's timers list a timer under Math.trunc of its delay and fire it once that
+// many whole milliseconds have passed (checked against Node v25.9.0: a 30.9 ms timer fires with the 30 ms ones,
+// before a 31 ms one, and a 1.9 ms timer after 1 ms).
 func timerDelay(ms float64) int64 {
 	if !(ms >= 1 && ms <= 1<<31-1) {
 		return 1
 	}
-	return int64(math.Ceil(ms))
+	return int64(ms)
 }
 
 // CallWithTimeout returns a promise settled like promise, or rejected with TimeoutError("Operation timed out.")

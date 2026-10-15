@@ -85,13 +85,14 @@ func TestForeignRPCMetadata(t *testing.T) {
 	}
 }
 
-// timerDelay is Node's setTimeout delay: 1 outside 1..2^31-1, fractions rounded up (not covered by the recording,
-// whose virtual clock takes whole milliseconds only).
+// timerDelay is Node's setTimeout delay: 1 outside 1..2^31-1, fractions truncated (not covered by the recording,
+// whose virtual clock takes whole milliseconds only; the values are Node v25.9.0's).
 func TestTimerDelay(t *testing.T) {
 	for _, c := range []struct {
 		in   float64
 		want int64
-	}{{0, 1}, {-5, 1}, {math.NaN(), 1}, {1, 1}, {1.5, 2}, {10, 10}, {1<<31 - 1, 1<<31 - 1}, {1 << 31, 1}, {math.Inf(1), 1}} {
+	}{{0, 1}, {-5, 1}, {math.NaN(), 1}, {0.5, 1}, {1, 1}, {1.5, 1}, {1.9, 1}, {2.5, 2}, {10, 10}, {30.9, 30},
+		{1<<31 - 1, 1<<31 - 1}, {1<<31 - 0.5, 1}, {1 << 31, 1}, {math.Inf(1), 1}} {
 		if got := timerDelay(c.in); got != c.want {
 			t.Errorf("timerDelay(%v) = %d, want %d", c.in, got, c.want)
 		}
