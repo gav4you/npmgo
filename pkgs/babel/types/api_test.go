@@ -168,6 +168,9 @@ func TestExportTable(t *testing.T) {
 }
 
 func TestValidatorValues(t *testing.T) {
+	if breaking8 {
+		t.Skip("BABEL_TYPES_8_BREAKING is set: these are the default environment's validators")
+	}
 	v := getProp(getProp(getProp(NODE_FIELDS, "Identifier"), "name"), "validate").(*Validator)
 	if v.Name() != "validate" || v.Length() != 3 || v.Props().Get("type") != "string" || v.JSTypeOf() != "function" {
 		t.Errorf("validator %q/%d %v", v.Name(), v.Length(), v.Props().Keys())
@@ -177,9 +180,6 @@ func TestValidatorValues(t *testing.T) {
 	}
 	if msg := panicText(func() { v.Call(Identifier("a"), "name", 1.0) }); msg != "throws TypeError: Property name expected type of string but got number" {
 		t.Errorf("Call: %s", msg)
-	}
-	if breaking8 {
-		t.Skip("BABEL_TYPES_8_BREAKING is set")
 	}
 	if NODE_PARENT_VALIDATIONS.Len() != 0 {
 		t.Errorf("%d parent validations in the default environment", NODE_PARENT_VALIDATIONS.Len())

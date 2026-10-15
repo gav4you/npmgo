@@ -467,6 +467,9 @@ func generatedValidator(name string, exported bool) any {
 }
 
 func TestParity(t *testing.T) {
+	if breaking8 {
+		t.Skip("BABEL_TYPES_8_BREAKING is set: this is the default environment's recording (TestParityBreaking8 runs the other)")
+	}
 	cases := loadCases(t)
 	exp := loadExpected(t)
 	// The state the oracle starts from: the package just loaded.
