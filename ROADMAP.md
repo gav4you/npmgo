@@ -4,12 +4,12 @@
 no Node runtime, no embedded JavaScript engine, no compatibility VM. The output is ordinary Go
 modules (`go get`) and, eventually, whole applications compiled to a single binary.
 
-Status as of 2026-10-15: Phase 1 is underway (`ms`, `debug`, Node's `util.inspect`/`util.format`,
+Status as of 2026-10-16: Phase 1 is underway (`ms`, `debug`, Node's `util.inspect`/`util.format`,
 React 19's server renderer — `react` plus `react-dom/server` — `chalk` 4 with its dependency tree and
 `graceful-fs` 4 are ported and verified; `@opentelemetry/core` 2.11.0 with `@opentelemetry/api` 1.9.0 and
 `@opentelemetry/semantic-conventions` 1.40.0 are ported and verified; `@babel/types` 7.29.0 with
-`@babel/helper-validator-identifier` 7.28.5 and `@babel/helper-string-parser` 7.27.1 are ported and verified, pending
-review; see `PROGRESS.md`).
+`@babel/helper-validator-identifier` 7.28.5 and `@babel/helper-string-parser` 7.27.1 are ported and verified; see
+`PROGRESS.md`).
 
 ---
 

@@ -49,12 +49,12 @@ Run all checks: `go test ./...`  ·  Re-record a package's originals: see the he
 | @jest/types | 29.6.3 | MIT | N/A: types-only (`build/index.js` is just `'use strict'`) | - |
 | inherits | 2.0.4 | ISC | N/A: re-export of Node's `util.inherits` (prototype-chain wiring, with a browser fallback); Go types have no prototype chain | - |
 | define-properties | 1.2.1 | MIT | N/A: intrinsic shim, defines non-enumerable data properties unless a predicate says otherwise (used by es-shim polyfills); Go has no mutable built-ins | - |
-| @opentelemetry/api (`pkgs/opentelemetry/api`) | 1.9.0 | Apache-2.0 | ✅ match (reviewed; `experimental` entry point not ported) | 248 cases, 820 trace lines and checks: contexts and keys, the globalThis registry (with records of other versions), 133 semver pairs, 31 diag set-ups (every level, NaN / fractional / out-of-range levels, override messages, the self-logger error, component loggers, DiagConsoleLogger over 4 consoles), baggage, the propagation API and default getter / setter, 16 id checks, 13 tracer programs (no-op, proxy and delegate tracers, every startActiveSpan arity), 27 TraceState programs, no-op metrics, enums, exports |
+| @opentelemetry/api (`pkgs/opentelemetry/api`) | 1.9.0 | Apache-2.0 | ✅ match (reviewed; `experimental` entry point not ported) | 250 cases, 838 trace lines and checks: contexts and keys, the globalThis registry (with records of other versions), 133 semver pairs, 31 diag set-ups (every level, NaN / fractional / out-of-range levels, override messages, the self-logger error, component loggers, DiagConsoleLogger over 4 consoles), baggage, the propagation API and default getter / setter, 16 id checks, 13 tracer programs (no-op, proxy and delegate tracers, every startActiveSpan arity), 27 TraceState programs, no-op metrics, enums, exports |
 | @opentelemetry/core (`pkgs/opentelemetry/core`) | 2.11.0 | Apache-2.0 | ✅ match (reviewed) | 676 cases, 1,898 trace lines: 223 traceparent strings, trace-context extract (42) and inject (28), 28 TraceState programs, baggage extract (61) and inject (46) at every W3C limit, 43 composite runs, attributes, 44 merges (cycles, sharing, 25 levels), time utilities, environment readers, the error handlers over 21 exception kinds, the anchored clock, and 30 promise programs (callWithTimeout, BindOnceFuture, internal._export) on a virtual clock |
 | @opentelemetry/semantic-conventions (`pkgs/opentelemetry/semantic-conventions`) | 1.40.0 | Apache-2.0 | ✅ match (reviewed) | every export: 601 of the main entry point, 2,353 of `incubating` (template functions over 5 sample keys) |
-| @babel/types (`pkgs/babel/types`) | 7.29.0 | MIT | ✅ match (pending review) | 15,918 traces in the default environment and 13,248 with `BABEL_TYPES_8_BREAKING`: the 1,356 exports, every table entry (1,183 lines, with the sharing of arrays, objects and validators), 308 `is*` and 308 `assert*` over 297 values (182,952 outcomes, 4,620 messages), 676 option checks, 8,710 builder calls (257 builders under 596 names: valid, each argument invalid, missing), 3,349 calls of the other exports, 27 deprecation warnings |
-| @babel/helper-validator-identifier (`pkgs/babel/helper-validator-identifier`) | 7.28.5 | MIT | ✅ match (pending review) | 2,228,784 checks: isIdentifierStart / isIdentifierChar on every code point and 32 other numbers, isIdentifierName on 48 strings, the keyword predicates on 60 words |
-| @babel/helper-string-parser (`pkgs/babel/helper-string-parser`) | 7.27.1 | MIT | ✅ match (pending review) | 3,606 cases: readStringContents (1,751: template, double and single quotes, 1,500 of them fuzzed), readInt (1,827), readCodePoint (28), with every call to the errors object |
+| @babel/types (`pkgs/babel/types`) | 7.29.0 | MIT | ✅ match (reviewed) | 15,933 traces in the default environment and 13,263 with `BABEL_TYPES_8_BREAKING`: the 1,356 exports, every table entry (1,183 lines, with the sharing of arrays, objects and validators), 308 `is*` and 308 `assert*` over 297 values (182,952 outcomes, 4,620 messages), 676 option checks, 8,710 builder calls (257 builders under 596 names: valid, each argument invalid, missing), 3,364 calls of the other exports, 27 deprecation warnings |
+| @babel/helper-validator-identifier (`pkgs/babel/helper-validator-identifier`) | 7.28.5 | MIT | ✅ match (reviewed) | 2,228,784 checks: isIdentifierStart / isIdentifierChar on every code point and 32 other numbers, isIdentifierName on 48 strings, the keyword predicates on 60 words |
+| @babel/helper-string-parser (`pkgs/babel/helper-string-parser`) | 7.27.1 | MIT | ✅ match (reviewed) | 3,606 cases: readStringContents (1,751: template, double and single quotes, 1,500 of them fuzzed), readInt (1,827), readCodePoint (28), with every call to the errors object |
 
 Licences of the N/A rows were checked in each tarball (`LICENSE` with the MIT/ISC text and copyright, and the
 `package.json` licence field). Other versions of the chalk family in the ranking are not yet ported: chalk 5.6.2,
@@ -450,7 +450,8 @@ Deviations (none is reachable through the TypeScript types):
   writes a one-element list) and `map[string]any`; inherited properties (`carrier['toString']`) are not modelled; a Go map
   lists its keys sorted (array-index keys first, then by UTF-16 code units), having no insertion order. Since the
   @babel/types port fixed `jsvalue.Object.Put`, the setter assigns a `*jsvalue.Object` carrier's own `__proto__` property,
-  as JavaScript does (it used to drop it); no OpenTelemetry case sets the key `__proto__` on a carrier.
+  as JavaScript does (it used to drop it); two propagation cases set `__proto__` through the default setter, on a carrier
+  with an own `__proto__` property and on one without.
 - `CreateBaggage` takes the record as its property assignments in order (pairs); they are ordered as a JavaScript object
   orders them, and a `__proto__` assignment creates no property.
 - merge: plain objects are `*jsvalue.Object`, arrays Go slices, a Date a `time.Time` (or pointer), a RegExp a
@@ -597,8 +598,8 @@ shallow clone shares its children) and of comments cloned once is compared. Reco
 nothing depends on the machine (the stack lines of deprecation warnings are counted, not recorded).
 
 Checks:
-- @babel/types: 15,918 traces in the default environment and 13,248 with `BABEL_TYPES_8_BREAKING` (167 table lines, 478
-  builder calls and 202 other calls differ from the default): the 1,356 export names and kinds; every entry of every table
+- @babel/types: 15,933 traces in the default environment and 13,263 with `BABEL_TYPES_8_BREAKING` (167 table lines, 478
+  builder calls and 203 other calls differ from the default): the 1,356 export names and kinds; every entry of every table
   (1,183 lines: VISITOR_KEYS, ALIAS_KEYS, FLIPPED_ALIAS_KEYS, NODE_FIELDS with each field's `validate` / `optional` /
   `default` / `deprecated` in key order and each validator's name, length and properties, BUILDER_KEYS, DEPRECATED_KEYS,
   NODE_PARENT_VALIDATIONS, NODE_UNION_SHAPES__PRIVATE, the placeholder tables, TYPES, every constant,
@@ -606,10 +607,10 @@ Checks:
   functions on 297 sample values (every node type, deprecated types, aliases, placeholders of every kind, odd values:
   182,952 outcomes and 4,620 assert messages) and 676 option checks; 8,710 builder calls (the 257 builders under all 596
   export names with valid arguments; every argument replaced in turn by 16 to 20 invalid values, 7,660 calls, the
-  validators' messages compared exactly; every shorter argument list, 454); 3,349 calls of the other 75 exports and of
+  validators' messages compared exactly; every shorter argument list, 454); 3,364 calls of the other 75 exports and of
   builders in particular states (cloneNode and its variants, the comment helpers, every converter, valueToNode over 41
   values, the modifications, ensureBlock, inherits and removeProperties on nodes with an own `__proto__` property,
-  removeTypeDuplicates for flow and TypeScript, the retrievers over 32 node shapes, traverse and traverseFast with every
+  removeTypeDuplicates for flow and TypeScript, cyclic structures (the original's RangeError), the retrievers over 32 node shapes, traverse and traverseFast with every
   handler form, is / isType / isPlaceholderType including names of Object.prototype, the other validators,
   matchesPattern, shallowEqual on validators read from NODE_FIELDS (their name, length and properties), the React
   helpers, 621 validate calls including every validator only `BABEL_TYPES_8_BREAKING` uses); 27 deprecation warnings from
@@ -667,10 +668,12 @@ Deviations that well-typed code can meet (the TypeScript types allow these input
   result for such an escape, and the message of the `BABEL_TYPES_8_BREAKING` RegExp-flags check (which reads code units).
   The harnesses compare such results with U+FFFD in place of the lone surrogate and say how many they compared so: 2
   traces of @babel/types in each environment and 6 string-parser results.
-- A cyclic AST (a node that contains itself) overflows the Go stack in cloneNode and the traversals, a fatal error that
-  cannot be recovered, where V8 throws a RangeError ("Maximum call stack size exceeded"). (JSON.stringify of a circular
-  structure, in toKeyAlias and the validators' messages, throws V8's TypeError with its description of the circle, as in
-  JavaScript.)
+- A cyclic AST (a node that contains itself) makes cloneNode, the traversals, isNodesEquivalent, valueToNode,
+  toSequenceExpression and removeTypeDuplicates recurse without end: V8 throws "RangeError: Maximum call stack size
+  exceeded" where its stack runs out (2,000 to 4,000 levels for these functions in Node v25 with its default stack); the
+  port raises the same RangeError, as a recoverable panic, at 10,000 levels (`maxCallDepth`), so a finite tree deeper than
+  V8's limit but within 10,000 levels succeeds here and throws there. (JSON.stringify of a circular structure, in
+  toKeyAlias and the validators' messages, throws V8's TypeError with its description of the circle, as in JavaScript.)
 - helper-string-parser: positions, line numbers and radixes are ints, where the TypeScript types say number (a fraction
   is accepted by JavaScript).
 
@@ -680,7 +683,8 @@ Inputs the Go API cannot express (the port has no counterpart for them; most are
   results) only by how the port treats it (`__proto__` or `constructor` is an own property of those results, as in
   JavaScript); an object made with another prototype cannot be passed. An assignment to `__proto__` sets the object's own
   `__proto__` property if it has one, as in JavaScript, and otherwise creates nothing, where JavaScript's accessor would
-  make an object value the prototype (`inherits` from a parent with an own object-valued `__proto__`). A class instance,
+  make an object value the prototype (`inherits` from a parent with an own object-valued `__proto__`; Object.assign, which
+  copies `extra` in cloneNode, assigns the same way). A class instance,
   Date, Map or Go map is not a plain object for valueToNode, as in JavaScript.
 - Named properties of arrays and functions: `removeComments` on an array or a function sets nothing (JavaScript sets the
   three comment properties on it). A validator's `prototype`, and the `call` / `apply` / `bind` of Function.prototype, are
@@ -726,11 +730,12 @@ throws V8's TypeError for a circular structure, with V8's description of the cir
 `jsvalue.Object.Put` (the assignment `o[k] = v`) now assigns an own `__proto__` property, as JavaScript does; it used to
 drop every `__proto__` assignment, which is right only for an object without one. The other users of `Put` assign to
 objects they have just made, except the OpenTelemetry text-map setter on a caller's carrier, which now also behaves as in
-JavaScript.
+JavaScript. `Object.Assign` (Object.assign) copies by that assignment too, so a source's own `__proto__` makes no property
+on an ordinary target (fixed in the pre-push review; it used to create one).
 
 Review notes:
 - A mutation check of the harness: `node tools/mutate_babel_types.cjs` (on a clean tree; an argument selects mutations by
-  description) applies 54 deliberate changes: to the generated builders, validators, asserts, definitions and constants,
+  description) applies 56 deliberate changes: to the generated builders, validators, asserts, definitions and constants,
   the definer (alias order, inherited fields, the shared builder keys, placeholders, deprecated aliases, the type
   expansion), the validators (placeholders, assertShape, the `BABEL_TYPES_8_BREAKING` assertEach, optional-chain walk,
   a chain's length, RestElement and Identifier checks), the customs, the Object.prototype tables, the Map keys, the
@@ -740,23 +745,62 @@ Review notes:
   keys by identity), and one survived for want of a case: `BABEL_TYPES_8_BREAKING`'s validation of each array element
   against its parent is only visible where the element validator does not validate the child itself, which only
   `File.tokens`'s does not; `file()` cases with a RestElement and a VariableDeclaration among the tokens were added. Two
-  mutations were added after the first review (a chain validator's length, an own `__proto__`). All 54 are caught.
+  mutations were added after the first review (a chain validator's length, an own `__proto__`) and two in the pre-push
+  review (Object.assign creating an own `__proto__`; the depth limit off, so that a cycle overflows the Go stack). All 56
+  are caught.
 - After a first review: validators carry the JavaScript function's length, which the encoding compares for every
   validator in the tables, and cases read validators through NODE_FIELDS; cases with an own `__proto__` property found
   that `jsvalue.Object.Put` dropped its assignment (3 mismatches in each environment until `Put` was fixed); cases for
   traverseFast on an unknown type and `is` with a symbol type were added for coverage.
 - Re-running the generators and the oracle reproduces `definitions_gen.go`, `builders_gen.go`, `validators_gen.go`,
   `asserts_gen.go`, `constants_gen.go`, `exports_gen.go`, `data.go`, `cases.json` and `expected.json` byte for byte.
-- Coverage (Go's block coverage of `pkgs/babel/types`, the two environments merged): the parity tests reach 4,117 of
-  4,216 blocks, and with `api_test.go` (the Go-only paths: Go slices, `Pusher` scopes, `*regexp.Regexp`, the typed
-  handler forms, the export table) 4,137. The 79 left: 9 that no input reaches in JavaScript either (toIdentifier's final
-  `|| "_"`, gatherSequenceExpressions' `indexOf` of a node from its own list, the internal-error handlers of the
-  TemplateElement check, the push onto a duplicates list that is always an array, a shape validator's non-TypeError); 7
-  errors of `defineType` and `chain` for options no definition has; 13 for table contents the original tables never hold
-  (a string or a symbol where a list of names is, a parent validation that is not a function), which a program can only
-  reach by changing the exported tables; 20 Go-only guards (typed nils, Map keys of other Go kinds, a nil `*big.Int`, a
-  short stack, the `String` / `JSTypeOf` methods of Object.prototype's functions); and 30 branches of the object-model
-  helpers (getProp, setProp, objectKeys, arrayFrom, hasIn, hasOwn) for receivers no call site passes.
+- Coverage (Go's block coverage of `pkgs/babel/types`, the two environments merged): the parity tests reach 4,128 of
+  4,223 blocks, and with `api_test.go` (the Go-only paths: Go slices, `Pusher` scopes, `*regexp.Regexp`, the typed
+  handler forms, the export table, cyclic and 5,000-level trees) 4,148. The 75 left: 9 that no input reaches in
+  JavaScript either (toIdentifier's final `|| "_"`, gatherSequenceExpressions' `indexOf` of a node from its own list, the
+  internal-error handlers of the TemplateElement check, the push onto a duplicates list that is always an array, a shape
+  validator's non-TypeError); 7 errors of `defineType` and `chain` for options no definition has; 13 for table contents
+  the original tables never hold (a string or a symbol where a list of names is, a parent validation that is not a
+  function), which a program can only reach by changing the exported tables; 20 Go-only guards (typed nils, Map keys of
+  other Go kinds, a nil `*big.Int`, a short stack, the `String` / `JSTypeOf` methods of Object.prototype's functions); and
+  26 branches of the object-model helpers (getProp, setProp, objectKeys, arrayFrom, hasIn, hasOwn) for receivers no call
+  site passes. The pre-push review re-derived this list and added cases for the four blocks JavaScript could reach
+  (removeTypeDuplicates of undefined and of a number, getFunctionName of a validator).
+- Pre-push review (Fable 5.1, 2026-10-16), line by line against fresh extractions of the three tarballs: the generator's
+  replay of the definitions (the identity of shared options, the classification of validator closures against fresh
+  factory instances, the 34 custom sites' source text against `custom.go`, the hash of the 73 hand-translated modules)
+  and the generated builders, validators, asserts, constants and export table; defineType, defineAliasedType, the
+  validator factories with their messages and validate.js; every utility (cloneNode's deep, shallow and withoutLoc paths
+  and its comment cache, the comment helpers and inherit's Set, valueToNode over -0, NaN, ±Infinity, BigInts, RegExps and
+  `__proto__` keys, toIdentifier's `\s` set and code-unit `.`, toKeyAlias's counter, getBindingIdentifiers and its
+  null-prototype result, traverse and traverseFast, the React helpers and cleanJSXElementLiteralChild, both
+  removeTypeDuplicates, matchesPattern, toComputedKey, toStatement, toExpression, gatherSequenceExpressions, inherits,
+  removeProperties, removeComments), and the deprecation warnings' stack walk; the identifier helper (the tables are the
+  original's and cover Unicode 17.0: the Sidetic, Tolong Siki, Beria Erfe and Tai Yo scripts answer true; the generator
+  checks the classes against the module on every BMP unit and the parity test every code point) and the keyword sets;
+  the string parser's escape reading (the position `res` captures, the `out += null` of a second invalid escape, the
+  fall-through of \8 and \9, NaN positions). The generators, the case generator and the oracle, re-run, reproduced every
+  generated file, cases.json and expected.json byte for byte before the new cases were added; so did OpenTelemetry's.
+  Licences, authorship, `go vet`, `gofmt`, `go mod tidy`, the suite under `-race` and both mutation checks pass.
+- Found and fixed in that review: `jsvalue.Object.Assign` (Object.assign) created an own `__proto__` property from a
+  source's own one, where Object.assign assigns through Object.prototype's accessor (reachable through cloneNode of a
+  node whose `extra` came from JSON.parse; a parity case covers it, and the React and OpenTelemetry callers of Assign are
+  Object.assign calls too); matchesPattern with a null or undefined match said "match.split is not a function" where V8
+  says "Cannot read properties of undefined (reading 'split')"; a cyclic AST overflowed the Go stack (a fatal error) where
+  V8 throws a RangeError, now raised at 10,000 levels and verified by parity cases on cycles through eight functions
+  (traverse and traverseFast, whose handlers would record every level, by the Go API tests); and
+  `BABEL_TYPES_8_BREAKING=1 go test ./pkgs/babel/types/` failed because TestParity and TestValidatorValues compared the
+  default environment's recording (they skip now; TestParityBreaking8 covers that environment). Judged unavoidable: a
+  lone surrogate as U+FFFD (Go strings cannot hold one), the package-path analogue of the `/@babel/` file-name test (Go
+  stacks carry no node_modules paths) and the `BABEL_TYPES_8_BREAKING` notice at initialisation (a Node program replaces
+  console.warn before requiring the package; a Go program runs nothing before init).
+- The shared `Put` change of the first review was checked against JavaScript's [[Set]]: on an object with Object.prototype
+  and no own `__proto__`, the assignment reaches the accessor (an object or null value changes the prototype, a primitive
+  nothing) and creates no property; with an own `__proto__` data property (JSON.parse, Object.defineProperty, a computed
+  key in a literal) it is overwritten; a null-prototype object (Object.create(null)) would create one, which
+  `jsvalue.Object` does not model (getBindingIdentifiers' results use Set directly). OpenTelemetry's parity still matches
+  (838 lines), with two propagation cases that set `__proto__` through the default text-map setter on a carrier with and
+  one without an own `__proto__` property, and its 42 mutations are all caught.
 
 ## React (`pkgs/react`, `pkgs/react-dom`, `pkgs/react-dom/server`)
 Translated from the production CJS builds: `react.production.js`, `react-dom.production.js`,
