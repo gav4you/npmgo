@@ -302,8 +302,9 @@ const comment = (value, idOpt) => (idOpt ? obj(idOpt, [['type', 'CommentBlock'],
   call('cloneNode', id('y', { optional: 'yes', extra: 'ab', innerComments: [comment('i')] }));
   call('cloneNode', id('y', { optional: false, extra: [1, 2] }));
   // An own __proto__ property of extra (the obj spec defines one; a literal's __proto__ key would set its prototype):
-  // Object.assign assigns, so the copy has no such property.
-  call('cloneNode', id('y', { extra: obj('exProto', [['__proto__', { a: 1 }], ['raw', 'r']]) }));
+  // Object.assign assigns, so the copy has no such property. Its value is a primitive, which the accessor ignores; an
+  // object would become the copy's prototype, an object of another prototype that the Go model cannot hold.
+  call('cloneNode', id('y', { extra: obj('exProto', [['__proto__', 'p'], ['raw', 'r']]) }));
   call('cloneNode', N('File', { program: N('Program', { body: [], directives: [], sourceType: 'module' }), comments: [comment('a'), comment('b')], tokens: [{ type: 'name' }] }));
   call('cloneNode', N('File', { program: N('Program', { body: [], directives: [] }), comments: null }));
   for (const v of [null, U, 0, '', false]) call('cloneNode', v);
