@@ -86,6 +86,12 @@ NPM Project/
   design is directly derived from a Phase 1 port, that package's original notice is kept.
 - Benchmarks per package (CPU, memory, startup) vs the Node original. Measure, don't assume.
 - Published as its own Go module(s) under one import path, versioned independently of npm.
+- **Open question for Phase 2 (user decision 2026-10-15): API shape.** Phase 1 ports deliberately keep a
+  JS-shaped Go API (`any` for values the package doesn't inspect, Node-style callbacks, explicit event loop /
+  virtual clock, e.g. `pkgs/graceful-fs`) because Phase 1's goal is to copy behaviour as closely as possible.
+  Whether Recast keeps any of that shape or goes fully idiomatic (blocking calls, `context.Context`, typed
+  options, `error` values) is decided at the start of Phase 2, not before. Phase 1 ports must not be reshaped
+  for Go idiom in the meantime.
 
 ---
 
