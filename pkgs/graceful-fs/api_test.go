@@ -290,34 +290,24 @@ func TestErrCode(t *testing.T) {
 		{errors.New("plain"), ""},
 		{codeError("EMFILE"), "EMFILE"},
 		{fmt.Errorf("wrapped: %w", codeError("ENFILE")), "ENFILE"},
-		{&os.PathError{Op: "open", Path: "x", Err: syscall.ENOENT}, "ENOENT"},
-		{fmt.Errorf("w: %w", &os.LinkError{Op: "rename", Old: "a", New: "b", Err: syscall.ENOENT}), "ENOENT"},
 	}
-	if runtime.GOOS != "windows" {
-		for _, e := range []syscall.Errno{syscall.EMFILE, syscall.ENFILE, syscall.EAGAIN, syscall.ENOSYS, syscall.EINVAL,
-			syscall.EPERM, syscall.EACCES, syscall.EBUSY, syscall.ENOENT} {
-			cases = append(cases, struct {
-				err  error
-				want string
-			}{&os.PathError{Op: "x", Path: "y", Err: e}, errnoName(e)})
-		}
+	// syscall.ENOENT is an errno on Unix and ERROR_FILE_NOT_FOUND on Windows
+	// (Plan 9 reports errors as strings, which have no code). The other errnos
+	// are checked in errcode_posix_test.go and errcode_windows_test.go.
+	if runtime.GOOS != "plan9" {
 		cases = append(cases, struct {
 			err  error
 			want string
-		}{syscall.EEXIST, ""})
+		}{&os.PathError{Op: "open", Path: "x", Err: syscall.ENOENT}, "ENOENT"}, struct {
+			err  error
+			want string
+		}{fmt.Errorf("w: %w", &os.LinkError{Op: "rename", Old: "a", New: "b", Err: syscall.ENOENT}), "ENOENT"})
 	}
 	for _, c := range cases {
 		if got := errCode(c.err); got != c.want {
 			t.Errorf("errCode(%v) = %q, want %q", c.err, got, c.want)
 		}
 	}
-}
-
-// errnoName is the symbol of the errnos sysErrCode names on Unix.
-func errnoName(e syscall.Errno) string {
-	return map[syscall.Errno]string{syscall.EMFILE: "EMFILE", syscall.ENFILE: "ENFILE", syscall.EAGAIN: "EAGAIN",
-		syscall.ENOSYS: "ENOSYS", syscall.EINVAL: "EINVAL", syscall.EPERM: "EPERM", syscall.EACCES: "EACCES",
-		syscall.EBUSY: "EBUSY", syscall.ENOENT: "ENOENT"}[e]
 }
 
 // A Go string read from a file system may hold bytes that are not UTF-8; its
