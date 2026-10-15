@@ -84,9 +84,7 @@ const M = [
   ['jsvalue: unshift appends', 'internal/jsvalue/array.go', 'a.items = append(items, a.items...)', 'a.items = append(a.items, items...)', types],
   ['jsvalue: Object.assign copies no symbols', 'internal/jsvalue/object.go', '\t\t\tfor _, e := range src.syms {\n\t\t\t\to.SetSymbol(e.key, e.val)\n\t\t\t}\n', '', types],
   ['jsvalue: an own __proto__ property is not assigned', 'internal/jsvalue/object.go', 'if k == "__proto__" && !o.Has(k) {', 'if k == "__proto__" {', types],
-  ['jsvalue: Object.assign creates an own __proto__', 'internal/jsvalue/object.go', '				o.Put(e.key, e.val)
-', '				o.Set(e.key, e.val)
-', types],
+  ['jsvalue: Object.assign creates an own __proto__', 'internal/jsvalue/object.go', '\t\t\t\to.Put(e.key, e.val)\n', '\t\t\t\to.Set(e.key, e.val)\n', types],
   ['jsvalue: circular message shows three prefix lines', 'internal/jsvalue/jsvalue.go', 'const prefixCount, postfixCount = 2, 1', 'const prefixCount, postfixCount = 3, 1', jsv],
   // helper-string-parser.
   ['string parser: \\400 not trimmed to \\40', S + '/stringparser.go', 'if octal > 255 {', 'if octal > 256 {', strp],
