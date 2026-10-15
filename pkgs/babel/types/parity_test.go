@@ -465,7 +465,9 @@ func generatedValidator(name string, exported bool) any {
 func TestParity(t *testing.T) {
 	cases := loadCases(t)
 	exp := loadExpected(t)
+	// The state the oracle starts from: the package just loaded.
 	resetDeprecationWarnings()
+	SetToKeyAliasUid(0)
 	m := &mismatches{t: t}
 	none := func() string { return "" }
 

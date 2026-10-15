@@ -924,6 +924,11 @@ const comment = (value, idOpt) => (idOpt ? obj(idOpt, [['type', 'CommentBlock'],
   call('forOfStatement', N('VariableDeclaration', { kind: 'const', declarations: [decl1, decl1] }), id('xs'), block([]));
   call('memberExpression', id('o'), id('class'));
   call('variableDeclaration', 'let', [N('VariableDeclarator', { id: N('ArrayPattern', { elements: [] }), init: null })]);
+  // File.tokens' element validator checks nothing, so only BABEL_TYPES_8_BREAKING's assertEach validates each token
+  // against its parent (the others' node-type validators already do).
+  call('file', N('Program', { body: [], directives: [] }), null, [N('RestElement', { argument: id('r') }), 1]);
+  call('file', N('Program', { body: [], directives: [] }), null, [1, N('RestElement', { argument: id('r') })]);
+  call('file', N('Program', { body: [], directives: [] }), null, [N('VariableDeclaration', { kind: 'let', declarations: [N('VariableDeclarator', { id: N('ArrayPattern', { elements: [] }), init: null })] })]);
   call('optionalMemberExpression', id('a'), id('b'), false, false);
   call('optionalMemberExpression', ome(true, id('a')), id('b'), false, false);
   call('optionalCallExpression', id('f'), [], false);

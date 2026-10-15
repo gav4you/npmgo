@@ -22,7 +22,9 @@ const types = ['./' + T + '/', 'TestParity'];
 const strp = ['./' + S + '/', 'TestParity'];
 const ident = ['./' + I + '/', 'TestParity'];
 const jsv = ['./internal/jsvalue/', 'TestJSONCircular'];
-// [description, file, text to replace (its first occurrence), replacement, [package, test pattern]]
+// [description, file, text to replace (its first occurrence), replacement, [package, test pattern]]. An argument, if
+// given, runs only the mutations whose description contains it.
+const only = process.argv[2];
 const M = [
   // Generated code.
   ['builders: arrayExpression\'s default [] is null', T + '/builders_gen.go', 'elements_ = jsvalue.NewArray()', 'elements_ = nil', types],
@@ -57,12 +59,12 @@ const M = [
   ['customs: BinaryExpression.left never takes a PrivateName', T + '/custom.go', 'if strictEquals(getProp(node, "operator"), "in") {', 'if false {', types],
   // The JavaScript object model.
   ['jsobject: tables inherit nothing from Object.prototype', T + '/jsobject.go', '\tif v, ok := table.Lookup(k); ok {\n\t\treturn v\n\t}\n\tif v, ok := inheritedProp(k); ok {\n\t\treturn v\n\t}', '\tif v, ok := table.Lookup(k); ok {\n\t\treturn v\n\t}', types],
-  ['jsmap: -0 is not +0', T + '/jsmap.go', '\t\tif f == 0 {\n\t\t\treturn 0.0\n\t\t}\n', '', types],
+  ['jsmap: BigInts by identity, not value', T + '/jsmap.go', 'return "bigint:" + x.String()', 'return x', types],
   ['jsmap: NaN is not NaN', T + '/jsmap.go', 'return nanKey{}', 'return f', types],
   // Utilities.
   ['is: a placeholder matches even with options', T + '/is.go', 'if !truthy(optArg(opts)) && strictEquals(getProp(node, "type"), "Placeholder")', 'if strictEquals(getProp(node, "type"), "Placeholder")', types],
   ['isType: no ALIAS_KEYS check', T + '/is.go', 'if truthy(tableGet(ALIAS_KEYS, targetType)) {', 'if false {', types],
-  ['isReferenced: an ObjectProperty value in a pattern is referenced', T + '/is.go', 'return !strictEquals(gpType, "ObjectPattern")', 'return true', types],
+  ['isReferenced: an ObjectProperty value in a pattern is referenced', T + '/is.go', 'return !strictEquals(gpType, "ObjectPattern")', 'return !strictEquals(gpType, "ObjectPattern") || true', types],
   ['matchesPattern: allowPartial ignored', T + '/is.go', 'if !allowPartial && len(nodes) > len(parts) {', 'if len(nodes) > len(parts) {', types],
   ['cloneNode: optional copied whatever its type', T + '/clone.go', 'if b, ok := getProp(node, "optional").(bool); ok {\n\t\t\t\tnewNode.Set("optional", b)', 'if b := getProp(node, "optional"); true {\n\t\t\t\tnewNode.Set("optional", b)', types],
   ['cloneNode: comments are not cached', T + '/clone.go', 'if cached, _ := commentsCache.get(comment); truthy(cached) {', 'if cached, _ := commentsCache.get(comment); false && truthy(cached) {', types],
@@ -84,7 +86,7 @@ const M = [
   ['string parser: \\400 not trimmed to \\40', S + '/stringparser.go', 'if octal > 255 {', 'if octal > 256 {', strp],
   ['string parser: CR LF not folded in templates', S + '/stringparser.go', '\t\t\t\tif ch == 13 && in.at(pos) == 10 {\n\t\t\t\t\tpos++\n\t\t\t\t}\n\t\t\t\tcurLine++', '\t\t\t\tcurLine++', strp],
   ['string parser: a second invalid escape adds nothing', S + '/stringparser.go', 'out = append(out, nullText...) // out += null', '_ = nullText', strp],
-  ['string parser: a separator after another is allowed', S + '/stringparser.go', ' || forbiddenSiblings[prev] || ', ' || ', strp],
+  ['string parser: a separator after another is allowed', S + '/stringparser.go', ' || forbiddenSiblings[prev] || ', ' || forbiddenSiblings[prev] && false || ', strp],
   // helper-validator-identifier.
   ['identifier: one range of the start class shorter', I + '/data.go', '\\u00c0-\\u00d6', '\\u00c0-\\u00d5', ident],
   ['identifier: astral runs end one early', I + '/identifier.go', 'if pos > code {', 'if pos >= code {', ident],
@@ -94,7 +96,7 @@ const M = [
 
 let failures = 0;
 let caught = 0;
-for (const [name, file, from, to, [pkg, pattern]] of M) {
+for (const [name, file, from, to, [pkg, pattern]] of M.filter(m => !only || m[0].includes(only))) {
   const full = path.join(root, file);
   const src = fs.readFileSync(full, 'utf8').replace(/\r\n/g, '\n');
   const at = src.indexOf(from);
@@ -119,5 +121,5 @@ for (const [name, file, from, to, [pkg, pattern]] of M) {
 }
 const after = spawnSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' });
 console.log('working tree after: ' + (after.stdout.trim() || 'clean'));
-console.log(`${caught} of ${M.length} mutations caught`);
+console.log(`${caught} of ${caught + failures} mutations caught`);
 process.exitCode = failures ? 1 : 0;
