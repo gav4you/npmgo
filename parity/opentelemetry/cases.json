@@ -11572,6 +11572,8 @@
      "DOTTED": "İ",
      "SIGMA": "TRUEΣ",
      "Q": "o'k",
+     "GARAY": "TRUE𐵐",
+     "BERIA": "tRuE𖺠",
      "NBSP": " true "
     },
     "calls": [
@@ -11622,6 +11624,14 @@
      [
       "getBooleanFromEnv",
       "NBSP"
+     ],
+     [
+      "getBooleanFromEnv",
+      "GARAY"
+     ],
+     [
+      "getBooleanFromEnv",
+      "BERIA"
      ],
      [
       "getBooleanFromEnv",

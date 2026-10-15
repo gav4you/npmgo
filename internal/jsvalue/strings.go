@@ -154,12 +154,16 @@ func isASCII(s string) bool {
 
 // ToUpperCase is String.prototype.toUpperCase: the full, locale-independent
 // Unicode case mapping (ß becomes SS). Non-ASCII text goes through
-// golang.org/x/text's tables (Unicode 15.0); Node's ICU may be newer, which
-// matters only for characters added since.
+// golang.org/x/text's tables (Unicode 15.0) after the mappings of
+// casemap_supplement.go, which Node's ICU (Unicode 17.0) has and x/text
+// lacks: the letters of the case pairs added since. x/text does not know
+// those letters as cased, which only the final-sigma rule reads (see
+// ToLowerCase).
 func ToUpperCase(s string) string {
 	if isASCII(s) {
 		return strings.ToUpper(s)
 	}
+	s = supplement(s, upperSupplement)
 	c := upperPool.Get().(*cases.Caser)
 	defer upperPool.Put(c)
 	return c.String(s)
@@ -167,12 +171,43 @@ func ToUpperCase(s string) string {
 
 // ToLowerCase is String.prototype.toLowerCase: the full, locale-independent
 // Unicode case mapping (İ becomes i̇, a final Σ becomes ς), from
-// golang.org/x/text for non-ASCII text (Unicode 15.0).
+// golang.org/x/text for non-ASCII text (Unicode 15.0), after the mappings of
+// casemap_supplement.go. A Σ whose only neighbouring cased letter is one of
+// the supplemented letters becomes σ here (x/text does not count them as
+// cased), where ICU's final-sigma rule gives ς.
 func ToLowerCase(s string) string {
 	if isASCII(s) {
 		return strings.ToLower(s)
 	}
+	s = supplement(s, lowerSupplement)
 	c := lowerPool.Get().(*cases.Caser)
 	defer lowerPool.Put(c)
 	return c.String(s)
+}
+
+// supplement applies the simple mappings of table to s. Nothing else changes:
+// the bytes of the other characters, invalid UTF-8 included, are copied, and
+// s itself is returned when no character of it is in the table.
+func supplement(s string, table map[rune]rune) string {
+	for i := 0; i < len(s); {
+		r, size := utf8.DecodeRuneInString(s[i:])
+		if _, ok := table[r]; !ok {
+			i += size
+			continue
+		}
+		var b strings.Builder
+		b.Grow(len(s))
+		b.WriteString(s[:i])
+		for i < len(s) {
+			r, size := utf8.DecodeRuneInString(s[i:])
+			if m, ok := table[r]; ok {
+				b.WriteRune(m)
+			} else {
+				b.WriteString(s[i : i+size])
+			}
+			i += size
+		}
+		return b.String()
+	}
+	return s
 }

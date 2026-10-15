@@ -365,8 +365,9 @@ const envCases = [
     calls: ['S', 'SP', 'EMPTY', 'BLANK', 'UNI', 'NBSP', 'MISSING'].map(k => ['getStringFromEnv', k]),
   },
   {
-    env: { T: 'true', F: 'false', TU: 'TRUE', TS: '  True  ', ONE: '1', YES: 'yes', EMPTY: '', BLANK: '  ', DOTTED: 'İ', SIGMA: 'TRUEΣ', Q: "o'k", NBSP: ' true ' },
-    calls: ['T', 'F', 'TU', 'TS', 'ONE', 'YES', 'EMPTY', 'BLANK', 'DOTTED', 'SIGMA', 'Q', 'NBSP', 'MISSING'].map(k => ['getBooleanFromEnv', k]),
+    env: { T: 'true', F: 'false', TU: 'TRUE', TS: '  True  ', ONE: '1', YES: 'yes', EMPTY: '', BLANK: '  ', DOTTED: 'İ', SIGMA: 'TRUEΣ', Q: "o'k", GARAY: 'TRUE\u{10D50}', BERIA: 'tRuE\u{16EA0}', NBSP: ' true ' },
+    // GARAY and BERIA end in capital letters of scripts added in Unicode 16 and 17 (lower-cased in the warning).
+    calls: ['T', 'F', 'TU', 'TS', 'ONE', 'YES', 'EMPTY', 'BLANK', 'DOTTED', 'SIGMA', 'Q', 'NBSP', 'GARAY', 'BERIA', 'MISSING'].map(k => ['getBooleanFromEnv', k]),
   },
   {
     env: { L: 'a,b,c', SP: ' a , b ,, c ', EMPTY: '', COMMAS: ',,,', BLANKS: ' , , ', ONE: 'one', NBSP: ' a ,b' },

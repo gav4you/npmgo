@@ -15566,6 +15566,10 @@
     "diag.warn(\"Unknown value \\\"o'k\\\" for Q, expected 'true' or 'false', falling back to 'false' (default)\")",
     "getBooleanFromEnv Q -> false",
     "getBooleanFromEnv NBSP -> true",
+    "diag.warn(\"Unknown value 'true𐵰' for GARAY, expected 'true' or 'false', falling back to 'false' (default)\")",
+    "getBooleanFromEnv GARAY -> false",
+    "diag.warn(\"Unknown value 'true𖺻' for BERIA, expected 'true' or 'false', falling back to 'false' (default)\")",
+    "getBooleanFromEnv BERIA -> false",
     "getBooleanFromEnv MISSING -> false"
    ],
    [

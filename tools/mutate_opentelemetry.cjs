@@ -60,6 +60,7 @@ const M = [
   ['jspromise: reactions in reverse order', 'internal/jspromise/promise.go', 'for _, r := range reactions {', 'for i := range reactions {\n\t\tr := reactions[len(reactions)-1-i]', core],
   ['jsloop: microtasks never drained', 'internal/jsloop/virtual.go', '\t\tv.drainMicrotasks()\n', '\t\t_ = v.micro\n', core],
   ['jsvalue: decodeURIComponent accepts malformed UTF-8', 'internal/jsvalue/strings.go', 'if _, size := utf8.DecodeRune(seq); size != n {', 'if _, size := utf8.DecodeRune(seq); false && size != n {', core],
+  ['jsvalue: the case-mapping supplement off', 'internal/jsvalue/strings.go', 's = supplement(s, lowerSupplement)', '_ = lowerSupplement', core],
 ];
 
 let failures = 0;
