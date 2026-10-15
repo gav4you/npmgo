@@ -86,6 +86,18 @@ type RangeError struct{ Message string }
 
 func (e *RangeError) Error() string { return e.Message }
 
+// Error is a plain JavaScript Error (new Error(message)).
+type Error struct{ Message string }
+
+func (e *Error) Error() string { return e.Message }
+
+// RegExp is a JavaScript RegExp value as its properties describe it: Source is its source (escaped the way
+// JavaScript escapes it, "(?:)" for an empty pattern) and Flags its flags. It is not a matcher.
+type RegExp struct{ Source, Flags string }
+
+// String is RegExp.prototype.toString: "/source/flags".
+func (r *RegExp) String() string { return "/" + r.Source + "/" + r.Flags }
+
 // IsNull reports whether v is JavaScript null (nil, or a nil pointer, func,
 // map, channel or interface).
 func IsNull(v any) bool {
@@ -93,6 +105,8 @@ func IsNull(v any) bool {
 	case nil:
 		return true
 	case *Object:
+		return x == nil
+	case *Array:
 		return x == nil
 	case Undefined, bool, string, float64, int, Symbol:
 		return false
@@ -196,11 +210,13 @@ func Float(v any) float64 {
 // IsFunction reports typeof v === "function".
 func IsFunction(v any) bool { return TypeOf(v) == "function" }
 
-// IsArray reports Array.isArray(v): every Go slice except []byte.
+// IsArray reports Array.isArray(v): a non-nil *Array, and every Go slice except []byte.
 func IsArray(v any) bool {
-	switch v.(type) {
+	switch x := v.(type) {
 	case []any:
 		return true
+	case *Array:
+		return x != nil
 	case []byte, nil, string:
 		return false
 	}
@@ -212,6 +228,9 @@ func IsArray(v any) bool {
 func Items(v any) []any {
 	if a, ok := v.([]any); ok {
 		return a
+	}
+	if a, ok := v.(*Array); ok {
+		return a.Items()
 	}
 	rv := reflect.ValueOf(v)
 	if rv.Kind() != reflect.Slice {
@@ -389,6 +408,16 @@ func StrictEquals(a, b any) bool {
 	return ObjectIs(a, b)
 }
 
+// SameValueZero is the comparison of Array.prototype.includes, Set and Map: Object.is, except that +0 and -0 are
+// equal.
+func SameValueZero(a, b any) bool {
+	if IsNumber(a) && IsNumber(b) {
+		x, y := Float(a), Float(b)
+		return x == y || (math.IsNaN(x) && math.IsNaN(y))
+	}
+	return ObjectIs(a, b)
+}
+
 // ObjectIs is JavaScript's Object.is. Objects compare by identity: pointers
 // directly, slices / maps / funcs by their underlying pointer (an
 // approximation: Go closures from the same literal share a code pointer).
@@ -487,16 +516,100 @@ func JSONQuote(s string) string {
 var errUnserializable = errors.New("unserializable")
 
 // JSONStringify is JSON.stringify(v) for the modelled values. ok is false
-// where JSON.stringify returns undefined.
+// where JSON.stringify returns undefined. Like JSON.stringify it panics with a
+// *TypeError for a BigInt and for a circular structure (with V8's message,
+// which describes the circle).
 func JSONStringify(v any) (string, bool) {
-	var b strings.Builder
-	if err := jsonWrite(&b, v); err != nil {
+	var s jsonStringifier
+	if err := s.write(&s.b, "", v); err != nil {
 		return "", false
 	}
-	return b.String(), true
+	return s.b.String(), true
 }
 
-func jsonWrite(b *strings.Builder, v any) error {
+// jsonFrame is an object being serialised: the key it was reached by (a string, or an int index of an array) and its
+// identity.
+type jsonFrame struct {
+	key   any
+	id    any
+	array bool
+}
+
+type jsonStringifier struct {
+	b     strings.Builder
+	stack []jsonFrame
+}
+
+// identity returns a comparable identity for an object or array value (nil for values that have none).
+func jsonIdentity(v any) any {
+	switch x := v.(type) {
+	case *Object:
+		return x
+	case *Array:
+		return x
+	}
+	rv := reflect.ValueOf(v)
+	if rv.Kind() == reflect.Slice {
+		return [2]uintptr{rv.Pointer(), uintptr(rv.Len())}
+	}
+	return nil
+}
+
+// enter pushes an object, or panics with V8's circular-structure TypeError when it is already being serialised.
+func (s *jsonStringifier) enter(key, v any, array bool) {
+	id := jsonIdentity(v)
+	if id != nil {
+		for i, f := range s.stack {
+			if f.id == id {
+				panic(&TypeError{s.circularMessage(key, i)})
+			}
+		}
+	}
+	s.stack = append(s.stack, jsonFrame{key, id, array})
+}
+
+func (s *jsonStringifier) leave() { s.stack = s.stack[:len(s.stack)-1] }
+
+// circularMessage is V8's JsonStringifier::ConstructCircularStructureErrorMessage: the object the circle starts at,
+// at most two lines after it, an ellipsis, the last line, and the key that closes the circle.
+func (s *jsonStringifier) circularMessage(lastKey any, start int) string {
+	const prefixCount, postfixCount = 2, 1
+	ctor := func(f jsonFrame) string {
+		if f.array {
+			return "object with constructor 'Array'"
+		}
+		return "object with constructor 'Object'"
+	}
+	keyText := func(k any) string {
+		if i, ok := k.(int); ok {
+			return "index " + strconv.Itoa(i)
+		}
+		if k.(string) == "" {
+			return "<anonymous>"
+		}
+		return "property '" + k.(string) + "'"
+	}
+	var b strings.Builder
+	b.WriteString("Converting circular structure to JSON")
+	index := start
+	b.WriteString("\n    --> starting at " + ctor(s.stack[index]))
+	index++
+	prefixEnd := min(len(s.stack), index+prefixCount)
+	for ; index < prefixEnd; index++ {
+		b.WriteString("\n    |     " + keyText(s.stack[index].key) + " -> " + ctor(s.stack[index]))
+	}
+	if len(s.stack) > index+postfixCount {
+		b.WriteString("\n    |     ...")
+	}
+	index = max(index, len(s.stack)-postfixCount)
+	for ; index < len(s.stack); index++ {
+		b.WriteString("\n    |     " + keyText(s.stack[index].key) + " -> " + ctor(s.stack[index]))
+	}
+	b.WriteString("\n    --- " + keyText(lastKey) + " closes the circle")
+	return b.String()
+}
+
+func (s *jsonStringifier) write(b *strings.Builder, key, v any) error {
 	switch x := v.(type) {
 	case nil:
 		b.WriteString("null")
@@ -522,14 +635,15 @@ func jsonWrite(b *strings.Builder, v any) error {
 		}
 		if f, ok := x.Lookup("toJSON"); ok {
 			if fn, ok := f.(func() any); ok {
-				return jsonWrite(b, fn())
+				return s.write(b, key, fn())
 			}
 		}
+		s.enter(key, x, false)
 		b.WriteByte('{')
 		first := true
 		for _, k := range x.Keys() {
 			var sub strings.Builder
-			if err := jsonWrite(&sub, x.Get(k)); err != nil {
+			if err := s.write(&sub, k, x.Get(k)); err != nil {
 				continue
 			}
 			if !first {
@@ -541,6 +655,7 @@ func jsonWrite(b *strings.Builder, v any) error {
 			b.WriteString(sub.String())
 		}
 		b.WriteByte('}')
+		s.leave()
 		return nil
 	}
 	if IsNumber(v) {
@@ -557,16 +672,18 @@ func jsonWrite(b *strings.Builder, v any) error {
 		return nil
 	}
 	if IsArray(v) {
+		s.enter(key, v, true)
 		b.WriteByte('[')
 		for i, it := range Items(v) {
 			if i > 0 {
 				b.WriteByte(',')
 			}
-			if err := jsonWrite(b, it); err != nil {
+			if err := s.write(b, i, it); err != nil {
 				b.WriteString("null")
 			}
 		}
 		b.WriteByte(']')
+		s.leave()
 		return nil
 	}
 	if TypeOf(v) == "function" {

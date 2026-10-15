@@ -4,15 +4,22 @@ import "strconv"
 
 // Object is an ordered JavaScript plain object: its own enumerable
 // string-keyed properties, iterated in JavaScript's own-key order
-// (array-index keys ascending, then other keys in insertion order). A nil
-// *Object reads as an empty object.
+// (array-index keys ascending, then other keys in insertion order), and its
+// own symbol-keyed properties (in insertion order, after the strings, as
+// Reflect.ownKeys lists them). A nil *Object reads as an empty object.
 type Object struct {
 	entries []entry
 	index   map[string]int // built lazily for larger objects
+	syms    []symEntry
 }
 
 type entry struct {
 	key string
+	val any
+}
+
+type symEntry struct {
+	key Symbol
 	val any
 }
 
@@ -176,25 +183,85 @@ func (o *Object) Range(f func(k string, v any) bool) {
 	}
 }
 
-// Clone returns a shallow copy ({...o}).
+// Clone returns a shallow copy ({...o}), symbol-keyed properties included.
 func (o *Object) Clone() *Object {
 	c := &Object{}
 	if o != nil {
 		c.entries = append([]entry(nil), o.entries...)
+		c.syms = append([]symEntry(nil), o.syms...)
 		c.reindex()
 	}
 	return c
 }
 
 // Assign copies the own properties of each source onto o, like
-// Object.assign(o, ...sources). Non-object sources contribute nothing.
+// Object.assign(o, ...sources): string keys, then symbol keys. Non-object
+// sources contribute nothing.
 func (o *Object) Assign(sources ...any) *Object {
 	for _, s := range sources {
 		if src, ok := s.(*Object); ok && src != nil {
 			for _, e := range src.entries {
 				o.Set(e.key, e.val)
 			}
+			for _, e := range src.syms {
+				o.SetSymbol(e.key, e.val)
+			}
 		}
 	}
 	return o
+}
+
+// LookupSymbol returns the value of own symbol-keyed property s and whether it exists.
+func (o *Object) LookupSymbol(s Symbol) (any, bool) {
+	if o == nil {
+		return nil, false
+	}
+	for _, e := range o.syms {
+		if e.key == s {
+			return e.val, true
+		}
+	}
+	return nil, false
+}
+
+// GetSymbol returns own symbol-keyed property s, or Undefined{} when it is absent.
+func (o *Object) GetSymbol(s Symbol) any {
+	if v, ok := o.LookupSymbol(s); ok {
+		return v
+	}
+	return Undefined{}
+}
+
+// SetSymbol assigns symbol-keyed property s, keeping the position of an existing key.
+func (o *Object) SetSymbol(s Symbol, v any) {
+	for i := range o.syms {
+		if o.syms[i].key == s {
+			o.syms[i].val = v
+			return
+		}
+	}
+	o.syms = append(o.syms, symEntry{s, v})
+}
+
+// DeleteSymbol removes symbol-keyed property s and reports whether it existed.
+func (o *Object) DeleteSymbol(s Symbol) bool {
+	for i := range o.syms {
+		if o.syms[i].key == s {
+			o.syms = append(o.syms[:i], o.syms[i+1:]...)
+			return true
+		}
+	}
+	return false
+}
+
+// SymbolKeys returns the own symbol keys in insertion order (Object.getOwnPropertySymbols).
+func (o *Object) SymbolKeys() []Symbol {
+	if o == nil {
+		return nil
+	}
+	keys := make([]Symbol, len(o.syms))
+	for i, e := range o.syms {
+		keys[i] = e.key
+	}
+	return keys
 }
