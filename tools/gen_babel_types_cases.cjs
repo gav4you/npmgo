@@ -301,6 +301,7 @@ const comment = (value, idOpt) => (idOpt ? obj(idOpt, [['type', 'CommentBlock'],
   call('cloneNode', ident, false);
   call('cloneNode', id('y', { optional: 'yes', extra: 'ab', innerComments: [comment('i')] }));
   call('cloneNode', id('y', { optional: false, extra: [1, 2] }));
+  call('cloneNode', id('y', { extra: { __proto__: { a: 1 }, raw: 'r' } }));
   call('cloneNode', N('File', { program: N('Program', { body: [], directives: [], sourceType: 'module' }), comments: [comment('a'), comment('b')], tokens: [{ type: 'name' }] }));
   call('cloneNode', N('File', { program: N('Program', { body: [], directives: [] }), comments: null }));
   for (const v of [null, U, 0, '', false]) call('cloneNode', v);
@@ -542,6 +543,8 @@ const comment = (value, idOpt) => (idOpt ? obj(idOpt, [['type', 'CommentBlock'],
   }
   call('removeTypeDuplicates', 'ab');
   call('removeTypeDuplicates', null);
+  call('removeTypeDuplicates', U);
+  call('removeTypeDuplicates', 5);
   call('removeTypeDuplicates', { length: 2, 0: N('StringTypeAnnotation') });
   call('removeTypeDuplicates', [N('UnionTypeAnnotation', { types: null })]);
   call('removeTypeDuplicates', [N('UnionTypeAnnotation', { types: 5 })]);
@@ -659,6 +662,7 @@ const comment = (value, idOpt) => (idOpt ? obj(idOpt, [['type', 'CommentBlock'],
     [{ $: 'fn', name: 'f' }],
   ];
   for (const [node, parent] of named) call('getFunctionName', node, ...(parent === undefined ? [] : [parent]));
+  callWith('getFunctionName', { validatorAt: ['Identifier', 'name', 0] }, U);
 }
 
 // Traversal (the harness records each handler call).
@@ -816,6 +820,8 @@ const comment = (value, idOpt) => (idOpt ? obj(idOpt, [['type', 'CommentBlock'],
     }
   }
   call('matchesPattern', deepMember, 5);
+  call('matchesPattern', deepMember, U);
+  call('matchesPattern', deepMember, null);
   for (const m of members) {
     for (const p of ['a.b.c', 'a.b', 'React.Component']) {
       callWith('buildMatchMemberExpression', { member: m }, p);
@@ -966,6 +972,22 @@ const comment = (value, idOpt) => (idOpt ? obj(idOpt, [['type', 'CommentBlock'],
   call('validate', N('ExpressionStatement'), 'expression', obj('cyc2', [['type', obj('cyc3', [['self', ref('cyc3')]])]]));
   call('validate', N('ExpressionStatement'), 'expression', N(big(5)));
   call('validate', N('Program'), 'sourceType', big(5));
+}
+
+// Cyclic structures (a node that contains itself): the functions that walk a tree recurse without end, and V8 throws
+// a RangeError where its stack runs out; the port raises the same RangeError at its own depth limit. The handlers of
+// traverse and traverseFast would record every level, so those two are checked by the Go API tests instead.
+{
+  const cyclic = () => obj('cyc', [['type', 'ArrayExpression'], ['elements', [ref('cyc')]]]);
+  call('cloneNode', cyclic());
+  call('cloneNode', cyclic(), false);
+  call('isNodesEquivalent', cyclic(), cyclic());
+  call('valueToNode', arr('cycArr', [1, ref('cycArr')]));
+  call('valueToNode', obj('cycObj', [['self', ref('cycObj')]]));
+  call('toSequenceExpression', [obj('cycBlock', [['type', 'BlockStatement'], ['body', [ref('cycBlock')]], ['directives', []]])]);
+  call('removePropertiesDeep', cyclic());
+  call('removeTypeDuplicates', [N('GenericTypeAnnotation', { id: obj('cycQ', [['type', 'QualifiedTypeIdentifier'], ['id', id('q')], ['qualification', ref('cycQ')]]) })]);
+  call('createTSUnionType', [N('TSTypeReference', { typeName: obj('cycTQ', [['type', 'TSQualifiedName'], ['right', id('r')], ['left', ref('cycTQ')]]), typeParameters: { params: [] } })]);
 }
 
 // Deprecation warnings: the first call of each name warns (once per process); "internal" callers (a Babel package)

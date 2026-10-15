@@ -79,10 +79,14 @@ const M = [
   ['deprecation: nothing is internal', T + '/deprecation.go', 'return strings.HasPrefix(short[1].Function, babelPackages), strings.Join(lines, "\\n")', 'return false, strings.Join(lines, "\\n")', types],
   ['deprecation: an internal caller is not remembered', T + '/deprecation.go', '\tif internal {\n\t\treturn\n\t}', '\tif internal {\n\t\tdelete(warnings.seen, cacheKey)\n\t\treturn\n\t}', types],
   ['deprecation: the stack one frame off', T + '/deprecation.go', 'const skip = 3', 'const skip = 2', types],
+  ['depth: a cyclic tree overflows the Go stack (a fatal error, not a RangeError)', T + '/depth.go', 'if depth >= maxCallDepth {', 'if false {', types],
   // jsvalue.
   ['jsvalue: unshift appends', 'internal/jsvalue/array.go', 'a.items = append(items, a.items...)', 'a.items = append(a.items, items...)', types],
   ['jsvalue: Object.assign copies no symbols', 'internal/jsvalue/object.go', '\t\t\tfor _, e := range src.syms {\n\t\t\t\to.SetSymbol(e.key, e.val)\n\t\t\t}\n', '', types],
   ['jsvalue: an own __proto__ property is not assigned', 'internal/jsvalue/object.go', 'if k == "__proto__" && !o.Has(k) {', 'if k == "__proto__" {', types],
+  ['jsvalue: Object.assign creates an own __proto__', 'internal/jsvalue/object.go', '				o.Put(e.key, e.val)
+', '				o.Set(e.key, e.val)
+', types],
   ['jsvalue: circular message shows three prefix lines', 'internal/jsvalue/jsvalue.go', 'const prefixCount, postfixCount = 2, 1', 'const prefixCount, postfixCount = 3, 1', jsv],
   // helper-string-parser.
   ['string parser: \\400 not trimmed to \\40', S + '/stringparser.go', 'if octal > 255 {', 'if octal > 256 {', strp],
