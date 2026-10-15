@@ -9,8 +9,9 @@
 // synchronous render has returned.
 //
 // Virtual is a deterministic loop on a virtual clock (Date.now, setTimeout,
-// clearTimeout, process.nextTick and host work such as I/O completions), for
-// replaying timer-driven code identically in Go and in a parity oracle.
+// clearTimeout, process.nextTick, the microtask queue and host work such as
+// I/O completions), for replaying timer-driven code identically in Go and in
+// a parity oracle.
 package jsloop
 
 import "sync"

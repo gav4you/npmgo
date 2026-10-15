@@ -45,6 +45,46 @@ func TestVirtualOrder(t *testing.T) {
 	}
 }
 
+// Ticks, then microtasks, again while ticks were queued, before the first
+// task and after every task. The order is Node v25.9.0's for the same
+// program written with process.nextTick, Promise.resolve().then,
+// queueMicrotask and setTimeout.
+func TestVirtualMicrotasks(t *testing.T) {
+	v := NewVirtual(0)
+	var log []string
+	rec := func(s string) func() { return func() { log = append(log, s) } }
+	v.NextTick(rec("tick1"))
+	v.QueueMicrotask(func() {
+		rec("micro1")()
+		v.NextTick(rec("tick-from-micro1"))
+		v.QueueMicrotask(rec("micro-from-micro1"))
+	})
+	v.QueueMicrotask(rec("micro2"))
+	v.NextTick(func() { rec("tick2")(); v.QueueMicrotask(rec("micro-from-tick2")) })
+	v.SetTimeout(func() {
+		rec("timer1")()
+		v.QueueMicrotask(rec("micro-in-timer1"))
+		v.NextTick(rec("tick-in-timer1"))
+	}, 1)
+	v.SetTimeout(func() { rec("timer2")(); v.QueueMicrotask(rec("micro-in-timer2")) }, 1)
+	v.Run()
+	want := "tick1|tick2|micro1|micro2|micro-from-tick2|micro-from-micro1|tick-from-micro1|timer1|tick-in-timer1|micro-in-timer1|timer2|micro-in-timer2"
+	if got := strings.Join(log, "|"); got != want {
+		t.Fatalf("order:\n got %s\nwant %s", got, want)
+	}
+
+	// A microtask that panics goes to Uncaught; the others still run.
+	v = NewVirtual(0)
+	log = nil
+	v.Uncaught = func(r any) { log = append(log, fmt.Sprint("uncaught ", r)) }
+	v.QueueMicrotask(func() { panic("m1") })
+	v.QueueMicrotask(rec("m2"))
+	v.Run()
+	if got := strings.Join(log, "|"); got != "uncaught m1|m2" {
+		t.Fatalf("panicking microtask: %s", got)
+	}
+}
+
 func TestVirtualClear(t *testing.T) {
 	v := NewVirtual(0)
 	ran := false

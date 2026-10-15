@@ -19,8 +19,8 @@ for the whole repository:
   and distribution freely granted provided the notice is preserved); its notice is reproduced at
   the top of that file.
 - Files written for this project (`parity/`, `tools/`, `internal/jsnum/`, `internal/jsvalue/`,
-  `internal/jsloop/`, `internal/parityspec/`, `internal/reactspec/`, docs) are released under the MIT
-  licence:
+  `internal/jsloop/`, `internal/jspromise/`, `internal/parityspec/`, `internal/reactspec/`, docs) are
+  released under the MIT licence:
 
   > Copyright (c) 2026 npmgo contributors
   >

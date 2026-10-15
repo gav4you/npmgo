@@ -15,6 +15,12 @@ import (
 //   - NextTick queues a callback on the tick queue. Run drains the tick
 //     queue, including callbacks queued while it drains, before the first
 //     task and after every task, as Node drains process.nextTick callbacks.
+//   - QueueMicrotask queues a microtask (a promise job, queueMicrotask).
+//     After the ticks Run drains the microtasks, including ones queued
+//     while it drains, and repeats both while ticks were queued, as Node's
+//     processTicksAndRejections runs the tick queue and then V8's microtask
+//     queue. (oracle_gracefulfs.cjs has no microtasks; the OpenTelemetry
+//     oracle uses V8's own queue and yields to it after every task.)
 //   - SetTimeout schedules a timer ms milliseconds ahead. As in Node, a delay
 //     below 1 or above 2^31-1 becomes 1 ms, so setTimeout(fn, 0) runs 1 ms
 //     later.
@@ -23,11 +29,14 @@ import (
 //     without the timer clamp.
 //   - Run runs timers and host work in order of due time, then in the order
 //     they were scheduled, until neither tasks nor ticks remain.
-//   - After an uncaught exception (see Uncaught) the pending ticks are not
-//     run at once: Node skips the tick queue when a callback throws and
-//     queues a no-op setImmediate so that the next callback to complete
-//     runs them. Here they wait for the next task due at the current time
-//     to complete normally, and run at once when no task is due.
+//   - After an uncaught exception (see Uncaught) the pending ticks and
+//     microtasks are not run at once: Node skips the tick queue when a
+//     callback throws and queues a no-op setImmediate so that the next
+//     callback to complete runs them. Here they wait for the next task due
+//     at the current time to complete normally, and run at once when no
+//     task is due. A microtask that panics goes to Uncaught and the others
+//     still run, as Node reports an exception thrown by a queueMicrotask
+//     callback and carries on.
 //
 // A Virtual is not safe for concurrent use.
 type Virtual struct {
@@ -42,6 +51,7 @@ type Virtual struct {
 	now   int64
 	seq   uint64
 	ticks []func()
+	micro []func()
 	tasks taskQueue
 	ran   int
 	// held is set after an uncaught exception: the ticks wait for the next
@@ -57,6 +67,10 @@ func (v *Virtual) Now() int64 { return v.now }
 
 // NextTick queues fn on the tick queue (process.nextTick).
 func (v *Virtual) NextTick(fn func()) { v.ticks = append(v.ticks, fn) }
+
+// QueueMicrotask queues fn on the microtask queue (queueMicrotask, and the
+// jobs of promises).
+func (v *Virtual) QueueMicrotask(fn func()) { v.micro = append(v.micro, fn) }
 
 // timeoutMax is Node's TIMEOUT_MAX, 2^31-1.
 const timeoutMax = 1<<31 - 1
@@ -102,12 +116,12 @@ func (v *Virtual) Pending() int { return len(v.tasks) }
 // Run runs ticks and tasks until none remain.
 func (v *Virtual) Run() {
 	for {
-		// Ticks run before the first task and after every task, except that
-		// after an uncaught exception they wait for a task due now to
-		// complete (Node's no-op setImmediate runs them otherwise).
+		// Ticks and microtasks run before the first task and after every
+		// task, except that after an uncaught exception they wait for a task
+		// due now to complete (Node's no-op setImmediate runs them otherwise).
 		if !v.held || len(v.tasks) == 0 || v.tasks[0].due > v.now {
 			v.held = false
-			v.drainTicks()
+			v.drainTicksAndMicrotasks()
 			if v.held { // a tick threw: look again
 				continue
 			}
@@ -124,6 +138,34 @@ func (v *Virtual) Run() {
 			v.now = t.due
 		}
 		v.held = !v.call(t.fn)
+	}
+}
+
+// drainTicksAndMicrotasks is Node's processTicksAndRejections: the queued
+// ticks, then the microtasks, again while ticks were queued; it stops, with
+// held set, at a tick that throws.
+func (v *Virtual) drainTicksAndMicrotasks() {
+	for {
+		v.drainTicks()
+		if v.held {
+			return
+		}
+		v.drainMicrotasks()
+		if len(v.ticks) == 0 {
+			return
+		}
+	}
+}
+
+// drainMicrotasks runs the microtasks, and the ones they queue, in order (a
+// V8 microtask checkpoint). One that panics goes to Uncaught and the rest
+// still run.
+func (v *Virtual) drainMicrotasks() {
+	for len(v.micro) > 0 {
+		fn := v.micro[0]
+		v.micro[0] = nil
+		v.micro = v.micro[1:]
+		v.call(fn)
 	}
 }
 
