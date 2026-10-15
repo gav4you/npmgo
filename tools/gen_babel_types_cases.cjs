@@ -701,6 +701,15 @@ const comment = (value, idOpt) => (idOpt ? obj(idOpt, [['type', 'CommentBlock'],
   call('assertNode', obj('loop', [['self', ref('loop')]]));
   for (const [a, b] of [[{ a: 1 }, { a: 1 }], [{ a: 1, b: 2 }, { a: 1 }], [{ a: 1 }, { a: 1, b: 2 }], [{ a: [] }, { a: [] }],
     [obj('o', [['a', 1]]), {}], ['ab', 'ab'], [{ 0: 'a', 1: 'b' }, 'ab'], [{}, ''], [{ length: 2 }, [1]], [{ toString: 1 }, { toString: 1 }]]) call('shallowEqual', a, b);
+  // A validator read through NODE_FIELDS: its name, length and properties read as on any function. The harness puts
+  // NODE_FIELDS[type][field].validate in the place of the argument validatorAt names.
+  for (const [type, field, expected] of [['Identifier', 'name', { type: 'string' }], ['Identifier', 'name', { name: 'validate', length: 3 }],
+    ['Identifier', 'name', { type: 'number' }], ['ArrayExpression', 'elements', { length: 0, name: 'validate' }],
+    ['TemplateElement', 'value', { length: 0 }], ['MemberExpression', 'property', { name: 'validator', length: 3 }],
+    ['File', 'comments', { length: 0, name: '' }], ['TryStatement', 'block', { length: 3 }], ['OptionalMemberExpression', 'optional', { length: 3 }]]) {
+    callWith('shallowEqual', { validatorAt: [type, field, 0] }, null, expected);
+    callWith('shallowEqual', { validatorAt: [type, field, 1] }, expected, null);
+  }
   call('shallowEqual', null, { a: 1 });
   call('shallowEqual', {}, U);
   call('shallowEqual', 'abc', 'abcdef');

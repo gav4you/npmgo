@@ -339,6 +339,10 @@ func callsTrace(cases *ordered) [][]string {
 	for _, c := range list(at(cases, "types", "calls")) {
 		name := str(at(c, "fn"))
 		args := buildArgs(list(at(c, "args")))
+		if va := list(at(c, "validatorAt")); va != nil {
+			i, _ := va[2].(json.Number).Int64()
+			args[i] = getProp(getProp(getProp(NODE_FIELDS, str(va[0])), str(va[1])), "validate")
+		}
 		var f func(args []any) any
 		var extra []func() string
 		switch name {

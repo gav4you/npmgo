@@ -31,7 +31,7 @@ func computedOr(computed, normal *Validator) func(node, key, val any) {
 func (d *definer) customBinaryExpressionLeft() *Validator {
 	expression := d.assertNodeType("Expression")
 	inOp := d.assertNodeType("Expression", "PrivateName")
-	return newValidator("", func(node, key, val any) {
+	return newValidator("", 3, func(node, key, val any) {
 		v := expression
 		if strictEquals(getProp(node, "operator"), "in") {
 			v = inOp
@@ -42,14 +42,14 @@ func (d *definer) customBinaryExpressionLeft() *Validator {
 
 // NumericLiteral.value's second validator builds an Error for a negative or non-finite value and never throws it.
 func (d *definer) customNumericLiteralValue() *Validator {
-	return newValidator("", func(node, key, val any) {}, "type", "number")
+	return newValidator("", 3, func(node, key, val any) {}, "type", "number")
 }
 
 // MemberExpression.property.
 func (d *definer) customMemberExpressionProperty() *Validator {
 	normal := d.assertNodeType("Identifier", "PrivateName")
 	computed := d.assertNodeType("Expression")
-	return newValidator("validator", computedOr(computed, normal),
+	return newValidator("validator", 3, computedOr(computed, normal),
 		"oneOfNodeTypes", jsvalue.NewArray("Expression", "Identifier", "PrivateName"))
 }
 
@@ -57,7 +57,7 @@ func (d *definer) customMemberExpressionProperty() *Validator {
 func (d *definer) customObjectMethodKey() *Validator {
 	normal := d.assertNodeType("Identifier", "StringLiteral", "NumericLiteral", "BigIntLiteral")
 	computed := d.assertNodeType("Expression")
-	return newValidator("validator", computedOr(computed, normal),
+	return newValidator("validator", 3, computedOr(computed, normal),
 		"oneOfNodeTypes", jsvalue.NewArray("Expression", "Identifier", "StringLiteral", "NumericLiteral", "BigIntLiteral"))
 }
 
@@ -65,7 +65,7 @@ func (d *definer) customObjectMethodKey() *Validator {
 func (d *definer) customObjectPropertyKey() *Validator {
 	normal := d.assertNodeType("Identifier", "StringLiteral", "NumericLiteral", "BigIntLiteral", "DecimalLiteral", "PrivateName")
 	computed := d.assertNodeType("Expression")
-	return newValidator("", computedOr(computed, normal),
+	return newValidator("", 3, computedOr(computed, normal),
 		"oneOfNodeTypes", jsvalue.NewArray("Expression", "Identifier", "StringLiteral", "NumericLiteral", "BigIntLiteral", "DecimalLiteral", "PrivateName"))
 }
 
@@ -73,20 +73,20 @@ func (d *definer) customObjectPropertyKey() *Validator {
 func (d *definer) customClassMethodOrPropertyKey() *Validator {
 	normal := d.assertNodeType("Identifier", "StringLiteral", "NumericLiteral", "BigIntLiteral")
 	computed := d.assertNodeType("Expression")
-	return newValidator("", computedOr(computed, normal))
+	return newValidator("", 3, computedOr(computed, normal))
 }
 
 // The first validator of ClassAccessorProperty.key.
 func (d *definer) customClassAccessorPropertyKey() *Validator {
 	normal := d.assertNodeType("Identifier", "StringLiteral", "NumericLiteral", "BigIntLiteral", "PrivateName")
 	computed := d.assertNodeType("Expression")
-	return newValidator("", computedOr(computed, normal))
+	return newValidator("", 3, computedOr(computed, normal))
 }
 
 // TemplateElement.value's templateElementCookedValidator: the raw text must be the contents of a template up to its
 // end, and value.cooked is set from it (null where an escape is invalid).
 func (d *definer) customTemplateElementCooked() *Validator {
-	return newValidator("templateElementCookedValidator", func(node, key, val any) {
+	return newValidator("templateElementCookedValidator", 1, func(node, key, val any) {
 		raw := getProp(getProp(node, "value"), "raw")
 		unterminatedCalled := false
 		internal := func(int, int, int) { panic(&jsvalue.Error{Message: "Internal @babel/types error."}) }
@@ -153,19 +153,19 @@ func quasisCount(what string) func(node, key, val any) {
 
 // TemplateLiteral.expressions' third validator.
 func (d *definer) customTemplateLiteralExpressions() *Validator {
-	return newValidator("", quasisCount("expressions"))
+	return newValidator("", 3, quasisCount("expressions"))
 }
 
 // TSTemplateLiteralType.types' third validator.
 func (d *definer) customTSTemplateLiteralTypeTypes() *Validator {
-	return newValidator("", quasisCount("types"))
+	return newValidator("", 3, quasisCount("types"))
 }
 
 // OptionalMemberExpression.property.
 func (d *definer) customOptionalMemberExpressionProperty() *Validator {
 	normal := d.assertNodeType("Identifier")
 	computed := d.assertNodeType("Expression")
-	return newValidator("", computedOr(computed, normal), "oneOfNodeTypes", jsvalue.NewArray("Expression", "Identifier"))
+	return newValidator("", 3, computedOr(computed, normal), "oneOfNodeTypes", jsvalue.NewArray("Expression", "Identifier"))
 }
 
 // TSLiteralType.literal: a literal, or a UnaryExpression "-" of a number or bigint.
@@ -173,7 +173,7 @@ func (d *definer) customTSLiteralTypeLiteral() *Validator {
 	unaryExpression := d.assertNodeType("NumericLiteral", "BigIntLiteral")
 	unaryOperator := d.assertOneOf("-")
 	literal := d.assertNodeType("NumericLiteral", "StringLiteral", "BooleanLiteral", "BigIntLiteral", "TemplateLiteral")
-	return newValidator("validator", func(parent, key, node any) {
+	return newValidator("validator", 3, func(parent, key, node any) {
 		if Is("UnaryExpression", node) {
 			unaryOperator.fn(node, "operator", getProp(node, "operator"))
 			unaryExpression.fn(node, "argument", getProp(node, "argument"))
@@ -185,18 +185,18 @@ func (d *definer) customTSLiteralTypeLiteral() *Validator {
 
 // The element validator of File.tokens: anything.
 func (d *definer) customFileTokensEach() *Validator {
-	return newValidator("", func(node, key, val any) {}, "type", "any")
+	return newValidator("", 0, func(node, key, val any) {}, "type", "any")
 }
 
 // File.comments: no check (its each property describes the comments, as a plain object).
 func (d *definer) customFileComments() *Validator {
-	return newValidator("", func(node, key, val any) {},
+	return newValidator("", 0, func(node, key, val any) {},
 		"each", jsvalue.NewObject("oneOfNodeTypes", jsvalue.NewArray("CommentBlock", "CommentLine")))
 }
 
 // BindExpression.object and .callee: no check.
 func (d *definer) customBindExpressionNoop() *Validator {
-	return newValidator("", func(node, key, val any) {}, "oneOfNodeTypes", jsvalue.NewArray("Expression"))
+	return newValidator("", 0, func(node, key, val any) {}, "oneOfNodeTypes", jsvalue.NewArray("Expression"))
 }
 
 // --- BABEL_TYPES_8_BREAKING
@@ -205,7 +205,7 @@ func (d *definer) customBindExpressionNoop() *Validator {
 func (d *definer) customAssignmentExpressionOperator() *Validator {
 	identifier := d.assertOneOfArray(jsvalue.NewArray(items(ASSIGNMENT_OPERATORS)...))
 	pattern := d.assertOneOf("=")
-	return newValidator("", func(node, key, val any) {
+	return newValidator("", 3, func(node, key, val any) {
 		v := identifier
 		if Is("Pattern", getProp(node, "left")) {
 			v = pattern
@@ -216,7 +216,7 @@ func (d *definer) customAssignmentExpressionOperator() *Validator {
 
 // Identifier.name's second validator: a valid identifier name (reserved words allowed).
 func (d *definer) customIdentifierName() *Validator {
-	return newValidator("", func(node, key, val any) {
+	return newValidator("", 3, func(node, key, val any) {
 		if !IsValidIdentifier(val, false) {
 			panic(typeError(`"` + toStr(val) + `" is not a valid identifier name`))
 		}
@@ -225,7 +225,7 @@ func (d *definer) customIdentifierName() *Validator {
 
 // RegExpLiteral.flags' second validator: only the flags d, g, i, m, s, u, v and y.
 func (d *definer) customRegExpLiteralFlags() *Validator {
-	return newValidator("", func(node, key, val any) {
+	return newValidator("", 3, func(node, key, val any) {
 		// /[^dgimsuvy]/.exec(val): the first code unit that is not a flag.
 		for _, u := range utf16Units(toStr(val)) {
 			switch u {
@@ -239,7 +239,7 @@ func (d *definer) customRegExpLiteralFlags() *Validator {
 
 // ObjectProperty.shorthand's second validator.
 func (d *definer) customObjectPropertyShorthand() *Validator {
-	return newValidator("", func(node, key, shorthand any) {
+	return newValidator("", 3, func(node, key, shorthand any) {
 		if !truthy(shorthand) {
 			return
 		}
@@ -254,7 +254,7 @@ func (d *definer) customObjectPropertyShorthand() *Validator {
 
 // TryStatement.block's second validator.
 func (d *definer) customTryStatementBlock() *Validator {
-	return newValidator("", func(node, key, val any) {
+	return newValidator("", 1, func(node, key, val any) {
 		if !truthy(getProp(node, "handler")) && !truthy(getProp(node, "finalizer")) {
 			panic(typeError("TryStatement expects either a handler or finalizer, or both"))
 		}
@@ -263,7 +263,7 @@ func (d *definer) customTryStatementBlock() *Validator {
 
 // ExportNamedDeclaration.declaration's second validator.
 func (d *definer) customExportNamedDeclarationDeclaration() *Validator {
-	return newValidator("", func(node, key, val any) {
+	return newValidator("", 3, func(node, key, val any) {
 		if truthy(val) && truthy(getProp(getProp(node, "specifiers"), "length")) {
 			panic(typeError("Only declaration or specifiers is allowed on ExportNamedDeclaration"))
 		}
@@ -277,7 +277,7 @@ func (d *definer) customExportNamedDeclarationDeclaration() *Validator {
 func (d *definer) customExportNamedDeclarationSpecifier() *Validator {
 	sourced := d.assertNodeType("ExportSpecifier", "ExportDefaultSpecifier", "ExportNamespaceSpecifier")
 	sourceless := d.assertNodeType("ExportSpecifier")
-	return newValidator("", func(node, key, val any) {
+	return newValidator("", 3, func(node, key, val any) {
 		v := sourceless
 		if truthy(getProp(node, "source")) {
 			v = sourced
@@ -290,7 +290,7 @@ func (d *definer) customExportNamedDeclarationSpecifier() *Validator {
 func (d *definer) customForOfStatementLeft() *Validator {
 	declaration := d.assertNodeType("VariableDeclaration")
 	lval := d.assertNodeType("Identifier", "MemberExpression", "ArrayPattern", "ObjectPattern", "TSAsExpression", "TSSatisfiesExpression", "TSTypeAssertion", "TSNonNullExpression")
-	return newValidator("", func(node, key, val any) {
+	return newValidator("", 3, func(node, key, val any) {
 		if Is("VariableDeclaration", val) {
 			declaration.fn(node, key, val)
 		} else {
@@ -301,7 +301,7 @@ func (d *definer) customForOfStatementLeft() *Validator {
 
 // MetaProperty.meta's second validator: function.sent, new.target, import.meta.
 func (d *definer) customMetaPropertyMeta() *Validator {
-	return newValidator("", func(node, key, val any) {
+	return newValidator("", 3, func(node, key, val any) {
 		var property any = jsvalue.Undefined{}
 		switch n := getProp(val, "name"); {
 		case strictEquals(n, "function"):
@@ -319,7 +319,7 @@ func (d *definer) customMetaPropertyMeta() *Validator {
 
 // YieldExpression.delegate's second validator.
 func (d *definer) customYieldExpressionDelegate() *Validator {
-	return newValidator("", func(node, key, val any) {
+	return newValidator("", 3, func(node, key, val any) {
 		if truthy(val) && !truthy(getProp(node, "argument")) {
 			panic(typeError("Property delegate of YieldExpression cannot be true if there is no argument"))
 		}
@@ -330,7 +330,7 @@ func (d *definer) customYieldExpressionDelegate() *Validator {
 // outside export default.
 func (d *definer) idUnlessExportDefault() *Validator {
 	identifier := d.assertNodeType("Identifier")
-	return newValidator("", func(parent, key, node any) {
+	return newValidator("", 3, func(parent, key, node any) {
 		if !Is("ExportDefaultDeclaration", parent) {
 			identifier.fn(node, "id", getProp(node, "id"))
 		}
@@ -347,7 +347,7 @@ var lastKeyPart = regexp.MustCompile(`\.(\w+)$`)
 
 // Identifier's parent validation: a keyword or reserved word is not an identifier, except where a name is allowed.
 func (d *definer) customIdentifierParent() *Validator {
-	return newValidator("", func(parent, key, node any) {
+	return newValidator("", 3, func(parent, key, node any) {
 		match := lastKeyPart.FindStringSubmatch(keyToString(key))
 		if match == nil {
 			return
@@ -403,7 +403,7 @@ func keyToString(key any) string {
 func (d *definer) customObjectPropertyParent() *Validator {
 	pattern := d.assertNodeType("Identifier", "Pattern", "TSAsExpression", "TSSatisfiesExpression", "TSNonNullExpression", "TSTypeAssertion")
 	expression := d.assertNodeType("Expression")
-	return newValidator("", func(parent, key, node any) {
+	return newValidator("", 3, func(parent, key, node any) {
 		v := expression
 		if Is("ObjectPattern", parent) {
 			v = pattern
@@ -416,7 +416,7 @@ var listKeyIndex = regexp.MustCompile(`(\w+)\[(\d+)\]`)
 
 // RestElement's parent validation: it must be the last element of its list.
 func (d *definer) customRestElementParent() *Validator {
-	return newValidator("", func(parent, key, node any) {
+	return newValidator("", 2, func(parent, key, node any) {
 		match := listKeyIndex.FindStringSubmatch(keyToString(key))
 		if match == nil {
 			panic(&jsvalue.Error{Message: "Internal Babel error: malformed key."})
@@ -435,7 +435,7 @@ func (d *definer) customVariableDeclarationParent() *Validator {
 	withoutInit := d.assertNodeType("Identifier", "Placeholder")
 	constOrLetOrVar := d.assertNodeType("Identifier", "ArrayPattern", "ObjectPattern", "Placeholder")
 	usingOrAwaitUsing := d.assertNodeType("Identifier", "VoidPattern", "Placeholder")
-	return newValidator("", func(parent, key, node any) {
+	return newValidator("", 3, func(parent, key, node any) {
 		kind := getProp(node, "kind")
 		declarations := getProp(node, "declarations")
 		parentIsForX := Is("ForXStatement", parent, jsvalue.NewObject("left", node))

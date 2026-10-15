@@ -13,13 +13,14 @@ import (
 // fit, together with the properties @babel/types puts on it to describe what it accepts (oneOfNodeTypes, type,
 // chainOf, each, oneOf, shapeOf, oneOfNodeOrValueTypes). Its typeof is "function".
 type Validator struct {
-	name  string
-	fn    func(node, key, val any)
-	props *jsvalue.Object
+	name   string
+	length int // the JavaScript function's length: how many parameters it declares
+	fn     func(node, key, val any)
+	props  *jsvalue.Object
 }
 
-func newValidator(name string, fn func(node, key, val any), props ...any) *Validator {
-	return &Validator{name: name, fn: fn, props: jsvalue.NewObject(props...)}
+func newValidator(name string, length int, fn func(node, key, val any), props ...any) *Validator {
+	return &Validator{name: name, length: length, fn: fn, props: jsvalue.NewObject(props...)}
 }
 
 // JSTypeOf reports "function".
@@ -27,6 +28,9 @@ func (v *Validator) JSTypeOf() string { return "function" }
 
 // Name is the JavaScript function's name ("validate", "validator", or "" for an anonymous function).
 func (v *Validator) Name() string { return v.name }
+
+// Length is the JavaScript function's length: the number of parameters it declares.
+func (v *Validator) Length() int { return v.length }
 
 // Props returns the function's own enumerable properties (the object itself, as JavaScript code can change them).
 func (v *Validator) Props() *jsvalue.Object { return v.props }
@@ -54,7 +58,7 @@ type expandedTypes struct {
 
 // assertValueType is utils.js's assertValueType(type).
 func (d *definer) assertValueType(typ string) *Validator {
-	return newValidator("validate", func(node, key, val any) {
+	return newValidator("validate", 3, func(node, key, val any) {
 		if getType(val) == typ {
 			return
 		}
@@ -67,7 +71,7 @@ func (d *definer) assertNodeType(types ...string) *Validator {
 	typesArr := strArray(types)
 	expanded := map[string]bool{}
 	d.allExpandedTypes = append(d.allExpandedTypes, &expandedTypes{typesArr, expanded})
-	return newValidator("validate", func(node, key, val any) {
+	return newValidator("validate", 3, func(node, key, val any) {
 		var valType any = jsvalue.Undefined{}
 		if !nullish(val) {
 			valType = getProp(val, "type")
@@ -94,7 +98,7 @@ func (d *definer) assertNodeType(types ...string) *Validator {
 // assertNodeOrValueType is utils.js's assertNodeOrValueType(...types).
 func (d *definer) assertNodeOrValueType(types ...string) *Validator {
 	typesArr := strArray(types)
-	return newValidator("validate", func(node, key, val any) {
+	return newValidator("validate", 3, func(node, key, val any) {
 		primitiveType := getType(val)
 		for _, typ := range items(typesArr) {
 			if strictEquals(primitiveType, typ) || Is(typ, val) {
@@ -118,7 +122,7 @@ func (d *definer) assertOneOf(values ...any) *Validator {
 }
 
 func (d *definer) assertOneOfArray(valuesArr *jsvalue.Array) *Validator {
-	return newValidator("validate", func(node, key, val any) {
+	return newValidator("validate", 3, func(node, key, val any) {
 		if !valuesArr.Includes(val) {
 			panic(typeError("Property " + toStr(key) + " expected value to be one of " + jsonText(valuesArr) + " but got " + jsonText(val)))
 		}
@@ -132,7 +136,7 @@ func (d *definer) assertEach(callback *Validator) *Validator {
 	if d.breaking {
 		childValidator = validateChild
 	}
-	return newValidator("validator", func(node, key, val any) {
+	return newValidator("validator", 3, func(node, key, val any) {
 		if !isArray(val) {
 			return
 		}
@@ -150,7 +154,7 @@ func (d *definer) assertEach(callback *Validator) *Validator {
 // the TypeErrors they raise are collected into one.
 func (d *definer) assertShape(shape *jsvalue.Object) *Validator {
 	keys := shape.Keys()
-	return newValidator("validate", func(node, key, val any) {
+	return newValidator("validate", 3, func(node, key, val any) {
 		var errs []string
 		for _, property := range keys {
 			msg, failed := catchTypeError(func() {
@@ -190,7 +194,7 @@ func catchTypeError(f func()) (msg string, failed bool) {
 
 // assertOptionalChainStart is utils.js's assertOptionalChainStart().
 func (d *definer) assertOptionalChainStart() *Validator {
-	return newValidator("validate", func(node, key, val any) {
+	return newValidator("validate", 1, func(node, key, val any) {
 		current := node
 		for truthy(node) {
 			if nullish(current) {
@@ -232,7 +236,7 @@ func (d *definer) chain(fns ...*Validator) *Validator {
 	for _, f := range fns {
 		list.Push(f)
 	}
-	v := newValidator("validate", func(node, key, val any) {
+	v := newValidator("validate", 0, func(node, key, val any) {
 		for _, f := range items(list) {
 			callValue(f, "fn", node, key, val)
 		}

@@ -353,11 +353,11 @@ func encAll(roots []any) []string {
 			for _, k := range x.props.Keys() {
 				parts = append(parts, jsvalue.JSONQuote(k)+":"+out(x.props.Get(k)))
 			}
-			return prefix + "fn " + jsvalue.JSONQuote(x.name) + "{" + strings.Join(parts, ",") + "}"
+			return prefix + "fn " + jsvalue.JSONQuote(x.name) + "/" + strconv.Itoa(x.length) + "{" + strings.Join(parts, ",") + "}"
 		case builtin:
-			return prefix + "fn " + jsvalue.JSONQuote(toStr(getProp(x, "name"))) + "{}"
+			return prefix + "fn " + jsvalue.JSONQuote(toStr(getProp(x, "name"))) + "/" + toStr(getProp(x, "length")) + "{}"
 		case *namedFunc:
-			return prefix + "fn " + jsvalue.JSONQuote(x.name) + "{}"
+			return prefix + "fn " + jsvalue.JSONQuote(x.name) + "/0{}"
 		case *objectPrototypeValue:
 			return prefix + "{}"
 		case *jsvalue.RegExp:
@@ -369,7 +369,7 @@ func encAll(roots []any) []string {
 		case *instance:
 			return prefix + "object " + x.ctor
 		}
-		return prefix + "fn \"\"{}"
+		return prefix + "fn \"\"/0{}"
 	}
 	res := make([]string, len(roots))
 	for i, r := range roots {

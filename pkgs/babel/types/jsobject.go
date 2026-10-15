@@ -138,8 +138,11 @@ func getProp(v any, key string) any {
 		if val, ok := x.props.Lookup(key); ok {
 			return val
 		}
-		if key == "name" {
+		switch key {
+		case "name":
 			return x.name
+		case "length":
+			return float64(x.length)
 		}
 	case builtin:
 		switch key {

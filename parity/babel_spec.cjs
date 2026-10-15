@@ -105,7 +105,7 @@ function encNumber(x) {
 }
 
 // enc renders a value: primitives as JavaScript writes them (strings JSON-quoted, -0, 12n), arrays and objects with
-// their keys in order (symbol keys after the strings), functions as fn "name"{their own enumerable properties}, Dates,
+// their keys in order (symbol keys after the strings), functions as fn "name"/length{their own enumerable properties}, Dates,
 // RegExps and Maps by kind, other objects by constructor. An object or array met more than once is labelled the first
 // time (#n=) and referred to after (#n), so that sharing and cycles show.
 function enc(root) {
@@ -143,7 +143,7 @@ function encAll(roots) {
       prefix = '#' + labels.get(v) + '=';
     }
     if (Array.isArray(v)) return prefix + '[' + Array.from(v, out).join(',') + ']';
-    if (typeof v === 'function') return prefix + 'fn ' + JSON.stringify(v.name) + '{' + Object.keys(v).map(k => JSON.stringify(k) + ':' + out(v[k])).join(',') + '}';
+    if (typeof v === 'function') return prefix + 'fn ' + JSON.stringify(v.name) + '/' + v.length + '{' + Object.keys(v).map(k => JSON.stringify(k) + ':' + out(v[k])).join(',') + '}';
     if (v instanceof Date) return prefix + 'Date(' + encNumber(v.getTime()) + ')';
     if (v instanceof RegExp) return prefix + 'RegExp(' + String(v) + ')';
     if (v instanceof Map) return prefix + 'object Map';

@@ -121,6 +121,10 @@ function calls() {
   const out = [];
   for (const c of cases.types.calls) {
     const args = buildArgs(c.args);
+    if (c.validatorAt) {
+      const [type, field, i] = c.validatorAt;
+      args[i] = t.NODE_FIELDS[type][field].validate;
+    }
     let f;
     let extra = [];
     if (c.fn.startsWith('react.')) f = t.react[c.fn.slice(6)];
