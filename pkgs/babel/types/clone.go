@@ -5,30 +5,31 @@ package types
 
 import "github.com/gav4you/npmgo/internal/jsvalue"
 
-func cloneIfNode(obj any, deep, withoutLoc bool, commentsCache *jsMap) any {
+func cloneIfNode(obj any, deep, withoutLoc bool, commentsCache *jsMap, depth int) any {
 	if truthy(obj) {
 		if _, ok := getProp(obj, "type").(string); ok {
-			return cloneNodeInternal(obj, deep, withoutLoc, commentsCache)
+			return cloneNodeInternal(obj, deep, withoutLoc, commentsCache, depth)
 		}
 	}
 	return obj
 }
 
-func cloneIfNodeOrArray(obj any, deep, withoutLoc bool, commentsCache *jsMap) any {
+func cloneIfNodeOrArray(obj any, deep, withoutLoc bool, commentsCache *jsMap, depth int) any {
 	if isArray(obj) {
 		out := &jsvalue.Array{}
 		for _, node := range items(obj) {
-			out.Push(cloneIfNode(node, deep, withoutLoc, commentsCache))
+			out.Push(cloneIfNode(node, deep, withoutLoc, commentsCache, depth))
 		}
 		return out
 	}
-	return cloneIfNode(obj, deep, withoutLoc, commentsCache)
+	return cloneIfNode(obj, deep, withoutLoc, commentsCache, depth)
 }
 
 // CloneNode is cloneNode(node, deep = true, withoutLoc = false): a copy of node with its fields (cloned too when
 // deep), loc (null when withoutLoc), comments (cloned once each when deep) and a copy of extra. Pass the optional
 // arguments in order: CloneNode(node, false) is a shallow clone, CloneNode(node, true, true) a deep one without loc.
-// A falsy node is returned as it is; an unknown node type panics with JavaScript's Error.
+// A falsy node is returned as it is; an unknown node type panics with JavaScript's Error, and a cyclic tree with its
+// RangeError (maxCallDepth).
 func CloneNode(node any, opts ...bool) any {
 	deep, withoutLoc := true, false
 	if len(opts) > 0 {
@@ -37,10 +38,11 @@ func CloneNode(node any, opts ...bool) any {
 	if len(opts) > 1 {
 		withoutLoc = opts[1]
 	}
-	return cloneNodeInternal(node, deep, withoutLoc, newJSMap())
+	return cloneNodeInternal(node, deep, withoutLoc, newJSMap(), 0)
 }
 
-func cloneNodeInternal(node any, deep, withoutLoc bool, commentsCache *jsMap) any {
+func cloneNodeInternal(node any, deep, withoutLoc bool, commentsCache *jsMap, depth int) any {
+	depth = deeper(depth)
 	if !truthy(node) {
 		return node
 	}
@@ -55,14 +57,14 @@ func cloneNodeInternal(node any, deep, withoutLoc bool, commentsCache *jsMap) an
 		}
 		if hasOwn(node, "typeAnnotation") {
 			if deep {
-				newNode.Set("typeAnnotation", cloneIfNodeOrArray(getProp(node, "typeAnnotation"), true, withoutLoc, commentsCache))
+				newNode.Set("typeAnnotation", cloneIfNodeOrArray(getProp(node, "typeAnnotation"), true, withoutLoc, commentsCache, depth))
 			} else {
 				newNode.Set("typeAnnotation", getProp(node, "typeAnnotation"))
 			}
 		}
 		if hasOwn(node, "decorators") {
 			if deep {
-				newNode.Set("decorators", cloneIfNodeOrArray(getProp(node, "decorators"), true, withoutLoc, commentsCache))
+				newNode.Set("decorators", cloneIfNodeOrArray(getProp(node, "decorators"), true, withoutLoc, commentsCache, depth))
 			} else {
 				newNode.Set("decorators", getProp(node, "decorators"))
 			}
@@ -76,7 +78,7 @@ func cloneNodeInternal(node any, deep, withoutLoc bool, commentsCache *jsMap) an
 					if IsFile(node) && field == "comments" {
 						newNode.Set(field, maybeCloneComments(getProp(node, "comments"), deep, withoutLoc, commentsCache))
 					} else {
-						newNode.Set(field, cloneIfNodeOrArray(getProp(node, field), true, withoutLoc, commentsCache))
+						newNode.Set(field, cloneIfNodeOrArray(getProp(node, field), true, withoutLoc, commentsCache, depth))
 					}
 				} else {
 					newNode.Set(field, getProp(node, field))

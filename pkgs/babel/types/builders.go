@@ -67,7 +67,7 @@ func CreateTSUnionType(typeAnnotations any) any {
 			types.Push(typ)
 		}
 	}
-	flattened := removeTypeDuplicates(types, typeDuplicatesTS)
+	flattened := removeTypeDuplicates(types, typeDuplicatesTS, 0)
 	if flattened.Len() == 1 {
 		return flattened.At(0)
 	}

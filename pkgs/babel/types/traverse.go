@@ -16,7 +16,8 @@ type TraversalHandlers struct {
 
 // Traverse is traverse(node, handlers, state): a depth-first walk of node's children by VISITOR_KEYS, calling enter
 // before and exit after each node's children. handlers is a TraversalHandler (or a func of its signature) for enter
-// alone, TraversalHandlers or *TraversalHandlers, or a *jsvalue.Object with enter and exit functions.
+// alone, TraversalHandlers or *TraversalHandlers, or a *jsvalue.Object with enter and exit functions. A cyclic tree
+// panics with JavaScript's RangeError (maxCallDepth).
 func Traverse(node any, handlers any, state ...any) {
 	var enter, exit any = jsvalue.Undefined{}, jsvalue.Undefined{}
 	switch h := handlers.(type) {
@@ -42,7 +43,7 @@ func Traverse(node any, handlers any, state ...any) {
 		}
 		enter, exit = getProp(handlers, "enter"), getProp(handlers, "exit")
 	}
-	traverseSimpleImpl(node, enter, exit, optArg(state), &jsvalue.Array{})
+	traverseSimpleImpl(node, enter, exit, optArg(state), &jsvalue.Array{}, 0)
 }
 
 // handlerValue is a handler as a JavaScript value: a nil handler is undefined.
@@ -61,7 +62,8 @@ func callHandler(h any, name string, node any, ancestors *jsvalue.Array, state a
 	callValue(h, name, node, ancestors, state)
 }
 
-func traverseSimpleImpl(node, enter, exit, state any, ancestors *jsvalue.Array) {
+func traverseSimpleImpl(node, enter, exit, state any, ancestors *jsvalue.Array, depth int) {
+	depth = deeper(depth)
 	keys := tableGet(VISITOR_KEYS, getProp(node, "type"))
 	if !truthy(keys) {
 		return
@@ -79,12 +81,12 @@ func traverseSimpleImpl(node, enter, exit, state any, ancestors *jsvalue.Array) 
 					continue
 				}
 				ancestors.Push(jsvalue.NewObject("node", node, "key", key, "index", float64(i)))
-				traverseSimpleImpl(child, enter, exit, state, ancestors)
+				traverseSimpleImpl(child, enter, exit, state, ancestors, depth)
 				ancestors.Pop()
 			}
 		} else if truthy(subNode) {
 			ancestors.Push(jsvalue.NewObject("node", node, "key", key))
-			traverseSimpleImpl(subNode, enter, exit, state, ancestors)
+			traverseSimpleImpl(subNode, enter, exit, state, ancestors, depth)
 			ancestors.Pop()
 		}
 	}
@@ -102,12 +104,13 @@ var (
 
 // TraverseFast is traverseFast(node, enter, opts): a depth-first walk by VISITOR_KEYS calling enter(node, opts) on
 // each node (opts is a new empty object when not given or falsy). It reports whether enter returned
-// TraverseFastStop.
+// TraverseFastStop. A cyclic tree panics with JavaScript's RangeError (maxCallDepth).
 func TraverseFast(node any, enter func(node any, opts any) any, opts ...any) bool {
-	return traverseFast(node, enter, optArg(opts))
+	return traverseFast(node, enter, optArg(opts), 0)
 }
 
-func traverseFast(node any, enter func(node any, opts any) any, opts any) bool {
+func traverseFast(node any, enter func(node any, opts any) any, opts any, depth int) bool {
+	depth = deeper(depth)
 	if !truthy(node) {
 		return false
 	}
@@ -139,11 +142,11 @@ func traverseFast(node any, enter func(node any, opts any) any, opts any) bool {
 		}
 		if isArray(subNode) {
 			for i := 0; i < len(items(subNode)); i++ {
-				if traverseFast(items(subNode)[i], enter, opts) {
+				if traverseFast(items(subNode)[i], enter, opts, depth) {
 					return true
 				}
 			}
-		} else if traverseFast(subNode, enter, opts) {
+		} else if traverseFast(subNode, enter, opts, depth) {
 			return true
 		}
 	}

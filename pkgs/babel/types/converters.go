@@ -233,7 +233,7 @@ func ToSequenceExpression(nodes any, scope any) any {
 		return jsvalue.Undefined{}
 	}
 	declars := &jsvalue.Array{}
-	result := gatherSequenceExpressions(nodes, declars)
+	result := gatherSequenceExpressions(nodes, declars, 0)
 	if !truthy(result) {
 		return jsvalue.Undefined{}
 	}
@@ -258,7 +258,8 @@ func ToSequenceExpression(nodes any, scope any) any {
 	return result
 }
 
-func gatherSequenceExpressions(nodes any, declars *jsvalue.Array) any {
+func gatherSequenceExpressions(nodes any, declars *jsvalue.Array, depth int) any {
+	depth = deeper(depth)
 	exprs := &jsvalue.Array{}
 	ensureLastUndefined := true
 	for _, node := range iterate(nodes, "nodes") {
@@ -287,12 +288,12 @@ func gatherSequenceExpressions(nodes any, declars *jsvalue.Array) any {
 		case IsIfStatement(node):
 			var consequent, alternate any
 			if truthy(getProp(node, "consequent")) {
-				consequent = gatherSequenceExpressions(jsvalue.NewArray(getProp(node, "consequent")), declars)
+				consequent = gatherSequenceExpressions(jsvalue.NewArray(getProp(node, "consequent")), declars, depth)
 			} else {
 				consequent = BuildUndefinedNode()
 			}
 			if truthy(getProp(node, "alternate")) {
-				alternate = gatherSequenceExpressions(jsvalue.NewArray(getProp(node, "alternate")), declars)
+				alternate = gatherSequenceExpressions(jsvalue.NewArray(getProp(node, "alternate")), declars, depth)
 			} else {
 				alternate = BuildUndefinedNode()
 			}
@@ -301,7 +302,7 @@ func gatherSequenceExpressions(nodes any, declars *jsvalue.Array) any {
 			}
 			exprs.Push(ConditionalExpression(getProp(node, "test"), consequent, alternate))
 		case IsBlockStatement(node):
-			body := gatherSequenceExpressions(getProp(node, "body"), declars)
+			body := gatherSequenceExpressions(getProp(node, "body"), declars, depth)
 			if !truthy(body) {
 				return jsvalue.Undefined{}
 			}
@@ -378,8 +379,11 @@ func isPlainObject(v any) bool {
 // ValueToNode is valueToNode(value): the expression node that evaluates to value: undefined, booleans, null, strings,
 // numbers (negative and non-finite ones through - and /), BigInts, RegExps (*jsvalue.RegExp; a *regexp.Regexp gives
 // its Go pattern and no flags), arrays and plain objects (*jsvalue.Object). Anything else panics with JavaScript's
-// Error.
-func ValueToNode(value any) *jsvalue.Object {
+// Error, and a cyclic value with its RangeError (maxCallDepth).
+func ValueToNode(value any) *jsvalue.Object { return valueToNode(value, 0) }
+
+func valueToNode(value any, depth int) *jsvalue.Object {
+	depth = deeper(depth)
 	switch v := value.(type) {
 	case jsvalue.Undefined:
 		return Identifier("undefined")
@@ -430,7 +434,7 @@ func ValueToNode(value any) *jsvalue.Object {
 	if isArray(value) {
 		elements := &jsvalue.Array{}
 		for _, it := range items(value) {
-			elements.Push(ValueToNode(it))
+			elements.Push(valueToNode(it, depth))
 		}
 		return ArrayExpression(elements)
 	}
@@ -450,7 +454,7 @@ func ValueToNode(value any) *jsvalue.Object {
 			} else {
 				nodeKey = StringLiteral(key)
 			}
-			props.Push(ObjectProperty(nodeKey, ValueToNode(o.Get(key)), computed))
+			props.Push(ObjectProperty(nodeKey, valueToNode(o.Get(key), depth), computed))
 		}
 		return ObjectExpression(props)
 	}

@@ -106,17 +106,19 @@ func RemovePropertiesDeep(tree any, opts ...any) any {
 }
 
 // flowQualifiedName is the flow removeTypeDuplicates' getQualifiedName.
-func flowQualifiedName(node any) any {
+func flowQualifiedName(node any, depth int) any {
+	depth = deeper(depth)
 	if IsIdentifier(node) {
 		return getProp(node, "name")
 	}
-	return toStr(getProp(getProp(node, "id"), "name")) + "." + toStr(flowQualifiedName(getProp(node, "qualification")))
+	return toStr(getProp(getProp(node, "id"), "name")) + "." + toStr(flowQualifiedName(getProp(node, "qualification"), depth))
 }
 
 // RemoveTypeDuplicates is removeTypeDuplicates(nodes) for flow types: the distinct types, with nested union types
-// flattened, the base annotations and the generic types (merging their type parameters) last; an any type alone.
+// flattened, the base annotations and the generic types (merging their type parameters) last; an any type alone. A
+// cyclic structure panics with JavaScript's RangeError (maxCallDepth).
 func RemoveTypeDuplicates(nodesIn any) *jsvalue.Array {
-	return removeTypeDuplicates(nodesIn, typeDuplicatesFlow)
+	return removeTypeDuplicates(nodesIn, typeDuplicatesFlow, 0)
 }
 
 // typeDuplicatesFlavour is what differs between the flow and the TypeScript removeTypeDuplicates.
@@ -137,21 +139,22 @@ var typeDuplicatesFlow = typeDuplicatesFlavour{
 		if !IsGenericTypeAnnotation(node) {
 			return nil, false
 		}
-		return flowQualifiedName(getProp(node, "id")), true
+		return flowQualifiedName(getProp(node, "id"), 0), true
 	},
 	pushExpr:   "existing.typeParameters.params.push",
 	spreadExpr: "node.typeParameters.params",
 }
 
 // tsQualifiedName is the TypeScript removeTypeDuplicates' getQualifiedName.
-func tsQualifiedName(node any) any {
+func tsQualifiedName(node any, depth int) any {
+	depth = deeper(depth)
 	if IsIdentifier(node) {
 		return getProp(node, "name")
 	}
 	if IsThisExpression(node) {
 		return "this"
 	}
-	return toStr(getProp(getProp(node, "right"), "name")) + "." + toStr(tsQualifiedName(getProp(node, "left")))
+	return toStr(getProp(getProp(node, "right"), "name")) + "." + toStr(tsQualifiedName(getProp(node, "left"), depth))
 }
 
 var typeDuplicatesTS = typeDuplicatesFlavour{
@@ -163,14 +166,15 @@ var typeDuplicatesTS = typeDuplicatesFlavour{
 		if !IsTSTypeReference(node) || !truthy(getProp(node, "typeParameters")) {
 			return nil, false
 		}
-		return tsQualifiedName(getProp(node, "typeName")), true
+		return tsQualifiedName(getProp(node, "typeName"), 0), true
 	},
 	pushExpr:   "existingTypeArguments.params.push",
 	spreadExpr: "typeArguments.params",
 }
 
 // removeTypeDuplicates is the shared body of the two removeTypeDuplicates.
-func removeTypeDuplicates(nodesIn any, f typeDuplicatesFlavour) *jsvalue.Array {
+func removeTypeDuplicates(nodesIn any, f typeDuplicatesFlavour, depth int) *jsvalue.Array {
+	depth = deeper(depth)
 	nodes := arrayFrom(nodesIn)
 	generics := newJSMap()
 	bases := newJSMap()
@@ -205,11 +209,11 @@ func removeTypeDuplicates(nodesIn any, f typeDuplicatesFlavour) *jsvalue.Array {
 				if f.ts {
 					typeArguments := getProp(node, "typeParameters")
 					if existingTypeArguments := getProp(existing, "typeParameters"); truthy(existingTypeArguments) {
-						mergeParams(existingTypeArguments, typeArguments, f)
+						mergeParams(existingTypeArguments, typeArguments, f, depth)
 					}
 				} else if truthy(getProp(existing, "typeParameters")) {
 					if truthy(getProp(node, "typeParameters")) {
-						mergeParams(getProp(existing, "typeParameters"), getProp(node, "typeParameters"), f)
+						mergeParams(getProp(existing, "typeParameters"), getProp(node, "typeParameters"), f, depth)
 					}
 				}
 			} else {
@@ -230,7 +234,7 @@ func removeTypeDuplicates(nodesIn any, f typeDuplicatesFlavour) *jsvalue.Array {
 
 // mergeParams is `existing.params.push(...other.params); existing.params = removeTypeDuplicates(existing.params)`:
 // the push is on existing's own array, which every holder of it sees (a Go slice is replaced by a longer one).
-func mergeParams(existing, other any, f typeDuplicatesFlavour) {
+func mergeParams(existing, other any, f typeDuplicatesFlavour, depth int) {
 	params := getProp(existing, "params")
 	if nullish(params) {
 		panic(readError(params, "push")) // the callee is read before the arguments
@@ -243,5 +247,5 @@ func mergeParams(existing, other any, f typeDuplicatesFlavour) {
 	} else {
 		panic(typeError(f.pushExpr + " is not a function"))
 	}
-	setProp(existing, "params", removeTypeDuplicates(params, f))
+	setProp(existing, "params", removeTypeDuplicates(params, f, depth))
 }

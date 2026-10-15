@@ -240,3 +240,48 @@ func TestConcurrentUse(t *testing.T) {
 		t.Errorf("warnings: %q", warned)
 	}
 }
+
+// TestCyclicTrees: a tree that contains itself recurses without end; JavaScript throws a RangeError where V8's stack
+// runs out, Go raises the same RangeError at maxCallDepth, as a recoverable panic. A deep but finite tree is fine.
+func TestCyclicTrees(t *testing.T) {
+	const want = "throws RangeError: Maximum call stack size exceeded"
+	cyclic := ArrayExpression()
+	cyclic.Get("elements").(*jsvalue.Array).Push(cyclic)
+	block := BlockStatement(jsvalue.NewArray())
+	block.Get("body").(*jsvalue.Array).Push(block)
+	list := jsvalue.NewArray()
+	list.Push(list)
+	qualified := jsvalue.NewObject("type", "QualifiedTypeIdentifier", "id", Identifier("q"))
+	qualified.Set("qualification", qualified)
+	generic := GenericTypeAnnotation(qualified)
+	for name, f := range map[string]func(){
+		"cloneNode":            func() { CloneNode(cyclic) },
+		"traverse":             func() { Traverse(cyclic, func(any, *jsvalue.Array, any) {}) },
+		"traverseFast":         func() { TraverseFast(cyclic, func(any, any) any { return nil }) },
+		"removePropertiesDeep": func() { RemovePropertiesDeep(cyclic) },
+		"isNodesEquivalent":    func() { IsNodesEquivalent(cyclic, cyclic) },
+		"toSequenceExpression": func() { ToSequenceExpression(jsvalue.NewArray(block), jsvalue.NewArray()) },
+		"valueToNode":          func() { ValueToNode(list) },
+		"removeTypeDuplicates": func() { RemoveTypeDuplicates(jsvalue.NewArray(generic)) },
+	} {
+		if got := panicText(f); got != want {
+			t.Errorf("%s on a cycle: %q", name, got)
+		}
+	}
+	deep := Identifier("x")
+	for i := 0; i < 5000; i++ {
+		deep = ArrayExpression(jsvalue.NewArray(deep))
+	}
+	if got := panicText(func() {
+		if !IsNodesEquivalent(CloneNode(deep), deep) {
+			t.Error("a deep clone is not equivalent to its original")
+		}
+		count := 0
+		Traverse(deep, func(any, *jsvalue.Array, any) { count++ })
+		if count != 5001 {
+			t.Errorf("traverse visited %d nodes", count)
+		}
+	}); got != "" {
+		t.Errorf("a 5000-level tree: %s", got)
+	}
+}
