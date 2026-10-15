@@ -53,6 +53,7 @@ const M = [
   ['validator: assertShape reports its first error only', T + '/validator.go', '\t\t\tif failed {\n\t\t\t\terrs = append(errs, msg)', '\t\t\tif failed && len(errs) == 0 {\n\t\t\t\terrs = append(errs, msg)', types],
   ['validator: assertEach without parent validations (BABEL_TYPES_8_BREAKING)', T + '/validator.go', '\tif d.breaking {\n\t\tchildValidator = validateChild', '\tif false {\n\t\tchildValidator = validateChild', types],
   ['validator: the optional chain walks objects of calls (BABEL_TYPES_8_BREAKING)', T + '/validator.go', 'current = getProp(current, "callee")', 'current = getProp(current, "object")', types],
+  ['validator: chain declares three parameters', T + '/validator.go', 'v := newValidator("validate", 0, func', 'v := newValidator("validate", 3, func', types],
   ['customs: RestElement may be one before last (BABEL_TYPES_8_BREAKING)', T + '/custom.go', 'if length > jsvalue.StringToNumber(index)+1 {', 'if length > jsvalue.StringToNumber(index)+2 {', types],
   ['customs: Identifier "this" is no exception (BABEL_TYPES_8_BREAKING)', T + '/custom.go', ' && !strictEquals(name, "this")', '', types],
   ['customs: TemplateElement cooked never null', T + '/custom.go', '\t\tif res.FirstInvalidLoc != nil {\n\t\t\tcooked = nil\n\t\t}', '', types],

@@ -169,8 +169,11 @@ func TestExportTable(t *testing.T) {
 
 func TestValidatorValues(t *testing.T) {
 	v := getProp(getProp(getProp(NODE_FIELDS, "Identifier"), "name"), "validate").(*Validator)
-	if v.Name() != "validate" || v.Props().Get("type") != "string" || v.JSTypeOf() != "function" {
-		t.Errorf("validator %q %v", v.Name(), v.Props().Keys())
+	if v.Name() != "validate" || v.Length() != 3 || v.Props().Get("type") != "string" || v.JSTypeOf() != "function" {
+		t.Errorf("validator %q/%d %v", v.Name(), v.Length(), v.Props().Keys())
+	}
+	if c := getProp(getProp(getProp(NODE_FIELDS, "ArrayExpression"), "elements"), "validate").(*Validator); c.Length() != 0 || !c.Props().Has("chainOf") {
+		t.Errorf("chain %q/%d %v", c.Name(), c.Length(), c.Props().Keys())
 	}
 	if msg := panicText(func() { v.Call(Identifier("a"), "name", 1.0) }); msg != "throws TypeError: Property name expected type of string but got number" {
 		t.Errorf("Call: %s", msg)
