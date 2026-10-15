@@ -46,8 +46,11 @@ Run all checks: `go test ./...`  ·  Re-record a package's originals: see the he
 | set-function-length | 1.2.2 | MIT | N/A: intrinsic shim, sets a function's `length` property; Go functions have none | - |
 | safe-buffer | 5.2.1 | MIT | N/A: re-export of Node's `buffer` (a polyfill on old Node); covered by a future Phase 1b `Buffer` port (not started) | - |
 | safe-buffer | 5.1.2 | MIT | N/A: as 5.2.1 (re-export of `buffer`); covered by the future Phase 1b `Buffer` port (not started) | - |
+| @jest/types | 29.6.3 | MIT | N/A: types-only (`build/index.js` is just `'use strict'`) | - |
+| inherits | 2.0.4 | ISC | N/A: re-export of Node's `util.inherits` (prototype-chain wiring, with a browser fallback); Go types have no prototype chain | - |
+| define-properties | 1.2.1 | MIT | N/A: intrinsic shim, defines non-enumerable data properties unless a predicate says otherwise (used by es-shim polyfills); Go has no mutable built-ins | - |
 
-Licences of the N/A rows were checked in each tarball (`LICENSE` with the MIT text and copyright, and the
+Licences of the N/A rows were checked in each tarball (`LICENSE` with the MIT/ISC text and copyright, and the
 `package.json` licence field). Other versions of the chalk family in the ranking are not yet ported: chalk 5.6.2,
 ansi-styles 5.2.0 and 6.2.3, supports-color 5.5.0 and 8.1.1, has-flag 3.0.0.
 
